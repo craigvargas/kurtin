@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:map="http://schemas.android.com/tools"
+    android:background="@color/icons"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/recyclerViews"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:orientation="vertical"
+        android:layout_gravity="bottom|fill|start|end|center_horizontal">
+
+        <TextView
+            android:id="@+id/tvGroupType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/tvTravelSeason"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvGroupType"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/white" />
+
+        <ImageView
+            android:id="@+id/ivFavorite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/ivPlace"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_margin="16dp"
+            android:contentDescription="@null"
+            android:scaleType="fitXY"
+            android:src="@drawable/selector_favorite"
+            android:visibility="visible" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rvContacts"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_below="@+id/ivPlace" />
+
+        <View
+            android:id="@+id/line"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/rvContacts"
+            android:background="@color/divider" />
+
+        <ImageView
+            android:id="@+id/ivPlace"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:contentDescription="@null"
+            android:scaleType="centerCrop"
+            android:src="@drawable/city_placeholder"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+
+        <TextView
+            android:id="@+id/tvInstructions"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_below="@+id/line"
+            android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/blue"
+            />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:id="@+id/spaceUnderInstructions"
+            android:layout_below="@+id/tvInstructions"
+            android:background="@color/divider" />
+
+
+        <ImageView
+            android:id="@+id/ivInstructionImage"
+            android:layout_width="match_parent"
+            android:layout_alignLeft="@+id/tvInstructions"
+            android:layout_alignRight="@+id/tvInstructions"
+            android:layout_height="wrap_content"
+            android:contentDescription="@null"
+            android:layout_below="@+id/spaceUnderInstructions"
+            android:src="@drawable/city_placeholder"
+            />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:id="@+id/spaceUnderInstructionImage"
+            android:layout_below="@+id/ivInstructionImage"
+            android:background="@color/divider" />
+
+        <TextView
+            android:id="@+id/tvMapInstructions"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:textAlignment="center"
+            android:layout_below="@+id/spaceUnderInstructionImage"
+            android:layout_alignLeft="@+id/tvInstructions"
+            android:layout_alignRight="@+id/tvInstructions"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/blue" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:id="@+id/spaceUnderMapInstructions"
+            android:layout_below="@+id/tvMapInstructions"
+            android:background="@color/divider" />
+
+
+        <fragment
+            class="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_below="@+id/spaceUnderMapInstructions"
+            android:id="@+id/map"
+            map:liteMode="true"
+            map:mapType="normal"
+            android:layout_height="100dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:id="@+id/spaceUnderMap"
+            android:layout_below="@+id/map"
+            android:background="@color/divider" />
+
+
+        <Button
+            android:id="@+id/scanbtn"
+            android:layout_below="@+id/spaceUnderMap"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:height="30dp"
+            android:text="Start Playing"
+            android:shadowColor="@color/accent"
+            android:layout_alignRight="@+id/tvInstructions"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/white"
+            android:layout_gravity="bottom|fill|start|end|center_horizontal"
+            android:background="@color/blue"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+    </RelativeLayout>
+    <FrameLayout
+        android:id="@+id/fragment_frame_scanner"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+
+    <com.getbase.floatingactionbutton.FloatingActionsMenu
+        android:id="@+id/multiple_actions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_margin="16dp"
+        app:layout_anchor="@id/recyclerViews"
+        app:layout_anchorGravity="bottom|right|end"
+        fab:fab_addButtonColorNormal="@color/accent"
+        fab:fab_addButtonColorPressed="@color/accentPressed"
+        fab:fab_labelStyle="@style/menu_labels_style">
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabNewPlace"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_icon="@drawable/ic_event_available_white_24dp"
+            fab:fab_colorNormal="@color/accent"
+            fab:fab_colorPressed="@color/accentPressed"
+            fab:fab_size="mini"
+            fab:fab_title="@string/add_new_place" />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabNewDay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_colorNormal="@color/accent"
+            fab:fab_colorPressed="@color/accentPressed"
+            fab:fab_icon="@drawable/ic_local_activity_white_24dp"
+            fab:fab_size="mini"
+            fab:fab_title="@string/add_new_day" />
+
+    </com.getbase.floatingactionbutton.FloatingActionsMenu>
+
+
+
+</android.support.design.widget.CoordinatorLayout>

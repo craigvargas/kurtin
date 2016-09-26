@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/selector_place"
+    android:padding="10dp">
+
+    <ImageView
+        android:id="@+id/ivPlace"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/background_place_image"
+        android:contentDescription="@null"
+        android:scaleType="center"
+        android:src="@drawable/ic_public_white_48dp" />
+
+    <TextView
+        android:id="@+id/tvPlaceName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/ivPlace"
+        android:layout_toRightOf="@+id/ivPlace"
+        android:gravity="start"
+        tools:text="Castello di Amorosa" />
+
+    <TextView
+        android:id="@+id/tvVisitingTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvPlaceName"
+        android:layout_toEndOf="@+id/ivPlace"
+        android:layout_toRightOf="@+id/ivPlace"
+        tools:text="4 HOURS" />
+
+
+</RelativeLayout>

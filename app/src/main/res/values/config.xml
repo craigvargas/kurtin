@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="facebook_app_id">1666229463589747</string>
+    <string name="google_places_web_service_api_key">Your Google Places Web Service API Key</string>
+    <string name="foursquare_client_id">GPANDSXJ20UWVCQODWL2SDC3ORJSGK0YJHYUOOFTNVGVD5SF</string>
+    <string name="foursquare_client_secret">O3IOYAVB4MAPLJOQIAFBORTXJIPF32C53T3KAXSFABYN0XOP</string>
+</resources>

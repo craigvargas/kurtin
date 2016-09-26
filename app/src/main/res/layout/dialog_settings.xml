@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/tvGroup"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:text="@string/label_group_type"
+            android:gravity="center_vertical"
+            android:layout_weight="1"
+            android:layout_margin="10dp"
+            android:textSize="20sp" />
+
+        <Spinner
+            android:id="@+id/spnGroup"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:layout_margin="10dp"
+            android:drawSelectorOnTop="true"
+            android:entries="@array/group_type_array" />
+
+    </LinearLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/tvSeason"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:text="@string/label_season"
+            android:gravity="center_vertical"
+            android:layout_weight="1"
+            android:layout_margin="10dp"
+            android:textSize="20sp" />
+
+        <Spinner
+            android:id="@+id/spnSeason"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:layout_margin="10dp"
+            android:drawSelectorOnTop="true"
+            android:entries="@array/season_array" />
+
+    </LinearLayout>
+
+</LinearLayout>

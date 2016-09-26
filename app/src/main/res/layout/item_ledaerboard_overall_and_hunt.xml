@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:id="@+id/rlHuntItem"
+    android:layout_height="wrap_content"
+    android:background="@drawable/selector_place"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/tvPosition"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        tools:text="#1"
+        android:layout_marginLeft="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="3dp"
+        android:textSize="20dp"
+        android:layout_alignParentTop="true"
+        android:textColor="@color/md_material_blue_800"
+        android:layout_toRightOf="@+id/ivUserImage" />
+
+
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:layout_marginTop="3dp"
+        tools:text="Castello di Amorosa"
+        android:textSize="20dp"
+        android:textColor="@color/wikitude_orange_dark"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/tvPosition"
+        android:layout_toEndOf="@+id/tvPosition" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/ivUserImage"
+        android:layout_width="@dimen/background_profile_size"
+        android:layout_height="@dimen/background_profile_size"
+        android:background="@drawable/background_profile"
+        android:contentDescription="@null"
+        android:src="@drawable/profile_placeholder"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/tvPoints"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        tools:text="4 HOURS"
+        android:layout_below="@+id/tvPosition"
+        android:textSize="20dp"
+        android:textColor="@color/wikitude_orange_dark"
+        android:layout_centerVertical="true"
+        android:layout_alignLeft="@+id/tvPosition"
+        android:layout_alignRight="@+id/tvPosition"
+        android:layout_toRightOf="@+id/ivUserImage"
+        android:layout_toEndOf="@+id/ivUserImage"
+         />
+
+
+    <TextView
+        android:id="@+id/tvHuntName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:layout_below="@+id/tvName"
+        android:layout_marginTop="2dp"
+        tools:text="Castello di Amorosa"
+        android:textSize="20dp"
+        android:textColor="@color/md_material_blue_800"
+        android:layout_toRightOf="@+id/tvPoints"
+        />
+
+</RelativeLayout>

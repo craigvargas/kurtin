@@ -1,0 +1,31 @@
+<resources>
+
+    <!-- Base application theme. -->
+
+    <style name="AppTheme" parent="Base.AppTheme" />
+
+    <style name="Base.AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+    </style>
+
+    <style name="menu_labels_style">
+        <item name="android:background">@drawable/background_fab_item</item>
+        <item name="android:textColor">@color/icons</item>
+    </style>
+
+    <style name="OkDialogAppTheme" parent="android:Theme.Dialog">
+
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">300dp</item>
+        <!-- No backgrounds, titles or window float -->
+        <!--<item name="android:windowBackground">@null</item>-->
+        <!--<item name="android:windowNoTitle">true</item>-->
+        <!--<item name="android:windowIsFloating">false</item>-->
+        <item name="android:gravity">bottom|right</item>
+
+    </style>
+
+
+</resources>

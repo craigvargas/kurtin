@@ -1,0 +1,136 @@
+
+<android.support.percent.PercentRelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+
+    <FrameLayout
+        android:id="@+id/track_frame"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/on_click_cloud_tracking_info_field"
+        android:editable="false"
+        android:background="@color/wikitude_orange_light"
+        android:visibility="invisible"
+        app:layout_heightPercent="4%"
+        app:layout_widthPercent="100%"
+        android:gravity="center"
+        />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:id="@+id/space"
+        android:layout_below="@+id/on_click_cloud_tracking_info_field"
+        app:layout_heightPercent="1%"
+        app:layout_widthPercent="100%" />
+
+    <!-- Child2 is drawn over Child1 -->
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/q1"
+        app:layout_heightPercent="50%"
+        app:layout_widthPercent="50%"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_below="@+id/space"
+        android:orientation="vertical"
+        android:background="@drawable/border"
+        android:visibility="invisible">
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/space"
+        android:layout_alignTop="@+id/q1"
+        android:layout_alignBottom="@+id/q1"
+        android:id="@+id/q2"
+        app:layout_heightPercent="50%"
+        app:layout_widthPercent="50%"
+        android:orientation="vertical"
+        android:layout_marginRight="5dp"
+        android:visibility="invisible"
+        android:background="@drawable/border"
+        android:layout_toRightOf="@+id/q1">
+    </RelativeLayout>
+
+
+
+    <!-- Child2 is drawn over Child1 -->
+    <RelativeLayout
+        android:id="@+id/q3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_below="@+id/q1"
+        app:layout_heightPercent="45%"
+        app:layout_widthPercent="50%"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="5dp"
+        android:visibility="invisible"
+        android:background="@drawable/border"
+        android:layout_above="@+id/space2"
+        android:layout_gravity="bottom|left" >
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_heightPercent="45%"
+        app:layout_widthPercent="50%"
+        android:layout_marginRight="5dp"
+        android:id="@+id/q4"
+        android:layout_toRightOf="@+id/q3"
+        android:layout_below="@+id/q2"
+        android:layout_alignTop="@+id/q3"
+        android:layout_alignBottom="@+id/q3"
+        android:visibility="invisible"
+        android:layout_above="@+id/space2"
+        android:background="@drawable/border">
+
+    </RelativeLayout>
+
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:id="@+id/space2"
+        android:layout_above="@+id/on_click_cloud_tracking_recognize_button"
+        app:layout_heightPercent="1%"
+        app:layout_widthPercent="100%" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Scan"
+        android:id="@+id/on_click_cloud_tracking_recognize_button"
+        android:layout_gravity="center_horizontal"
+        android:background="@color/wikitude_orange_light"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        app:layout_heightPercent="4%"
+        app:layout_widthPercent="100%"
+        android:theme="@style/Widget.AppCompat.Button"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+
+</android.support.percent.PercentRelativeLayout>
+
