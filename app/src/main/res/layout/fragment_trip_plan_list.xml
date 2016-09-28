@@ -10,6 +10,7 @@
         android:id="@+id/swipeContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/black"
         android:orientation="vertical">
 
         <android.support.v7.widget.RecyclerView
@@ -37,8 +38,8 @@
         android:layout_margin="16dp"
         app:layout_anchor="@id/rvTripPlans"
         app:layout_anchorGravity="bottom|right|end"
-        fab:fab_colorNormal="@color/accent"
-        fab:fab_colorPressed="@color/accentPressed"
+        fab:fab_colorNormal="@color/kurtin_primary_light"
+        fab:fab_colorPressed="@color/kurtin_primary_dark"
         fab:fab_icon="@drawable/ic_add_white" />
 
 </android.support.design.widget.CoordinatorLayout>

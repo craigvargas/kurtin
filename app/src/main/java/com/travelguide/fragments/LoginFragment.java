@@ -403,32 +403,36 @@ public class LoginFragment extends DialogFragment {
     }
 
     private void saveNewParseUser(final ParseUser parseUser, final ParseFile profilePicture, final ParseFile coverPicture) {
-        coverPicture.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                parseUser.put("coverPic", coverPicture);
-                parseUser.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        // Toast.makeText(getActivity(), "New user: " + name + " Signed up", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        });
-        profilePicture.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                parseUser.put("profileThumb", profilePicture);
-                //Finally save all the user details
-                parseUser.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        Toast.makeText(getActivity(), "New user: " + name + " Signed up", Toast.LENGTH_SHORT).show();
-                        dismissDialog(getContext());
-                    }
-                });
-            }
-        });
+        if(coverPicture != null) {
+            coverPicture.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    parseUser.put("coverPic", coverPicture);
+                    parseUser.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            // Toast.makeText(getActivity(), "New user: " + name + " Signed up", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            });
+        }
+        if(profilePicture != null) {
+            profilePicture.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    parseUser.put("profileThumb", profilePicture);
+                    //Finally save all the user details
+                    parseUser.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            Toast.makeText(getActivity(), "New user: " + name + " Signed up", Toast.LENGTH_SHORT).show();
+                            dismissDialog(getContext());
+                        }
+                    });
+                }
+            });
+        }
     }
 
     private void updateExistingParseUser(final ParseUser parseUser, final ParseFile profilePicture, final ParseFile coverPicture) {

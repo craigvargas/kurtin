@@ -2,6 +2,7 @@ package com.travelguide.adapters;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -44,11 +45,19 @@ public class TripPlanAdapter extends RecyclerView.Adapter<TripPlanAdapter.ViewHo
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         final TripPlan tripPlan = mTripPlans.get(position);
 
-        String planName = tripPlan.getPlanName() + "\n" + tripPlan.getCityName();
-        Spannable span = new SpannableString(planName);
-        span.setSpan(new RelativeSizeSpan(0.75f), planName.indexOf("\n"), planName.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        String planName = tripPlan.getPlanName();
+        String cityName = tripPlan.getCityName();
+        String prize = tripPlan.getPrices();
 
-        holder.tvPlanName.setText(span);
+        //Commented out 4 lines below because no longer concatenating two lines into one String variable
+//        String planName = tripPlan.getPlanName() + "\n" + tripPlan.getCityName();
+//        Spannable span = new SpannableString(planName);
+//        span.setSpan(new RelativeSizeSpan(0.75f), planName.indexOf("\n"), planName.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//        holder.tvPlanName.setText(span);
+
+        holder.tvPlanName.setText(planName);
+        holder.tvHuntDistance.setText(cityName);
+        holder.tvHuntPrize.setText(prize);
         holder.ivPlace.setImageResource(R.drawable.city_placeholder);
 
         Glide.with(mContext)
@@ -60,7 +69,7 @@ public class TripPlanAdapter extends RecyclerView.Adapter<TripPlanAdapter.ViewHo
                     @Override
                     public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
                         super.onResourceReady(resource, glideAnimation);
-                        holder.ivPlace.setColorFilter(Color.argb(145, 50, 50, 50));
+//                        holder.ivPlace.setColorFilter(Color.argb(145, 50, 50, 50));
                     }
 
                     @Override
@@ -88,12 +97,19 @@ public class TripPlanAdapter extends RecyclerView.Adapter<TripPlanAdapter.ViewHo
     class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivPlace;
         TextView tvPlanName;
+        TextView tvHuntDistance;
+        TextView tvHuntPrize;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             ivPlace = (ImageView) itemView.findViewById(R.id.ivPlace);
             tvPlanName = (TextView) itemView.findViewById(R.id.tvPlanName);
+            tvHuntDistance = (TextView) itemView.findViewById(R.id.tvHuntDistance);
+            tvHuntPrize = (TextView) itemView.findViewById(R.id.tvHuntPrize);
+
+            Typeface face= Typeface.createFromAsset(mContext.getAssets(), "fonts/cabin-bold.ttf");
+            tvPlanName.setTypeface(face);
         }
     }
 }

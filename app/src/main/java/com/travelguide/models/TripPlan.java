@@ -36,6 +36,7 @@ public class TripPlan extends ParseObject {
     public Boolean getEnabledFlag() {return getBoolean("enabledFlag");}
     public String getWikitudeTargetCollectionId() {return getString("wikitudeTargetCollectionId");}
     public String getWikitudeClientID() {return getString("wikitudeClientToken");}
+    public String getPrices(){return getString("prices");}
 
 
     //Saving Data

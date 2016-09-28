@@ -14,5 +14,17 @@
     <color name="gray">#EEEEEE</color>
     <color name="green">#2ecc71</color>
 
+    <!--CVar's colors-->
+    <color name="black">#000</color>
+    <color name="kurtin_primary">#063f48</color>
+    <color name="kurtin_primary_light">#15d1ee</color>
+    <color name="kurtin_primary_dark">#05323a</color>
+    <color name="kurtin_text_light">#11a7be</color>
+    <color name="kurtin_text_primary">#0e8698</color>
+    <color name="kurtin_primay_translucent">#cc063f48</color>
+    <color name="kurtin_primary_dark_translucent">#aa05323a</color>
+    <color name="kurtin_home_divider">@color/black</color>
+
+
 
 </resources>

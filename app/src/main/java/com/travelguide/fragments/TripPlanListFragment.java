@@ -35,7 +35,11 @@ import java.util.List;
 
 public class TripPlanListFragment extends TripBaseFragment {
 
-    private static final String TAG = TripPlanListFragment.class.getSimpleName();
+    public static final String TAG = "TripPlanListFragment";
+    public static final String TITLE = "PUBLIC HUNTS";
+
+    private final int DIVIDER_HEIGHT = 24;
+
 
     private FloatingActionButton fabNewTripPlan;
 
@@ -88,7 +92,8 @@ public class TripPlanListFragment extends TripBaseFragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         rvTripPlans.setLayoutManager(layoutManager);
 
-        RecyclerView.ItemDecoration itemDecoration = new VerticalSpaceItemDecoration(5, true, true);
+        RecyclerView.ItemDecoration itemDecoration =
+                new VerticalSpaceItemDecoration(DIVIDER_HEIGHT, true, true);
         rvTripPlans.addItemDecoration(itemDecoration);
 
         setOnEndlessScrollListener(rvTripPlans);
