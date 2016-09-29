@@ -479,6 +479,12 @@ public class TravelGuideActivity extends AppCompatActivity implements
         setContentFragment(R.id.fragment_frame, new LeaderBoardFragment());
     }
 
+    @Override
+    public void onDisplayLeaderBoardFromHuntDetails(String currentHuntID) {
+        LeaderBoardFragment fragment = LeaderBoardFragment.newInstance(currentHuntID);
+        setContentFragment(R.id.fragment_frame, fragment);
+    }
+
 
     @Override
     public void onTripPlanCreated(String tripPlanObjectId, String imageUrl) {

@@ -4,8 +4,16 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <Spinner
+        android:id="@+id/spinnerHunts"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:prompt="@string/selectHunt"
+        android:text="[Select a Planet...]"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rvTripPlansInProfile"
+        android:layout_below="@+id/spinnerHunts"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
@@ -14,7 +22,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:text="@string/no_data_available"
+        android:text="@string/emptySelectionLB"
         android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/tvEmptyLeaderBoard"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="@string/emptyLeaderBoard"
+        android:visibility="gone" />
 </RelativeLayout>

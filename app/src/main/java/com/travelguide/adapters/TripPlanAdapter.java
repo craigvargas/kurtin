@@ -16,7 +16,13 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.ImageViewTarget;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 import com.travelguide.R;
+import com.travelguide.models.Day;
+import com.travelguide.models.LeaderBoard;
 import com.travelguide.models.TripPlan;
 
 import java.util.List;
@@ -25,6 +31,7 @@ public class TripPlanAdapter extends RecyclerView.Adapter<TripPlanAdapter.ViewHo
 
     private final Context mContext;
     private final List<TripPlan> mTripPlans;
+
 
     public TripPlanAdapter(List<TripPlan> mTripPlans, Context context) {
         this.mTripPlans = mTripPlans;
@@ -50,6 +57,59 @@ public class TripPlanAdapter extends RecyclerView.Adapter<TripPlanAdapter.ViewHo
 
         holder.tvPlanName.setText(span);
         holder.ivPlace.setImageResource(R.drawable.city_placeholder);
+        holder.ivStatusIcon.setVisibility(View.INVISIBLE);
+
+
+
+        if(ParseUser.getCurrentUser()!=null && mTripPlans.get(position).getObjectId()!= null){
+            //String huntID = mTripPlans.get(position).getObjectId();
+
+            //get no of levels first
+
+            ParseQuery<Day> query1 = ParseQuery.getQuery(Day.class);
+            query1.whereEqualTo("parent",mTripPlans.get(position));
+            //query1.orderByAscending("planName");
+            query1.findInBackground(new FindCallback<Day>() {
+                @Override
+                public void done(List<Day> list, ParseException e) {
+
+                    Integer totalLevelsInGame = list.size();
+                    final Integer totalQuesionsInGame = totalLevelsInGame*4;
+                    //final Integer totalQuesionsInGame = 5;
+                    if(totalLevelsInGame!=0 && totalQuesionsInGame!=0)
+                    {
+                        //now make a call to LeaderBoard to see if user answered any questions--
+
+                        ParseQuery<LeaderBoard> query2 = ParseQuery.getQuery(LeaderBoard.class);
+
+                        query2.whereEqualTo("huntID",mTripPlans.get(position).getObjectId());
+                        //query1.orderByAscending("planName");
+                        query2.findInBackground(new FindCallback<LeaderBoard>() {
+                            @Override
+                            public void done(List<LeaderBoard> list1, ParseException e) {
+
+                                if(totalQuesionsInGame == list1.size()){
+                                    holder.ivStatusIcon.setImageResource(R.drawable.completed);
+                                    holder.ivStatusIcon.setVisibility(View.VISIBLE);
+                                }else if ((list1.size()!=0) && (totalQuesionsInGame != list1.size())){
+                                    holder.ivStatusIcon.setImageResource(R.drawable.in_progress_2);
+                                    holder.ivStatusIcon.setVisibility(View.VISIBLE);
+                                }else if(list1.size() == 0){
+                                    //do nothing.....
+                                }
+                            }
+                        });
+                    }
+
+
+                }
+            });
+
+
+
+        }else{
+
+        }
 
         Glide.with(mContext)
                 .load(tripPlan.getCityImageUrl())
@@ -88,12 +148,15 @@ public class TripPlanAdapter extends RecyclerView.Adapter<TripPlanAdapter.ViewHo
     class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivPlace;
         TextView tvPlanName;
+        ImageView ivStatusIcon;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             ivPlace = (ImageView) itemView.findViewById(R.id.ivPlace);
             tvPlanName = (TextView) itemView.findViewById(R.id.tvPlanName);
+            ivStatusIcon = (ImageView) itemView.findViewById(R.id.ivStatusIcon);
+            ivStatusIcon.setVisibility(View.INVISIBLE);
         }
     }
 }
