@@ -10,5 +10,7 @@ public interface OnTripPlanListener {
 
     void onTripPlanNew();
 
+    void  onDisplayLeaderBoardFromHuntDetails(String currentHuntID);
+
     void onShowImageSlideShow(ArrayList<String> imageUrlSet);
 }

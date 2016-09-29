@@ -39,6 +39,7 @@ public class OverallLeaderBoardFragment extends LeaderBoardFragment {
     private MaterialDialog progressDialog;
     private OverallLeaderBoardAdapter mTripPlanAdapter;
     private List<MasterLeaderBoard> mTripPlans;
+    private TextView tvEmptyLeaderBoardOverall;
 
     private SharedPreferences userInfo;
     private String userObjectId = null;
@@ -59,6 +60,8 @@ public class OverallLeaderBoardFragment extends LeaderBoardFragment {
 
         rvTripPlans = (RecyclerView) view.findViewById(R.id.rvTripPlansInProfile);
         rvTripPlans.setAdapter(mTripPlanAdapter);
+
+        tvEmptyLeaderBoardOverall = (TextView) view.findViewById(R.id.tvEmptyLeaderBoardOverall);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         rvTripPlans.setLayoutManager(layoutManager);
@@ -228,6 +231,7 @@ public class OverallLeaderBoardFragment extends LeaderBoardFragment {
                 }
                 if (mTripPlans.size() == 0) {
                     showEmptyView();
+                    tvEmptyLeaderBoardOverall.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -245,6 +249,7 @@ public class OverallLeaderBoardFragment extends LeaderBoardFragment {
             @Override
             public void done(List<MasterLeaderBoard> tripPlans, ParseException e) {
                 progressDialog.dismiss();
+                tvEmptyLeaderBoardOverall.setVisibility(View.INVISIBLE);
                 if (e == null) {
                     hideEmptyView();
                     mTripPlans.clear();
@@ -298,7 +303,7 @@ public class OverallLeaderBoardFragment extends LeaderBoardFragment {
 
     private void hideEmptyView() {
         rvTripPlans.setVisibility(View.VISIBLE);
-        tvEmpty.setVisibility(View.GONE);
+        tvEmptyLeaderBoardOverall.setVisibility(View.GONE);
     }
 
 

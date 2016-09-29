@@ -34,6 +34,9 @@ public class LeaderBoardFragment extends Fragment {
     private String userObjectId = null;
     private SharedPreferences userInfo;
     private OnFragmentInteractionListener mListener;
+    private static final String ARG_HUNT_ID = "currentHuntID";
+    static String mHuntID;
+
 
     private ViewPager vpPager;
     private TripPlanPagerAdapter viewPagerAdapter;
@@ -45,6 +48,9 @@ public class LeaderBoardFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSharedPreferences();
+        if (getArguments() != null) {
+            mHuntID = getArguments().getString(ARG_HUNT_ID);
+        }
         if (userObjectId.equals("missing")) {
             Toast.makeText(getActivity(), "No logged in user! Cannot view profile!!", Toast.LENGTH_SHORT).show();
             onStop();
@@ -105,6 +111,15 @@ public class LeaderBoardFragment extends Fragment {
     private void getSharedPreferences() {
         userInfo = getActivity().getSharedPreferences("userInfo", 0);
         userObjectId = userInfo.getString("userObjectId", "missing");
+    }
+
+
+    public static LeaderBoardFragment newInstance(String currentHuntID) {
+        LeaderBoardFragment fragment = new LeaderBoardFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_HUNT_ID, currentHuntID);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     public interface OnFragmentInteractionListener {
