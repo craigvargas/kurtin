@@ -114,7 +114,9 @@ public class TripPlanListFragment extends TripBaseFragment {
             @Override
             public void onClick(View v) {
                 if (mTripPlanListener != null) {
-                    mTripPlanListener.onTripPlanNew();
+                    //mTripPlanListener.onTripPlanNew();
+                    mTripPlanListener.onDisplayLeaderBoardFromHuntDetails(null);
+
                 }
             }
         });
@@ -203,8 +205,15 @@ public class TripPlanListFragment extends TripBaseFragment {
                     } else {
                         status = true;
                         hideEmptyView();
+                        //Check the item user is part of
+
+
                         populateTripPlanList(tripPlans);
                         savingOnDatabase(tripPlans);
+
+
+
+
                     }
                 } else {
                     status = false;

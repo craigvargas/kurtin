@@ -50,6 +50,12 @@
     <string name="start">START</string>
     <string name="end">END</string>
     <string name="single">Single</string>
+    <string name="selectHunt">Select a hunt...</string>
+    <string name="emptyLeaderBoard">No Leader yet for this hunt</string>
+    <string name="emptySelectionLB">Select a hunt to see Leaders</string>
+    <string name="emptyLeaderBoardOverall">No Leaders identified yet</string>
+
+
 
     <string name="full_screen">Full Screen</string>
     <string name="small_screen">Small Screen</string>

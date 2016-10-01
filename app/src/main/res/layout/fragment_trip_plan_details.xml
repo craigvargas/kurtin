@@ -185,14 +185,14 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/kurtin_text_primary" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:id="@+id/spaceUnderMapInstructions"
-            android:layout_below="@+id/tvHuntPrize"
-            android:background="@color/white" />
+        <!--<View-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="1dp"-->
+            <!--android:id="@+id/spaceUnderMapInstructions"-->
+            <!--android:layout_below="@+id/tvHuntPrize"-->
+            <!--android:background="@color/white" />-->
 
-
+<!--
         <fragment
             class="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
@@ -202,14 +202,14 @@
             map:liteMode="true"
             map:mapType="normal"
             android:layout_height="100dp"/>
+            -->
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:id="@+id/spaceUnderMap"
-            android:layout_below="@+id/map"
+            android:layout_below="@+id/tvHuntPrize"
             android:background="@color/white" />
-
 
         <Button
             android:id="@+id/scanbtn"
@@ -239,8 +239,11 @@
         android:visibility="gone" />
 
 
-    <com.getbase.floatingactionbutton.FloatingActionsMenu
-        android:id="@+id/multiple_actions"
+
+
+
+    <com.getbase.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabNewTripPlan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -249,31 +252,10 @@
         android:layout_margin="16dp"
         app:layout_anchor="@id/recyclerViews"
         app:layout_anchorGravity="bottom|right|end"
-        fab:fab_addButtonColorNormal="@color/accent"
-        fab:fab_addButtonColorPressed="@color/accentPressed"
-        fab:fab_labelStyle="@style/menu_labels_style">
-
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabNewPlace"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:fab_icon="@drawable/ic_event_available_white_24dp"
-            fab:fab_colorNormal="@color/accent"
-            fab:fab_colorPressed="@color/accentPressed"
-            fab:fab_size="mini"
-            fab:fab_title="@string/add_new_place" />
-
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabNewDay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            fab:fab_colorNormal="@color/accent"
-            fab:fab_colorPressed="@color/accentPressed"
-            fab:fab_icon="@drawable/ic_local_activity_white_24dp"
-            fab:fab_size="mini"
-            fab:fab_title="@string/add_new_day" />
-
-    </com.getbase.floatingactionbutton.FloatingActionsMenu>
+        fab:fab_colorNormal="@color/accent"
+        fab:fab_colorPressed="@color/accentPressed"
+        fab:fab_icon="@drawable/ic_add_white">
+    </com.getbase.floatingactionbutton.FloatingActionButton>
 
 
 

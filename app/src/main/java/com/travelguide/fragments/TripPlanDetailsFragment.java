@@ -30,16 +30,6 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.ImageViewTarget;
 import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.getbase.floatingactionbutton.FloatingActionsMenu;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMapOptions;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CircleOptions;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -66,8 +56,6 @@ import com.travelguide.models.Questions;
 import com.travelguide.models.TripPlan;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import static com.facebook.FacebookSdk.getApplicationContext;
@@ -81,7 +69,8 @@ public class TripPlanDetailsFragment extends TripBaseFragment
 
     private RecyclerView rvDayDetails;
     private RecyclerView rvPlaceDetails;
-    private FloatingActionsMenu floatingActionsMenu;
+    //private FloatingActionsMenu floatingActionsMenu;
+    private FloatingActionButton fabNewTripPlan;
     private ImageView ivPlace;
     private ImageView ivFavIcon;
     private TextView tvGroupType;
@@ -97,7 +86,9 @@ public class TripPlanDetailsFragment extends TripBaseFragment
     private List<Day> mDayList;
     private List<Place> mPlaceList;
     private List<Questions> mQuestionsList;
-    private SupportMapFragment mapFragment;
+    //private SupportMapFragment mapFragment;
+
+    private OnTripPlanListener mTripPlanListener;
 
 
     private TextView tvHuntName;
@@ -154,6 +145,7 @@ public class TripPlanDetailsFragment extends TripBaseFragment
         // Required empty public constructor
     }
 
+    /**
     public void hideOrShowFAB() {
         if (floatingActionsMenu != null) {
             if (!Preferences.DEF_VALUE.equals(Preferences.readString(getContext(), Preferences.User.USER_OBJECT_ID))
@@ -163,6 +155,16 @@ public class TripPlanDetailsFragment extends TripBaseFragment
             } else {
                 floatingActionsMenu.setVisibility(View.GONE);
             }
+        }
+    }
+     */
+
+    public void hideOrShowFAB() {
+        if (fabNewTripPlan != null) {
+            if (Preferences.DEF_VALUE.equals(Preferences.readString(getContext(), Preferences.User.USER_OBJECT_ID)))
+                fabNewTripPlan.setVisibility(View.GONE);
+            else
+                fabNewTripPlan.setVisibility(View.VISIBLE);
         }
     }
 
@@ -183,6 +185,7 @@ public class TripPlanDetailsFragment extends TripBaseFragment
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_trip_plan_details, container, false);
         setHasOptionsMenu(true);
 
@@ -242,11 +245,21 @@ public class TripPlanDetailsFragment extends TripBaseFragment
                     .crossFade()
                     .into(ivPlace);
 
+        fragment_frame_scanner = (FrameLayout)view.findViewById(R.id.fragment_frame_scanner);
+
+        scanbtn = (Button)view.findViewById(R.id.scanbtn);
+        scanbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                scanImage();
+            }
+        });
+
         //tvGroupType.setText(mTripPlan.getGroupType());
         //tvTravelSeason.setText(mTripPlan.getTravelSeason());
         //tvGroupType.setVisibility(view.VISIBLE);
 
-
+/**
         floatingActionsMenu = (FloatingActionsMenu) view.findViewById(R.id.multiple_actions);
         fragment_frame_scanner = (FrameLayout)view.findViewById(R.id.fragment_frame_scanner);
 
@@ -303,6 +316,20 @@ public class TripPlanDetailsFragment extends TripBaseFragment
                 floatingActionsMenu.collapseImmediately();
             }
         });
+
+ */
+        fabNewTripPlan = (FloatingActionButton) view.findViewById(R.id.fabNewTripPlan);
+        fabNewTripPlan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) {
+                    //listener.onTripPlanNew();
+                    listener.onDisplayLeaderBoardFromHuntDetails(mTripPLanObjectId.toString());
+                }
+            }
+        });
+
+        hideOrShowFAB();
 
         //Setup RecyclerView Days
         LinearLayoutManager layoutManagerDay = new LinearLayoutManager(getContext());
@@ -529,7 +556,7 @@ public class TripPlanDetailsFragment extends TripBaseFragment
 //                    tvInstructions.setText(list.get(0).get("imageInstructions").toString());
 //                    tvMapInstructions.setText(list.get(0).get("locationInstrcutions").toString());
 
-
+/*
                     mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
 
                     mapFragment.getMapAsync(new OnMapReadyCallback() {
@@ -546,6 +573,7 @@ public class TripPlanDetailsFragment extends TripBaseFragment
 
                         }
                     });
+                    */
 
 
 
