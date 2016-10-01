@@ -5,14 +5,30 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
-    android:background="@drawable/selector_day">
+    android:background="@color/transparent">
+
+    <ImageView
+        android:id="@+id/ivLevelIcon"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/ic_kurtin_lock_white"
+        android:tint="@color/kurtin_text_primary"/>
+
+    <ImageView
+        android:id="@+id/ivLevelIconFinished"
+        android:visibility="gone"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/ic_kurtin_lock_white"
+        android:tint="@color/kurtin_text_primary"/>
 
     <TextView
         android:id="@+id/tvLevel"
+        android:layout_below="@id/ivLevelIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/primary"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/kurtin_text_primary"
         tools:text="16"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />

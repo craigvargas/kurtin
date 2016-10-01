@@ -24,6 +24,7 @@
     <color name="kurtin_primay_translucent">#cc063f48</color>
     <color name="kurtin_primary_dark_translucent">#aa05323a</color>
     <color name="kurtin_home_divider">@color/black</color>
+    <color name="transparent">#0000</color>
 
 
 

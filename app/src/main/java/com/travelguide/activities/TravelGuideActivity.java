@@ -54,6 +54,7 @@ import com.squareup.picasso.Picasso;
 import com.travelguide.R;
 import com.travelguide.foursquare.constants.FoursquareConstants;
 import com.travelguide.fragments.FullscreenFragment;
+import com.travelguide.fragments.KurtinLoginFragment;
 import com.travelguide.fragments.LeaderBoardFragment;
 import com.travelguide.fragments.LoginFragment;
 import com.travelguide.fragments.ProfileFragment;
@@ -80,7 +81,8 @@ public class TravelGuideActivity extends AppCompatActivity implements
         ProfileFragment.OnFragmentInteractionListener,
         LoginFragment.OnLoginLogoutListener,
         AppBarLayout.OnOffsetChangedListener,
-        LeaderBoardFragment.OnFragmentInteractionListener{
+        LeaderBoardFragment.OnFragmentInteractionListener,
+        KurtinLoginFragment.OnLoginLogoutListener{
 
     private static final String TAG = "TravelGuideActivity";
     private DrawerLayout mDrawer;
@@ -172,6 +174,8 @@ public class TravelGuideActivity extends AppCompatActivity implements
         mLoginStatus = Preferences.readBoolean(this, Preferences.User.LOG_IN_STATUS);
         setMenuItemLoginTitle();
 
+        prepareNavMenu();
+
         setContentFragment(R.id.fragment_frame, new TripPlanListFragment());
     }
 
@@ -232,7 +236,8 @@ public class TravelGuideActivity extends AppCompatActivity implements
         switch (menuItem.getItemId()) {
             case R.id.login_fragment:
                 if (!mLoginStatus)
-                    new LoginFragment().show(getSupportFragmentManager(), "Login_with_Facebook");
+                    setContentFragment(R.id.fragment_frame, new KurtinLoginFragment());
+//                    new LoginFragment().show(getSupportFragmentManager(), "Login_with_Facebook");
                 else
                     new LoginFragment().logout(ParseUser.getCurrentUser(), this);
                 break;
@@ -242,6 +247,8 @@ public class TravelGuideActivity extends AppCompatActivity implements
             case R.id.settings_fragment:
                 showSettingsDialog();
                 break;
+            case R.id.logout_fragment:
+                new KurtinLoginFragment().logout(ParseUser.getCurrentUser(), this);
         }
 
         // Highlight the selected item, update the title, and close the drawer
@@ -456,6 +463,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
             }
             super.onBackPressed();
             if (!(getSupportFragmentManager().getBackStackEntryCount() > 0)) {
+                Log.v("Finish","Finish");
                 finish();
             }
         }
@@ -499,7 +507,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
         fragmentTransaction.replace(fragmentFrame, fragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
-        lockUnlockNavigationDrawer(fragment);
+//        lockUnlockNavigationDrawer(fragment);
         if (fragment instanceof FullscreenFragment) {
             coordinatorLayout.setVisibility(View.GONE);
             fragmentFrameFullscreen.setVisibility(View.VISIBLE);
@@ -527,10 +535,12 @@ public class TravelGuideActivity extends AppCompatActivity implements
 
     @Override
     public void onBackStackChanged() {
+            Log.v("BackStack","count: " + getSupportFragmentManager().getBackStackEntryCount());
 
             final View.OnClickListener originalToolbarListener = drawerToggle.getToolbarNavigationClickListener();
             boolean canBack = getSupportFragmentManager().getBackStackEntryCount() > 1;
             if (canBack) {
+                Log.v("canBack","canBack");
                 ValueAnimator anim = ValueAnimator.ofFloat(0, 1);
                 anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
@@ -561,6 +571,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
                     }
                 });
             } else {
+                Log.v("canBack","No canBack");
                 setDisplayHomeAsUpEnabled(false);
                 drawerToggle.setDrawerIndicatorEnabled(true);
                 ValueAnimator anim = ValueAnimator.ofFloat(1, 0);
@@ -578,7 +589,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
             }
 
             Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_frame);
-            lockUnlockNavigationDrawer(fragment);
+//            lockUnlockNavigationDrawer(fragment);
             allowCollapsingToolbarScroll(fragment);
     }
 
@@ -750,5 +761,71 @@ public class TravelGuideActivity extends AppCompatActivity implements
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
+    }
+
+    //////////////////////////
+    //////////////////////////
+    //CVar code block starts//
+    //////////////////////////
+    //////////////////////////
+
+    //Listener for Kurtin Logins and Logouts
+    @Override
+    public void onCompletedLoginLogout(boolean loginStatus) {
+        mLoginStatus = loginStatus;
+//        setMenuItemLoginTitle();
+        prepareNavMenu();
+        setHeaderProfileInfo(false);
+        refreshBackdrop();
+        hideOrShowFAB();
+        Log.v("Completed Login","My backstack pop");
+        if(mLoginStatus) {
+            popBackStackToFirstFragment();
+        }
+    }
+
+    //Setup the navigation menu depending on the whether or not the user is logged in
+    private void prepareNavMenu() {
+        boolean isLoggedIn = mLoginStatus;
+
+        nvDrawer.getMenu().findItem(R.id.login_fragment).setVisible(!isLoggedIn);
+
+        nvDrawer.getMenu().findItem(R.id.home_fragment).setVisible(isLoggedIn);
+        nvDrawer.getMenu().findItem(R.id.my_hunts_fragment).setVisible(isLoggedIn);
+        nvDrawer.getMenu().findItem(R.id.favorites_fragment).setVisible(isLoggedIn);
+        nvDrawer.getMenu().findItem(R.id.leaders_fragment).setVisible(isLoggedIn);
+        nvDrawer.getMenu().findItem(R.id.private_fragment).setVisible(isLoggedIn);
+        nvDrawer.getMenu().findItem(R.id.invite_friends_fragment).setVisible(isLoggedIn);
+        nvDrawer.getMenu().findItem(R.id.profile_fragment).setVisible(isLoggedIn);
+        nvDrawer.getMenu().findItem(R.id.logout_fragment).setVisible(isLoggedIn);
+        nvDrawer.getMenu().findItem(R.id.settings_fragment).setVisible(isLoggedIn);
+    }
+
+    private void refreshBackdrop() {
+        getSharedPreferences();
+        if (!Preferences.DEF_VALUE.equals(name)) {
+            tvName.setText(name);
+        } else {
+            tvName.setText("NAME");
+        }
+        if (!Preferences.DEF_VALUE.equals(email)) {
+            tvEmail.setText(email);
+        } else {
+            tvEmail.setText("Email");
+        }
+        if (!Preferences.DEF_VALUE.equals(profilePicUrl)) {
+            Glide.with(this).load(profilePicUrl).into(ivProfilePic);
+        } else {
+            ivProfilePic.setImageResource(R.drawable.profile_placeholder);
+        }
+        if (!Preferences.DEF_VALUE.equals(coverPicUrl)) {
+            Picasso.with(this).load(coverPicUrl).resize(DeviceDimensionsHelper.getDisplayWidth(this), 0).into(ivCoverPic);
+        } else {
+            ivCoverPic.setImageResource(android.R.color.transparent);
+        }
+    }
+
+    private void popBackStackToFirstFragment(){
+        getSupportFragmentManager().popBackStack();
     }
 }

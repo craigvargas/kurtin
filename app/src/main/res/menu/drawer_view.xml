@@ -4,15 +4,64 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/login_fragment"
-            android:icon="@drawable/ic_system_update_alt_white_24dp"
+            android:icon="@drawable/ic_account_circle_white_24dp"
             android:title="@string/action_login" />
         <item
+            android:id="@+id/home_fragment"
+            android:icon="@drawable/ic_kurtin_k_white"
+            android:title="@string/action_home" />
+        <item
+            android:id="@+id/my_hunts_fragment"
+            android:icon="@drawable/ic_kurtin_hunt_white"
+            android:title="@string/action_my_hunts" />
+        <item
+            android:id="@+id/favorites_fragment"
+            android:icon="@drawable/ic_kurtin_favorite_white"
+            android:title="@string/action_favorites" />
+        <item
+            android:id="@+id/leaders_fragment"
+            android:icon="@drawable/ic_kurtin_trophy_white"
+            android:title="@string/action_leaders" />
+        <item
+            android:id="@+id/private_fragment"
+            android:icon="@drawable/ic_kurtin_lock_white"
+            android:title="@string/action_private" />
+        <item
+            android:id="@+id/invite_friends_fragment"
+            android:icon="@drawable/ic_kurtin_friend_white"
+            android:title="@string/action_invite_friends" />
+        <item
             android:id="@+id/profile_fragment"
-            android:icon="@drawable/ic_account_circle_white_24dp"
+            android:icon="@drawable/ic_kurtin_profile_white"
             android:title="@string/action_profile" />
+        <item
+            android:id="@+id/logout_fragment"
+            android:icon="@drawable/ic_kurtin_key_white"
+            android:title="@string/action_logout" />
         <item
             android:id="@+id/settings_fragment"
             android:icon="@drawable/ic_settings_white_24dp"
             android:title="@string/action_settings" />
     </group>
 </menu>
+
+
+<!--Old Nav Menu Below-->
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<menu xmlns:android="http://schemas.android.com/apk/res/android">-->
+
+    <!--<group android:checkableBehavior="single">-->
+        <!--<item-->
+            <!--android:id="@+id/login_fragment"-->
+            <!--android:icon="@drawable/ic_system_update_alt_white_24dp"-->
+            <!--android:title="@string/action_login" />-->
+        <!--<item-->
+            <!--android:id="@+id/profile_fragment"-->
+            <!--android:icon="@drawable/ic_account_circle_white_24dp"-->
+            <!--android:title="@string/action_profile" />-->
+        <!--<item-->
+            <!--android:id="@+id/settings_fragment"-->
+            <!--android:icon="@drawable/ic_settings_white_24dp"-->
+            <!--android:title="@string/action_settings" />-->
+    <!--</group>-->
+<!--</menu>-->

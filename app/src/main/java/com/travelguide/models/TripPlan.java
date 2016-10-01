@@ -37,6 +37,14 @@ public class TripPlan extends ParseObject {
     public String getWikitudeTargetCollectionId() {return getString("wikitudeTargetCollectionId");}
     public String getWikitudeClientID() {return getString("wikitudeClientToken");}
     public String getPrices(){return getString("prices");}
+    //CVars data members
+    public String getHuntName(){return getString("huntName");}
+    public String getHuntLocation(){return getString("huntLocation");}
+    public String getHuntDescription(){return getString("huntDescription");}
+    public String getHuntTime(){return getString("huntTime");}
+    public String getHuntAddress(){return getString("huntAddress");}
+    public String getHuntPrize(){return getString("huntPrize");}
+
 
 
     //Saving Data
@@ -55,6 +63,13 @@ public class TripPlan extends ParseObject {
     public void putTripCost(Integer tripCost) {put("tripCost",tripCost);}
     public void putGroupType(String groupType) {put("groupType",groupType);}
     public void putEnabledFlag(Boolean enabledFlag) {put("enabledFlag",enabledFlag);}
+    //CVars data members
+    public void putHuntName(String huntName){put("huntName", huntName);}
+    public void putHuntLocation(String huntLocation){put("huntLocation", huntLocation);}
+    public void putHuntDescription(String huntDescription){put("huntDescription", huntDescription);}
+    public void putHuntTime(String huntTime){put("huntTime", huntTime);}
+    public void putHuntAddress(String huntAddress){put("huntAddress", huntAddress);}
+    public void putHuntPrize(String huntPrize){put("huntPrize", huntPrize);}
 
     public Boolean isFavorited() {
         final ParseUser user = ParseUser.getCurrentUser();

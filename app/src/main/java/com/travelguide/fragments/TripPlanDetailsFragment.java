@@ -4,6 +4,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -99,10 +100,13 @@ public class TripPlanDetailsFragment extends TripBaseFragment
     private SupportMapFragment mapFragment;
 
 
-
+    private TextView tvHuntName;
+    private TextView tvHuntDescription;
     private TextView tvInstructions;
+    private TextView tvHuntAddress;
+    private TextView tvHuntTime;
+    private TextView tvHuntPrize;
     private ImageView ivInstructionImage;
-    private TextView tvMapInstructions;
     private Button btnLaunchScanner;
     private ImageView ivMaps;
     private  String wikitudeFolderToken;
@@ -206,13 +210,26 @@ public class TripPlanDetailsFragment extends TripBaseFragment
 
 //////////////////////////////
 
-
+        tvHuntName = (TextView) view.findViewById(R.id.tvHuntTitle);
+        tvHuntDescription = (TextView) view.findViewById(R.id.tvHuntDescription);
         tvInstructions = (TextView) view.findViewById(R.id.tvInstructions);
+        tvHuntTime = (TextView) view.findViewById(R.id.tvHuntTime);
+        tvHuntPrize = (TextView) view.findViewById(R.id.tvHuntPrize);
         ivInstructionImage = (ImageView) view.findViewById(R.id.ivInstructionImage);
-        tvMapInstructions = (TextView) view.findViewById(R.id.tvMapInstructions);
+        tvHuntAddress = (TextView) view.findViewById(R.id.tvHuntAddress);
         //ivMaps = (ImageView) view.findViewById(R.id.ivInstructionMapImage);;
 
         // eEnd -Hemanth New Code
+
+        Typeface cabinBoldFont = Typeface.createFromAsset(getContext().getAssets(), "fonts/cabin_bold.ttf");
+        Typeface cabinRegularFont = Typeface.createFromAsset(getContext().getAssets(), "fonts/cabin_regular.ttf");
+        tvHuntName.setTypeface(cabinBoldFont);
+        tvHuntDescription.setTypeface(cabinRegularFont);
+        tvInstructions.setTypeface(cabinBoldFont);
+        tvHuntTime.setTypeface(cabinBoldFont);
+        tvHuntPrize.setTypeface(cabinBoldFont);
+        tvHuntAddress.setTypeface(cabinBoldFont);
+
 
         ivFavIcon = (ImageView) view.findViewById(R.id.ivFavorite);
         setupFavIconOnClickListener();
@@ -509,8 +526,8 @@ public class TripPlanDetailsFragment extends TripBaseFragment
                             into(ivMaps);
                             **/
 
-                    tvInstructions.setText(list.get(0).get("imageInstructions").toString());
-                    tvMapInstructions.setText(list.get(0).get("locationInstrcutions").toString());
+//                    tvInstructions.setText(list.get(0).get("imageInstructions").toString());
+//                    tvMapInstructions.setText(list.get(0).get("locationInstrcutions").toString());
 
 
                     mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
@@ -644,7 +661,7 @@ public class TripPlanDetailsFragment extends TripBaseFragment
                                 @Override
                                 public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
                                     super.onResourceReady(resource, glideAnimation);
-                                    ivPlace.setColorFilter(Color.argb(145, 50, 50, 50));
+//                                    ivPlace.setColorFilter(Color.argb(145, 50, 50, 50));
                                 }
 
                                 @Override
@@ -657,6 +674,14 @@ public class TripPlanDetailsFragment extends TripBaseFragment
                     bindFavoriteIcon();
                     tvGroupType.setText(mTripPlan.getGroupType());
                     tvTravelSeason.setText(mTripPlan.getTravelSeason());
+                    tvHuntName.setText(mTripPlan.getHuntName());
+                    tvHuntDescription.setText(mTripPlan.getHuntDescription());
+                    tvHuntAddress.setText(mTripPlan.getHuntAddress());
+                    tvHuntTime.setText(mTripPlan.getHuntTime());
+                    tvHuntPrize.setText(mTripPlan.getHuntPrize());
+                    //********
+                    //Continue writing code to fill hunt details with real info
+                    //Need to update the model
                 } else {
                     e.printStackTrace();
                 }

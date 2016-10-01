@@ -1,12 +1,8 @@
 package com.travelguide.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.RelativeSizeSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -108,7 +104,7 @@ public class TripPlanAdapter extends RecyclerView.Adapter<TripPlanAdapter.ViewHo
             tvHuntDistance = (TextView) itemView.findViewById(R.id.tvHuntDistance);
             tvHuntPrize = (TextView) itemView.findViewById(R.id.tvHuntPrize);
 
-            Typeface face= Typeface.createFromAsset(mContext.getAssets(), "fonts/cabin-bold.ttf");
+            Typeface face= Typeface.createFromAsset(mContext.getAssets(), "fonts/cabin_bold.ttf");
             tvPlanName.setTypeface(face);
         }
     }

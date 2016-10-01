@@ -1,0 +1,209 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.travelguide.fragments.KurtinLoginFragment">
+
+    <ImageView
+        android:id="@+id/ivBkgdLogin"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        android:src="@drawable/bkgd_login"
+        android:scaleType="centerCrop"
+        />
+
+    <ImageView
+        android:id="@+id/ivLogoKurtinMotto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/logo_kurtin_motto"
+        android:layout_marginTop="-16dp"
+        android:layout_marginLeft="128dp"
+        android:layout_marginRight="128dp"/>
+
+    <TextView
+        android:id="@+id/tvLoginInstructionOne"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/login_instruction_one"
+        android:layout_below="@+id/ivLogoKurtinMotto"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        style="@style/login_instruction_text"
+        />
+
+    <Button
+        android:id="@+id/btnTwitertLogin"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/btn_twitter_login"
+        android:layout_below="@+id/tvLoginInstructionOne"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/btn_login_margin_top"
+        />
+
+    <Button
+        android:id="@+id/btnFacebookLogin"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/btn_facebook_login"
+        android:layout_below="@+id/tvLoginInstructionOne"
+        android:layout_toLeftOf="@+id/btnTwitertLogin"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/btn_login_margin_top"
+        android:layout_marginRight="@dimen/btn_login_margin_left_right"
+        />
+
+    <Button
+        android:id="@+id/btnSnapchatLogin"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/btn_snapchat_login"
+        android:layout_below="@+id/tvLoginInstructionOne"
+        android:layout_toRightOf="@+id/btnTwitertLogin"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/btn_login_margin_top"
+        android:layout_marginLeft="@dimen/btn_login_margin_left_right"
+        />
+
+    <TextView
+        android:id="@+id/tvLoginInstructionTwo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/login_instruction_two"
+        android:layout_below="@+id/btnTwitertLogin"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        style="@style/login_instruction_text"
+        />
+
+    <TextView
+        android:id="@+id/tvKurtinLoginText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/kurtin_login_text"
+        android:layout_below="@+id/tvLoginInstructionTwo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        style="@style/login_instruction_text"
+        />
+
+    <TextView
+        android:layout_width="96dp"
+        android:layout_height="@dimen/line_width_thin"
+        android:background="@color/white"
+        android:layout_below="@+id/tvLoginInstructionTwo"
+        android:layout_toLeftOf="@+id/tvKurtinLoginText"
+        android:layout_marginTop="16dp"
+        android:layout_marginRight="@dimen/text_decoration_margin_left_right"
+        />
+
+    <TextView
+        android:layout_width="96dp"
+        android:layout_height="@dimen/line_width_thin"
+        android:background="@color/white"
+        android:layout_below="@+id/tvLoginInstructionTwo"
+        android:layout_toRightOf="@+id/tvKurtinLoginText"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="@dimen/text_decoration_margin_left_right"
+        />
+
+    <EditText
+        android:id="@+id/etEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvKurtinLoginText"
+        android:layout_marginTop="32dp"
+        android:drawableLeft="@drawable/ic_kurtin_email_white"
+        android:hint="@string/email_hint"
+        android:inputType="textEmailAddress"
+        style="@style/login_edit_text"
+        />
+
+    <TextView
+        android:id="@+id/tvEmailDecoration"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/line_width_thin"
+        android:background="@color/white"
+        android:layout_below="@+id/etEmail"
+        android:layout_marginTop="0dp"
+        style="@style/decoration_login_edit_text"
+        />
+
+    <EditText
+        android:id="@+id/etPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvEmailDecoration"
+        android:layout_marginTop="0dp"
+        android:drawableLeft="@drawable/ic_kurtin_lock_white"
+        android:hint="@string/password_hint"
+        android:inputType="textPassword"
+        style="@style/login_edit_text"
+        />
+
+    <TextView
+        android:id="@+id/tvPasswordDecoration"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/line_width_thin"
+        android:background="@color/white"
+        android:layout_below="@+id/etPassword"
+        android:layout_marginTop="0dp"
+        style="@style/decoration_login_edit_text"
+        />
+
+    <Button
+        android:id="@+id/btnLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="48dp"
+        android:layout_marginRight="48dp"
+        android:layout_marginBottom="32dp"
+        android:background="@drawable/btn_rounded"
+        android:backgroundTint="@color/kurtin_primary_light"
+        android:layout_alignParentBottom="true"
+        android:text="@string/action_login"
+        android:textColor="@color/white"
+        />
+
+    <!---->
+    <!--<TextView-->
+        <!--android:id="@+id/tvLoginInstructionThree"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="@string/login_instruction_two"-->
+        <!--android:layout_below="@+id/tvPasswordDecoration"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:layout_marginTop="16dp"-->
+        <!--style="@style/login_instruction_text"-->
+        <!--/>-->
+
+    <Button
+        android:id="@+id/btnSignup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/kurtin_signup_text"
+        android:layout_below="@+id/tvPasswordDecoration"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="24dp"
+        android:background="@color/transparent"
+        style="@style/login_instruction_text"
+        android:textColor="@color/kurtin_primary_light"
+        />
+
+    <ImageView
+        android:id="@+id/ivCoverPic"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/primary"
+        android:visibility="invisible" />
+
+    <ImageView
+        android:id="@+id/ivProfilePic"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/primary"
+        android:visibility="invisible" />
+
+</RelativeLayout>

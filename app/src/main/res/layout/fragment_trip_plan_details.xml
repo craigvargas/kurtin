@@ -50,19 +50,6 @@
             android:src="@drawable/selector_favorite"
             android:visibility="visible" />
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rvContacts"
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            android:layout_below="@+id/ivPlace" />
-
-        <View
-            android:id="@+id/line"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@+id/rvContacts"
-            android:background="@color/divider" />
-
         <ImageView
             android:id="@+id/ivPlace"
             android:layout_width="match_parent"
@@ -74,15 +61,53 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
 
+        <TextView
+            android:id="@+id/tvHuntTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ivPlace"
+            android:text="Hunt Title"
+            android:gravity="center_horizontal|center_vertical"
+            android:textSize="40sp"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/kurtin_text_primary"
+            />
+
+        <TextView
+            android:id="@+id/tvHuntDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvHuntTitle"
+            android:text="Hunt Description"
+            android:gravity="center_horizontal|center_vertical"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/black"
+            />
+
+        <View
+            android:id="@+id/dividerMain"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_margin="8dp"
+            android:layout_below="@+id/tvHuntDescription"
+            android:background="@color/kurtin_text_primary" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rvContacts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/dividerMain" />
 
         <TextView
             android:id="@+id/tvInstructions"
             android:layout_width="match_parent"
             android:layout_height="30dp"
-            android:layout_below="@+id/line"
-            android:textAlignment="center"
+            android:layout_below="@+id/rvContacts"
+            android:text="@string/scan_instructions"
+            android:gravity="center_horizontal|center_vertical"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/blue"
+            android:textColor="@color/kurtin_text_primary"
             />
 
         <View
@@ -90,17 +115,21 @@
             android:layout_height="1dp"
             android:id="@+id/spaceUnderInstructions"
             android:layout_below="@+id/tvInstructions"
-            android:background="@color/divider" />
+            android:background="@color/white" />
 
 
         <ImageView
             android:id="@+id/ivInstructionImage"
             android:layout_width="match_parent"
+            android:padding="8dp"
+            android:layout_marginLeft="64dp"
+            android:layout_marginRight="64dp"
             android:layout_alignLeft="@+id/tvInstructions"
             android:layout_alignRight="@+id/tvInstructions"
             android:layout_height="wrap_content"
             android:contentDescription="@null"
             android:layout_below="@+id/spaceUnderInstructions"
+            android:background="@color/kurtin_text_primary"
             android:src="@drawable/city_placeholder"
             />
 
@@ -109,30 +138,65 @@
             android:layout_height="1dp"
             android:id="@+id/spaceUnderInstructionImage"
             android:layout_below="@+id/ivInstructionImage"
-            android:background="@color/divider" />
+            android:background="@color/white" />
 
         <TextView
-            android:id="@+id/tvMapInstructions"
+            android:id="@+id/tvHuntAddress"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:textAlignment="center"
+            android:layout_height="wrap_content"
+            android:text="Address"
+            android:drawableLeft="@drawable/ic_kurtin_hunt_white"
+            android:drawableTint="@color/kurtin_text_primary"
+            android:gravity="center_vertical"
+            android:layout_marginLeft="48dp"
             android:layout_below="@+id/spaceUnderInstructionImage"
             android:layout_alignLeft="@+id/tvInstructions"
             android:layout_alignRight="@+id/tvInstructions"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/blue" />
+            android:textColor="@color/kurtin_text_primary" />
+
+        <TextView
+            android:id="@+id/tvHuntTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Time"
+            android:drawableLeft="@drawable/ic_kurtin_clock_white"
+            android:drawableTint="@color/kurtin_text_primary"
+            android:gravity="center_vertical"
+            android:layout_marginLeft="48dp"
+            android:layout_below="@+id/tvHuntAddress"
+            android:layout_alignLeft="@+id/tvInstructions"
+            android:layout_alignRight="@+id/tvInstructions"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/kurtin_text_primary" />
+
+        <TextView
+            android:id="@+id/tvHuntPrize"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Time"
+            android:drawableLeft="@drawable/ic_trophy_white"
+            android:drawableTint="@color/kurtin_text_primary"
+            android:gravity="center_vertical"
+            android:layout_marginLeft="48dp"
+            android:layout_below="@+id/tvHuntTime"
+            android:layout_alignLeft="@+id/tvInstructions"
+            android:layout_alignRight="@+id/tvInstructions"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/kurtin_text_primary" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:id="@+id/spaceUnderMapInstructions"
-            android:layout_below="@+id/tvMapInstructions"
-            android:background="@color/divider" />
+            android:layout_below="@+id/tvHuntPrize"
+            android:background="@color/white" />
 
 
         <fragment
             class="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
+            android:visibility="gone"
             android:layout_below="@+id/spaceUnderMapInstructions"
             android:id="@+id/map"
             map:liteMode="true"
@@ -144,7 +208,7 @@
             android:layout_height="1dp"
             android:id="@+id/spaceUnderMap"
             android:layout_below="@+id/map"
-            android:background="@color/divider" />
+            android:background="@color/white" />
 
 
         <Button
@@ -152,18 +216,22 @@
             android:layout_below="@+id/spaceUnderMap"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
+            android:layout_marginLeft="80dp"
+            android:layout_marginRight="80dp"
             android:height="30dp"
-            android:text="Start Playing"
+            android:text="@string/scan_motto"
             android:shadowColor="@color/accent"
             android:layout_alignRight="@+id/tvInstructions"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/white"
+            android:textColor="@color/kurtin_text_primary"
             android:layout_gravity="bottom|fill|start|end|center_horizontal"
-            android:background="@color/blue"
+            android:background="@drawable/btn_hollow_rounded"
+            android:backgroundTint="@color/kurtin_text_primary"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
 
     </RelativeLayout>
+
     <FrameLayout
         android:id="@+id/fragment_frame_scanner"
         android:layout_width="match_parent"
