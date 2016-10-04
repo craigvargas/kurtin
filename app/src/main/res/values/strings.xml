@@ -56,7 +56,6 @@
     <string name="emptyLeaderBoardOverall">No Leaders identified yet</string>
 
 
-
     <string name="full_screen">Full Screen</string>
     <string name="small_screen">Small Screen</string>
 
@@ -64,6 +63,9 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string name="scan">scan</string>
+
+    <string name="hunt_code_prompt">enter your special hunt code</string>
+    <string name="hunt_code">HUNT CODE</string>
 
 
     <!--******************-->
@@ -80,18 +82,26 @@
     <string name="action_invite_friends">INVITE FRIENDS</string>
     <string name="action_profile">PROFILE</string>
     <string name="action_logout">LOGOUT</string>
-    <string name="hunt_code_prompt">enter your special hunt code</string>
-    <string name="hunt_code">HUNT CODE</string>
 
-    <!--Other Strings-->
+    <!--Login and Signup Strings-->
     <string name="login_instruction_one">Login Using</string>
     <string name="login_instruction_two">Or</string>
     <string name="kurtin_login_text">Email</string>
+    <string name="username_hint">USERNAME</string>
     <string name="email_hint">EMAIL</string>
     <string name="password_hint">PASSWORD</string>
+    <string name="confirm_password_hint">CONFIRM PASSWORD</string>
     <string name="kurtin_signup_text">Or Sign Up Now</string>
+    <string name="sign_up_instruction_one">Sign Up Using</string>
+    <string name="sign_up_instruction_two">SIGN UP WITH KURTIN</string>
+    <string name="action_sign_up">SIGN UP</string>
+
+
+    <!--Other Strings-->
     <string name="scan_motto">PULL THE KURTIN</string>
     <string name="scan_instructions">Find and scan this image:</string>
+    <string name="leader_boards">leader boards</string>
+    <string name="change_profile_pic">Change Profile Pic</string>
 
 
 </resources>

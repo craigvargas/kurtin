@@ -55,6 +55,7 @@ import com.travelguide.R;
 import com.travelguide.foursquare.constants.FoursquareConstants;
 import com.travelguide.fragments.FullscreenFragment;
 import com.travelguide.fragments.KurtinLoginFragment;
+import com.travelguide.fragments.KurtinSignUpFragment;
 import com.travelguide.fragments.LeaderBoardFragment;
 import com.travelguide.fragments.LoginFragment;
 import com.travelguide.fragments.ProfileFragment;
@@ -82,7 +83,8 @@ public class TravelGuideActivity extends AppCompatActivity implements
         LoginFragment.OnLoginLogoutListener,
         AppBarLayout.OnOffsetChangedListener,
         LeaderBoardFragment.OnFragmentInteractionListener,
-        KurtinLoginFragment.OnLoginLogoutListener{
+        KurtinLoginFragment.LoginListener,
+        KurtinSignUpFragment.SignUpListener{
 
     private static final String TAG = "TravelGuideActivity";
     private DrawerLayout mDrawer;
@@ -117,6 +119,8 @@ public class TravelGuideActivity extends AppCompatActivity implements
     private String coverPicUrl = null;
 
     private boolean mLoginStatus = false;
+
+    private static int NO_FLAGS = 0;
 
 
     @Override
@@ -172,7 +176,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
         season = "Any";
 
         mLoginStatus = Preferences.readBoolean(this, Preferences.User.LOG_IN_STATUS);
-        setMenuItemLoginTitle();
+//        setMenuItemLoginTitle();
 
         prepareNavMenu();
 
@@ -188,7 +192,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
         mLoginStatus = Preferences.readBoolean(this, Preferences.User.LOG_IN_STATUS);
-        setMenuItemLoginTitle();
+//        setMenuItemLoginTitle();
         setHeaderProfileInfo(true);
         loadBackdrop();
     }
@@ -232,15 +236,20 @@ public class TravelGuideActivity extends AppCompatActivity implements
                 });
     }
 
+    //Nav options
     public void selectDrawerItem(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.login_fragment:
-                if (!mLoginStatus)
+                if (!mLoginStatus) {
                     setContentFragment(R.id.fragment_frame, new KurtinLoginFragment());
 //                    new LoginFragment().show(getSupportFragmentManager(), "Login_with_Facebook");
-                else
-                    new LoginFragment().logout(ParseUser.getCurrentUser(), this);
+                }
+                else {
+//                    new LoginFragment().logout(ParseUser.getCurrentUser(), this);
+                }
                 break;
+            case R.id.home_fragment:
+                setContentFragment(R.id.fragment_frame, new TripPlanListFragment());
             case R.id.profile_fragment:
                 setContentFragment(R.id.fragment_frame, new ProfileFragment());
                 break;
@@ -248,7 +257,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
                 showSettingsDialog();
                 break;
             case R.id.logout_fragment:
-                new KurtinLoginFragment().logout(ParseUser.getCurrentUser(), this);
+                new KurtinLoginFragment().logoutKurtin(ParseUser.getCurrentUser(), this);
         }
 
         // Highlight the selected item, update the title, and close the drawer
@@ -511,7 +520,11 @@ public class TravelGuideActivity extends AppCompatActivity implements
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out);
         fragmentTransaction.replace(fragmentFrame, fragment);
-        fragmentTransaction.addToBackStack(null);
+        if(fragment instanceof TripPlanListFragment){
+            fragmentTransaction.addToBackStack("home");
+        }else {
+            fragmentTransaction.addToBackStack(null);
+        }
         fragmentTransaction.commit();
 //        lockUnlockNavigationDrawer(fragment);
         if (fragment instanceof FullscreenFragment) {
@@ -541,12 +554,12 @@ public class TravelGuideActivity extends AppCompatActivity implements
 
     @Override
     public void onBackStackChanged() {
-            Log.v("BackStack","count: " + getSupportFragmentManager().getBackStackEntryCount());
+//            Log.v("BackStack","count: " + getSupportFragmentManager().getBackStackEntryCount());
 
             final View.OnClickListener originalToolbarListener = drawerToggle.getToolbarNavigationClickListener();
             boolean canBack = getSupportFragmentManager().getBackStackEntryCount() > 1;
             if (canBack) {
-                Log.v("canBack","canBack");
+//                Log.v("canBack","canBack");
                 ValueAnimator anim = ValueAnimator.ofFloat(0, 1);
                 anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
@@ -577,7 +590,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
                     }
                 });
             } else {
-                Log.v("canBack","No canBack");
+//                Log.v("canBack","No canBack");
                 setDisplayHomeAsUpEnabled(false);
                 drawerToggle.setDrawerIndicatorEnabled(true);
                 ValueAnimator anim = ValueAnimator.ofFloat(1, 0);
@@ -642,7 +655,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
     @Override
     public void onLoginOrLogout(boolean status) {
         mLoginStatus = status;
-        setMenuItemLoginTitle();
+//        setMenuItemLoginTitle();
         setHeaderProfileInfo(false);
         hideOrShowFAB();
     }
@@ -784,10 +797,21 @@ public class TravelGuideActivity extends AppCompatActivity implements
         setHeaderProfileInfo(false);
         refreshBackdrop();
         hideOrShowFAB();
-        Log.v("Completed Login","My backstack pop");
         if(mLoginStatus) {
-            popBackStackToFirstFragment();
+            getSupportFragmentManager().popBackStack();
         }
+    }
+
+    @Override
+    public void onSignUpRequested(){
+        KurtinSignUpFragment fragment = new KurtinSignUpFragment();
+        setContentFragment(R.id.fragment_frame, fragment);
+    }
+
+    @Override
+    public void onLoginRequested(){
+        KurtinLoginFragment fragment = new KurtinLoginFragment();
+        setContentFragment(R.id.fragment_frame, fragment);
     }
 
     //Setup the navigation menu depending on the whether or not the user is logged in
@@ -821,6 +845,11 @@ public class TravelGuideActivity extends AppCompatActivity implements
         }
         if (!Preferences.DEF_VALUE.equals(profilePicUrl)) {
             Glide.with(this).load(profilePicUrl).into(ivProfilePic);
+//            Glide.with(getApplicationContext())
+//                    .load(profilePicUrl)
+//                    .asBitmap()
+//                    .fitCenter()
+//                    .into(ivProfilePic);
         } else {
             ivProfilePic.setImageResource(R.drawable.profile_placeholder);
         }
@@ -831,7 +860,26 @@ public class TravelGuideActivity extends AppCompatActivity implements
         }
     }
 
-    private void popBackStackToFirstFragment(){
+    private void popBackStackToReferenceFragment(){
         getSupportFragmentManager().popBackStack();
     }
+
+    @Override
+    public void onSignUpCompleted(Boolean isLoggedIn){
+        mLoginStatus = isLoggedIn;
+        prepareNavMenu();
+        setHeaderProfileInfo(false);
+        refreshBackdrop();
+        hideOrShowFAB();
+        if(mLoginStatus) {
+            getSupportFragmentManager().popBackStack("home", NO_FLAGS);
+        }
+    }
+
+    ////////////////////////
+    ////////////////////////
+    //CVar code block ends//
+    ////////////////////////
+    ////////////////////////
+
 }

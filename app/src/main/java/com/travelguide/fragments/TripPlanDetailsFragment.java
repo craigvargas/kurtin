@@ -3,7 +3,6 @@ package com.travelguide.fragments;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -123,6 +122,8 @@ public class TripPlanDetailsFragment extends TripBaseFragment
     FrameLayout fragment_frame_scanner;
 
     Button scanbtn;
+
+    KurtinLoginFragment.LoginListener mLoginListener;
 
     public static TripPlanDetailsFragment newInstance(String tripPlanObjectId) {
         TripPlanDetailsFragment fragment = new TripPlanDetailsFragment();
@@ -251,7 +252,12 @@ public class TripPlanDetailsFragment extends TripBaseFragment
         scanbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                scanImage();
+                ParseUser parseUser = ParseUser.getCurrentUser();
+                if (parseUser == null){
+                    mLoginListener.onLoginRequested();
+                }else {
+                    scanImage();
+                }
             }
         });
 
@@ -417,11 +423,21 @@ public class TripPlanDetailsFragment extends TripBaseFragment
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
+        //Attach Trip Plan Listener
         try {
             listener = (OnTripPlanListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
                     + " must implement OnTripPlanListener");
+        }
+
+        //Attach login listener
+        try {
+            mLoginListener = (KurtinLoginFragment.LoginListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement LoginListener");
         }
     }
 
@@ -545,7 +561,7 @@ public class TripPlanDetailsFragment extends TripBaseFragment
                     //String imageURL = new GoogleStaticMapsAPIServices().getStaticMapURL(location,100);
 
                     //ivInstructionImage = (ImageView) view.findViewById(R.id.ivInstructionMapImage);
-                    Picasso.with(getContext()).load(list.get(0).get("scannerImage").toString()).resize(250,250).centerInside().placeholder(R.drawable.city_placeholder).into(ivInstructionImage);
+                    Picasso.with(getContext()).load(list.get(0).get("scannerImage").toString()).resize(1000,1000).centerInside().placeholder(R.drawable.city_placeholder).into(ivInstructionImage);
 
                     /*
                     Picasso.with(mContext)

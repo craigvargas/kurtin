@@ -495,7 +495,7 @@ public class LoginFragment extends DialogFragment {
             mLoginLogoutListener = (OnLoginLogoutListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
-                    + " must implement OnLoginLogoutListener");
+                    + " must implement LoginListener");
         }
     }
 

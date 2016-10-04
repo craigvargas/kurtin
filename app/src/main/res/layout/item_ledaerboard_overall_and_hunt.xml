@@ -9,16 +9,16 @@
 
     <TextView
         android:id="@+id/tvPosition"
-        android:layout_width="50dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="start"
+        android:gravity="center"
         tools:text="#1"
-        android:layout_marginLeft="15dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="3dp"
-        android:textSize="20dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:textSize="16sp"
         android:layout_alignParentTop="true"
-        android:textColor="@color/md_material_blue_800"
+        android:textColor="@color/black"
         android:layout_toRightOf="@+id/ivUserImage" />
 
 
@@ -27,10 +27,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="start"
-        android:layout_marginTop="3dp"
+        android:layout_marginTop="4dp"
         tools:text="Castello di Amorosa"
-        android:textSize="20dp"
-        android:textColor="@color/wikitude_orange_dark"
+        android:textSize="16sp"
+        android:textColor="@color/kurtin_text_primary"
+        android:layout_marginLeft="16dp"
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/tvPosition"
         android:layout_toEndOf="@+id/tvPosition" />
@@ -48,19 +49,21 @@
 
     <TextView
         android:id="@+id/tvPoints"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
-        tools:text="4 HOURS"
+        android:layout_marginLeft="16dp"
+        tools:text="400"
         android:layout_below="@+id/tvPosition"
-        android:textSize="20dp"
-        android:textColor="@color/wikitude_orange_dark"
-        android:layout_centerVertical="true"
-        android:layout_alignLeft="@+id/tvPosition"
-        android:layout_alignRight="@+id/tvPosition"
+        android:textSize="24sp"
+        android:textColor="@color/kurtin_text_primary"
         android:layout_toRightOf="@+id/ivUserImage"
-        android:layout_toEndOf="@+id/ivUserImage"
          />
+    <!--android:layout_alignLeft="@+id/tvPosition"-->
+    <!--android:layout_alignRight="@+id/tvPosition"-->
+    <!--android:layout_toEndOf="@+id/ivUserImage"-->
+    <!--android:layout_centerVertical="true"-->
+
 
 
     <TextView
@@ -71,9 +74,19 @@
         android:layout_below="@+id/tvName"
         android:layout_marginTop="2dp"
         tools:text="Castello di Amorosa"
-        android:textSize="20dp"
-        android:textColor="@color/md_material_blue_800"
+        android:textSize="16sp"
+        android:textColor="@color/kurtin_text_light"
         android:layout_toRightOf="@+id/tvPoints"
+        android:layout_marginLeft="16dp"
         />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_below="@+id/ivUserImage"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:background="@color/kurtin_primary_light"/>
 
 </RelativeLayout>

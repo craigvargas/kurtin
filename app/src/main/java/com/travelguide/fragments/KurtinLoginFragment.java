@@ -5,11 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +21,9 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
@@ -41,12 +45,8 @@ import com.travelguide.helpers.Preferences;
 
 import org.json.JSONException;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.travelguide.R.id.ivCoverPic;
-import static com.travelguide.R.id.ivProfilePic;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -61,8 +61,9 @@ public class KurtinLoginFragment extends Fragment {
     private String profilePicUrl = null;
     private String coverPicUrl = null;
 
-    private OnLoginLogoutListener mLoginLogoutListener;
+    private LoginListener mLoginLogoutListener;
     private boolean saveOrUpdate = false;
+    private boolean mIsLoggedIn = false;
 
     private MaterialDialog progressDialog;
 
@@ -77,8 +78,10 @@ public class KurtinLoginFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public interface OnLoginLogoutListener {
+    public interface LoginListener {
         public void onCompletedLoginLogout(boolean status);
+        public void onSignUpRequested();
+        public void onLoginRequested();
     }
 
 
@@ -123,7 +126,7 @@ public class KurtinLoginFragment extends Fragment {
         Button btnFacebookLogin;
         Button btnTwitterLogin;
         Button btnSnapchatLogin;
-        Button btnSignup;
+        Button btnSignUp;
         Button btnLogin;
 
         EditText etEmail;
@@ -136,11 +139,11 @@ public class KurtinLoginFragment extends Fragment {
             btnFacebookLogin = (Button) view.findViewById(R.id.btnFacebookLogin);
             btnTwitterLogin = (Button) view.findViewById(R.id.btnTwitertLogin);
             btnSnapchatLogin = (Button) view.findViewById(R.id.btnSnapchatLogin);
-            btnSignup = (Button) view.findViewById(R.id.btnSignup);
+            btnSignUp = (Button) view.findViewById(R.id.btnSignUp);
             btnLogin = (Button) view.findViewById(R.id.btnLogin);
 
             etEmail = (EditText) view.findViewById(R.id.etEmail);
-            etPassword = (EditText) view.findViewById(R.id.etEmail);
+            etPassword = (EditText) view.findViewById(R.id.etPassword);
 
             ivProfilePic = (ImageView) view.findViewById(R.id.ivProfilePic);
             ivCoverPic = (ImageView) view.findViewById(R.id.ivCoverPic);
@@ -148,10 +151,92 @@ public class KurtinLoginFragment extends Fragment {
     }
 
     private void setupButtonListeners(){
-        setupFacebookBtnListener();
+        setupFacebookBtnClickListener();
+        setupSignUpBtnClickListener();
+        setupLoginBtnClickListener();
     }
 
-    private void setupFacebookBtnListener(){
+    private void setupLoginBtnClickListener(){
+        viewHolder.btnLogin.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                if(allLoginInputValid()){
+                    loginParseUser();
+                }else{
+                    Toast.makeText(getContext(), "Input not valid", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private Boolean allLoginInputValid(){
+        if (emailIsValid()){
+            return true;
+        }else{
+            String msg = "Email is not valid";
+            Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+        }
+        return false;
+    }
+
+
+    private Boolean emailIsValid(){
+        return !TextUtils.isEmpty(viewHolder.etEmail.getText().toString()) &&
+                Patterns.EMAIL_ADDRESS.matcher(viewHolder.etEmail.getText().toString()).matches();
+    }
+
+    private void loginParseUser(){
+        progressDialog.show();
+        String email = viewHolder.etEmail.getText().toString();
+        String password = viewHolder.etPassword.getText().toString();
+
+        ParseUser.logInInBackground(email, password, new LogInCallback() {
+            public void done(ParseUser user, ParseException e) {
+                if (user != null) {
+                    // Hooray! The user is logged in.
+                    mIsLoggedIn = true;
+                    saveDataFromKurtinAccount();
+                    completeLogin();
+                } else {
+                    // login failed. Look at the ParseException to see what happened.
+                    progressDialog.dismiss();
+                    String msg = "Login failed: " + e.toString();
+                    Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void saveDataFromKurtinAccount(){
+        Context context = getContext();
+        ParseUser parseUser = ParseUser.getCurrentUser();
+        if(parseUser != null) {
+            Preferences.writeString(context, Preferences.User.USER_OBJECT_ID, parseUser.getObjectId());
+            String nickname = (String) parseUser.get("nickname");
+            if(nickname != null){
+                Preferences.writeString(context, Preferences.User.NAME, nickname);
+            }
+            Preferences.writeString(context, Preferences.User.EMAIL, parseUser.getEmail());
+            Preferences.writeBoolean(context, Preferences.User.LOG_IN_STATUS, mIsLoggedIn);
+        }
+    }
+
+    ///////////////////////////
+    ////////////////////////////////
+    //////////////////////////
+    /////////////////////////
+    //////////////////////////
+
+    private void setupSignUpBtnClickListener(){
+        viewHolder.btnSignUp.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                mLoginLogoutListener.onSignUpRequested();
+            }
+        });
+    }
+
+    private void setupFacebookBtnClickListener(){
         viewHolder.btnFacebookLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -180,8 +265,8 @@ public class KurtinLoginFragment extends Fragment {
                     });
                 } else {
                     //User is already logged in
-                    parseUser = ParseUser.getCurrentUser();
-                    logout(parseUser, getContext());
+//                    parseUser = ParseUser.getCurrentUser();
+//                    logout(parseUser, getContext());
                 }
             }
         });
@@ -192,6 +277,29 @@ public class KurtinLoginFragment extends Fragment {
             getUserDetailsFromParse();
         if (requestType == LoginFragment.RequestType.NEW)
             getUserDetailsFromFB(requestType);
+    }
+
+    public void logoutKurtin(ParseUser parseUser, final Context context){
+        if(Preferences.readBoolean(context, Preferences.User.LOG_IN_STATUS)){
+            if(parseUser != null){
+                ParseUser.logOutInBackground(new LogOutCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if(e == null){
+                            String username = Preferences.readString(context, Preferences.User.NAME);
+                            clearPrefs(context);
+                            String msg = "User " + username + " is logged out";
+                            Toast.makeText(context, msg, Toast.LENGTH_SHORT);
+                        }else{
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }else{
+                //Parse user not logged in
+                clearPrefs(context);
+            }
+        }
     }
 
     public void logout(ParseUser parseUser, final Context context) {
@@ -265,6 +373,8 @@ public class KurtinLoginFragment extends Fragment {
                             if(response.getJSONObject().getJSONObject("picture").getJSONObject("data").getString("url") != null) {
                                 profilePicUrl = response.getJSONObject().getJSONObject("picture").getJSONObject("data").getString("url");
                                 Preferences.writeString(getContext(), Preferences.User.PROFILE_PIC_URL, profilePicUrl);
+                            }else{
+                                profilePicUrl = null;
                             }
 
                             if (response.getJSONObject().optJSONObject("cover") != null) {
@@ -359,42 +469,115 @@ public class KurtinLoginFragment extends Fragment {
         Preferences.writeString(getContext(), Preferences.User.USER_OBJECT_ID, parseUser.getObjectId());
         parseUser.setUsername(name);
         parseUser.setEmail(email);
-        // Saving profile photo as a ParseFile
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        Bitmap bitmap = ((BitmapDrawable) viewHolder.ivProfilePic.getDrawable()).getBitmap();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-        byte[] data = stream.toByteArray();
-        String thumbName = parseUser.getUsername().replaceAll("\\s+", "");
-        ParseFile profilePicture = new ParseFile(thumbName + "_thumb.jpg", data);
-        ParseFile coverPicture = null;
-        // Saving cover photo as a ParseFile
-        if (coverPicUrl != null && viewHolder.ivCoverPic.getDrawable() != null) {
-            ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
-            Bitmap bitmap2 = ((BitmapDrawable) viewHolder.ivCoverPic.getDrawable()).getBitmap();
-            bitmap2.compress(Bitmap.CompressFormat.JPEG, 100, stream2);
-            byte[] data2 = stream2.toByteArray();
-            String fileName = parseUser.getUsername().replaceAll("\\s+", "");
-            coverPicture = new ParseFile(fileName + "_cover.jpg", data2);
+
+        //Load profile pic into a file if it exists
+        if(profilePicUrl != null) {
+            Glide.with(getContext())
+                    .load(profilePicUrl)
+                    .asBitmap()
+                    .toBytes()
+                    .fitCenter()
+                    .into(new SimpleTarget<byte[]>(250, 250) {
+                        @Override
+                        public void onResourceReady(byte[] data, GlideAnimation anim) {
+                            // Post your bytes to a background thread and upload them here.
+                            final ParseFile profilePic = new ParseFile("profile_pic.jpg", data);
+                            profilePic.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    parseUser.put("profileThumb", profilePic);
+                                    //Load cover pic into a file if it exists
+                                    if(coverPicUrl != null){
+                                        Glide.with(getContext())
+                                                .load(coverPicUrl)
+                                                .asBitmap()
+                                                .toBytes()
+                                                .fitCenter()
+                                                .into(new SimpleTarget<byte[]>(500, 500) {
+                                                    @Override
+                                                    public void onResourceReady(byte[] data, GlideAnimation anim) {
+                                                        // Post your bytes to a background thread and upload them here.
+                                                        final ParseFile coverPic = new ParseFile("cover_pic.jpg", data);
+                                                        coverPic.saveInBackground(new SaveCallback() {
+                                                            @Override
+                                                            public void done(ParseException e) {
+                                                                parseUser.put("coverPic", coverPic);
+                                                                parseUser.saveInBackground(new SaveCallback() {
+                                                                    @Override
+                                                                    public void done(ParseException e) {
+                                                                        //Both profile and cover pics loaded. complete login process
+//                                                                        completeLogin();
+                                                                    }
+                                                                });
+                                                                Log.v("Save", "2");
+                                                                completeLogin();
+                                                            }
+                                                        });
+                                                    }
+                                                });
+                                    }else{
+                                        //Loaded profile pic but no cover pic to load
+                                        parseUser.saveInBackground(new SaveCallback() {
+                                            @Override
+                                            public void done(ParseException e) {
+//                                                completeLogin();
+                                            }
+                                        });
+                                        Log.v("Save", "1");
+                                        completeLogin();
+                                    }
+                                }
+                            });
+                        }
+                    });
+        }else{
+            //No profile pic exists.  Don't bother with Cover pic.  Save user data to cloud.
+            parseUser.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+//                    completeLogin();
+                }
+            });
+            Log.v("Save", "0");
+            completeLogin();
         }
-        // else {
-        //     int width = DeviceDimensionsHelper.getDisplayWidth(getContext());
-        //     int height = DeviceDimensionsHelper.getDisplayHeight(getContext());
-        //     int[] colors = new int[width * height];
-        //     for (int i = 0; i < width * height; i++) {
-        //         colors[i] = R.color.colorPrimary;
-        //     }
-        //     bitmap = Bitmap.createBitmap(colors, width, height, Bitmap.Config.ARGB_8888);
-        //     bitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream);
-        //     data = stream.toByteArray();
-        //     String fileName = parseUser.getUsername().replaceAll("\\s+", "");
-        //     coverPicture = new ParseFile(fileName + "_cover.jpg", data);
-        // }
-        if (requestType == LoginFragment.RequestType.NEW) {
-            parseUser.put("favTrips", new ArrayList<String>());
-            saveNewParseUser(parseUser, profilePicture, coverPicture);
-        } else {
-            updateExistingParseUser(parseUser, profilePicture, coverPicture);
-        }
+
+//        // Saving profile photo as a ParseFile
+//        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//        Bitmap bitmap = ((BitmapDrawable) viewHolder.ivProfilePic.getDrawable()).getBitmap();
+//        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+//        byte[] data = stream.toByteArray();
+//        String thumbName = parseUser.getUsername().replaceAll("\\s+", "");
+//        ParseFile profilePicture = new ParseFile(thumbName + "_thumb.jpg", data);
+//        ParseFile coverPicture = null;
+//        // Saving cover photo as a ParseFile
+//        if (coverPicUrl != null && viewHolder.ivCoverPic.getDrawable() != null) {
+//            ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
+//            Bitmap bitmap2 = ((BitmapDrawable) viewHolder.ivCoverPic.getDrawable()).getBitmap();
+//            bitmap2.compress(Bitmap.CompressFormat.JPEG, 100, stream2);
+//            byte[] data2 = stream2.toByteArray();
+//            String fileName = parseUser.getUsername().replaceAll("\\s+", "");
+//            coverPicture = new ParseFile(fileName + "_cover.jpg", data2);
+//        }
+//        // else {
+//        //     int width = DeviceDimensionsHelper.getDisplayWidth(getContext());
+//        //     int height = DeviceDimensionsHelper.getDisplayHeight(getContext());
+//        //     int[] colors = new int[width * height];
+//        //     for (int i = 0; i < width * height; i++) {
+//        //         colors[i] = R.color.colorPrimary;
+//        //     }
+//        //     bitmap = Bitmap.createBitmap(colors, width, height, Bitmap.Config.ARGB_8888);
+//        //     bitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream);
+//        //     data = stream.toByteArray();
+//        //     String fileName = parseUser.getUsername().replaceAll("\\s+", "");
+//        //     coverPicture = new ParseFile(fileName + "_cover.jpg", data);
+//        // }
+//        if (requestType == LoginFragment.RequestType.NEW) {
+//            parseUser.put("favTrips", new ArrayList<String>());
+//            saveNewParseUser(parseUser, profilePicture, coverPicture);
+//        } else {
+//            updateExistingParseUser(parseUser, profilePicture, coverPicture);
+//        }
     }
 
     //Last step in login process of new user
@@ -489,10 +672,10 @@ public class KurtinLoginFragment extends Fragment {
 
     public void attachListener(Context context) {
         try {
-            mLoginLogoutListener = (OnLoginLogoutListener) context;
+            mLoginLogoutListener = (LoginListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
-                    + " must implement OnLoginLogoutListener");
+                    + " must implement LoginListener");
         }
     }
 
@@ -519,6 +702,7 @@ public class KurtinLoginFragment extends Fragment {
         if (progressDialog != null) {
             progressDialog.dismiss();
         }
+        Log.v("CompleteLogin", "Called");
         mLoginLogoutListener.onCompletedLoginLogout(Preferences.readBoolean(context, Preferences.User.LOG_IN_STATUS));
     }
 

@@ -53,7 +53,7 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.xgc1986.android:parallaxpagertransformer:1.0.3'
     compile 'com.code-troopers.betterpickers:library:2.2.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha8'
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha9'
     compile 'com.android.support:percent:24.2.1'
     compile 'com.android.support:support-v4:24.2.1'
     compile 'com.google.android.gms:play-services-maps:9.6.1'

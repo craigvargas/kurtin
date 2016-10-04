@@ -2,6 +2,7 @@ package com.travelguide.fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,9 +32,12 @@ import com.travelguide.models.TripPlan;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.travelguide.R.id.tvHuntName;
+
 public class MyHuntsLeaderBoardFragment extends LeaderBoardFragment {
     private static final String TAG = ProfileItemsFragment.class.getSimpleName();
 
+    private TextView tvBanner;
     private TextView tvEmpty;
     private RecyclerView rvTripPlans;
     Spinner huntList;
@@ -67,8 +71,13 @@ public class MyHuntsLeaderBoardFragment extends LeaderBoardFragment {
         rvTripPlans = (RecyclerView) view.findViewById(R.id.rvTripPlansInProfile);
         rvTripPlans.setAdapter(mTripPlanAdapter);
 
+        tvBanner = (TextView) view.findViewById(R.id.tvBanner);
         tvEmptyInProfile = (TextView) view.findViewById(R.id.tvEmptyInProfile);
         tvEmptyLeaderBoard = (TextView) view.findViewById(R.id.tvEmptyLeaderBoard);
+
+        Typeface cabinBoldFont = Typeface.createFromAsset(getContext().getAssets(), "fonts/cabin_bold.ttf");
+        tvBanner.setTypeface(cabinBoldFont);
+
 
         selectedHuntID = LeaderBoardFragment.mHuntID;
 

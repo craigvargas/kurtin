@@ -2,6 +2,7 @@ package com.travelguide.fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -34,6 +35,7 @@ import java.util.List;
 public class OverallLeaderBoardFragment extends LeaderBoardFragment {
     private static final String TAG = ProfileItemsFragment.class.getSimpleName();
 
+    private TextView tvBanner;
     private TextView tvEmpty;
     private RecyclerView rvTripPlans;
     private MaterialDialog progressDialog;
@@ -71,7 +73,11 @@ public class OverallLeaderBoardFragment extends LeaderBoardFragment {
 
         //We dont need this click
 
+        tvBanner = (TextView) view.findViewById(R.id.tvBanner);
         tvEmpty = (TextView) view.findViewById(R.id.tvEmptyInProfile);
+
+        Typeface cabinBoldFont = Typeface.createFromAsset(getContext().getAssets(), "fonts/cabin_bold.ttf");
+        tvBanner.setTypeface(cabinBoldFont);
 
         progressDialog = new MaterialDialog.Builder(getContext())
                 .title(R.string.loading_plans)

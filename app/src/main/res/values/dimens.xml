@@ -19,7 +19,7 @@
     <dimen name="home_tile_text_left_margin">150dp</dimen>
     <dimen name="banner_logo_width">100dp</dimen>
     <dimen name="btn_login_margin_top">16dp</dimen>
-    <dimen name="btn_login_margin_left_right">16dp</dimen>
+    <dimen name="btn_login_margin_left_right">24dp</dimen>
     <dimen name="login_instruction_text">12sp</dimen>
     <dimen name="text_decoration_margin_left_right">16dp</dimen>
     <dimen name="line_width_thin">1dp</dimen>
