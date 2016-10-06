@@ -189,7 +189,7 @@
         android:layout_above="@+id/ivUserPic"
         android:layout_alignLeft="@+id/ivUserPic"
         android:layout_alignStart="@+id/ivUserPic"
-        android:background="@drawable/btn_rounded"
+        android:background="@drawable/btn_round"
         android:backgroundTint="@color/kurtin_primary_dark"
         android:ellipsize="marquee"
         android:maxLines="1"

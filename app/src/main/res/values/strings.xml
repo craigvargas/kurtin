@@ -95,6 +95,7 @@
     <string name="sign_up_instruction_one">Sign Up Using</string>
     <string name="sign_up_instruction_two">SIGN UP WITH KURTIN</string>
     <string name="action_sign_up">SIGN UP</string>
+    <string name="finish_login">Finish</string>
 
 
     <!--Other Strings-->

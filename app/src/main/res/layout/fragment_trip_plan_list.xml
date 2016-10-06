@@ -38,10 +38,15 @@
         android:layout_marginRight="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="64dp"
+        android:src="@drawable/ic_trophy_white"
         app:layout_anchor="@id/rvTripPlans"
         app:layout_anchorGravity="bottom|right|end"
         fab:fab_colorNormal="@color/kurtin_primary_light"
         fab:fab_colorPressed="@color/kurtin_primary_dark"
-        fab:fab_icon="@drawable/ic_add_white" />
+        android:scaleType="centerCrop"
+        android:padding="16dp"
+        />
+    <!--fab:fab_icon="@drawable/ic_kurtin_scanner"-->
+
 
 </android.support.design.widget.CoordinatorLayout>

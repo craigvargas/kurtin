@@ -40,6 +40,7 @@ import com.parse.SaveCallback;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.travelguide.R;
+import com.travelguide.helpers.AppCodesKeys;
 import com.travelguide.helpers.NetworkAvailabilityCheck;
 import com.travelguide.helpers.Preferences;
 
@@ -64,10 +65,12 @@ public class KurtinLoginFragment extends Fragment {
     private LoginListener mLoginLogoutListener;
     private boolean saveOrUpdate = false;
     private boolean mIsLoggedIn = false;
+    private boolean mIsNewUser = false;
 
     private MaterialDialog progressDialog;
 
     private KurtinLoginFragment kurtinLoginFragment = this;
+
 
     public static final List<String> permissions = new ArrayList<String>() {{
         add("public_profile");
@@ -79,7 +82,7 @@ public class KurtinLoginFragment extends Fragment {
     }
 
     public interface LoginListener {
-        public void onCompletedLoginLogout(boolean status);
+        public void onCompletedLoginLogout(boolean isLoggedIn, boolean isNewUser);
         public void onSignUpRequested();
         public void onLoginRequested();
     }
@@ -211,13 +214,26 @@ public class KurtinLoginFragment extends Fragment {
         Context context = getContext();
         ParseUser parseUser = ParseUser.getCurrentUser();
         if(parseUser != null) {
+            //User ObjectId
             Preferences.writeString(context, Preferences.User.USER_OBJECT_ID, parseUser.getObjectId());
-            String nickname = (String) parseUser.get("nickname");
+
+            //User name
+            String nickname = (String) parseUser.get(AppCodesKeys.PARSE_USER_NICKNAME_KEY);
             if(nickname != null){
                 Preferences.writeString(context, Preferences.User.NAME, nickname);
             }
+
+            //Email
             Preferences.writeString(context, Preferences.User.EMAIL, parseUser.getEmail());
+
+            //login status
             Preferences.writeBoolean(context, Preferences.User.LOG_IN_STATUS, mIsLoggedIn);
+
+            //Profile pic
+            Bitmap profilePicBitmap = KurtinProfileFragment.loadPicFromParse(parseUser, AppCodesKeys.PARSE_USER_PROFILE_PIC_KEY);
+            if (profilePicBitmap != null){
+                KurtinProfileFragment.savePicToInternalStorage(profilePicBitmap, AppCodesKeys.PROFILE_PIC_FILE_NAME, context);
+            }
         }
     }
 
@@ -276,6 +292,7 @@ public class KurtinLoginFragment extends Fragment {
         if (requestType == LoginFragment.RequestType.UPDATE)
             getUserDetailsFromParse();
         if (requestType == LoginFragment.RequestType.NEW)
+            mIsNewUser = true;
             getUserDetailsFromFB(requestType);
     }
 
@@ -330,6 +347,7 @@ public class KurtinLoginFragment extends Fragment {
         Preferences.writeString(context, Preferences.User.COVER_PIC_URL, Preferences.DEF_VALUE);
         Preferences.writeString(context, Preferences.User.NAME, Preferences.DEF_VALUE);
         Preferences.writeString(context, Preferences.User.EMAIL, Preferences.DEF_VALUE);
+        Preferences.writeString(context, Preferences.User.PROFILE_PIC_LOCAL_PATH, Preferences.DEF_VALUE);
         Preferences.writeBoolean(context, Preferences.User.LOG_IN_STATUS, false);
         if (mLoginLogoutListener == null) {
             attachListener(context);
@@ -469,79 +487,93 @@ public class KurtinLoginFragment extends Fragment {
         Preferences.writeString(getContext(), Preferences.User.USER_OBJECT_ID, parseUser.getObjectId());
         parseUser.setUsername(name);
         parseUser.setEmail(email);
+        final Context context = getContext();
 
-        //Load profile pic into a file if it exists
-        if(profilePicUrl != null) {
-            Glide.with(getContext())
-                    .load(profilePicUrl)
-                    .asBitmap()
-                    .toBytes()
-                    .fitCenter()
-                    .into(new SimpleTarget<byte[]>(250, 250) {
-                        @Override
-                        public void onResourceReady(byte[] data, GlideAnimation anim) {
-                            // Post your bytes to a background thread and upload them here.
-                            final ParseFile profilePic = new ParseFile("profile_pic.jpg", data);
-                            profilePic.saveInBackground(new SaveCallback() {
-                                @Override
-                                public void done(ParseException e) {
-                                    parseUser.put("profileThumb", profilePic);
-                                    //Load cover pic into a file if it exists
-                                    if(coverPicUrl != null){
-                                        Glide.with(getContext())
-                                                .load(coverPicUrl)
-                                                .asBitmap()
-                                                .toBytes()
-                                                .fitCenter()
-                                                .into(new SimpleTarget<byte[]>(500, 500) {
-                                                    @Override
-                                                    public void onResourceReady(byte[] data, GlideAnimation anim) {
-                                                        // Post your bytes to a background thread and upload them here.
-                                                        final ParseFile coverPic = new ParseFile("cover_pic.jpg", data);
-                                                        coverPic.saveInBackground(new SaveCallback() {
-                                                            @Override
-                                                            public void done(ParseException e) {
-                                                                parseUser.put("coverPic", coverPic);
-                                                                parseUser.saveInBackground(new SaveCallback() {
-                                                                    @Override
-                                                                    public void done(ParseException e) {
-                                                                        //Both profile and cover pics loaded. complete login process
-//                                                                        completeLogin();
-                                                                    }
-                                                                });
-                                                                Log.v("Save", "2");
-                                                                completeLogin();
-                                                            }
-                                                        });
-                                                    }
-                                                });
-                                    }else{
-                                        //Loaded profile pic but no cover pic to load
-                                        parseUser.saveInBackground(new SaveCallback() {
-                                            @Override
-                                            public void done(ParseException e) {
-//                                                completeLogin();
-                                            }
-                                        });
-                                        Log.v("Save", "1");
-                                        completeLogin();
+        if (requestType == LoginFragment.RequestType.NEW) {
+
+            //Load profile pic into a file if it exists
+            if (profilePicUrl != null) {
+                Glide.with(context)
+                        .load(profilePicUrl)
+                        .asBitmap()
+                        .toBytes()
+                        .fitCenter()
+                        .into(new SimpleTarget<byte[]>(250, 250) {
+                            @Override
+                            public void onResourceReady(final byte[] data, GlideAnimation anim) {
+                                // Post your bytes to a background thread and upload them here.
+                                final ParseFile profilePic = new ParseFile("profile_pic.jpg", data);
+                                profilePic.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        parseUser.put("profileThumb", profilePic);
+                                        Bitmap profilePicBitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                                        KurtinProfileFragment.savePicToInternalStorage(
+                                                profilePicBitmap,
+                                                AppCodesKeys.PROFILE_PIC_FILE_NAME,
+                                                context);
+                                        //Load cover pic into a file if it exists
+                                        if (coverPicUrl != null) {
+                                            Glide.with(context)
+                                                    .load(coverPicUrl)
+                                                    .asBitmap()
+                                                    .toBytes()
+                                                    .fitCenter()
+                                                    .into(new SimpleTarget<byte[]>(500, 500) {
+                                                        @Override
+                                                        public void onResourceReady(byte[] data, GlideAnimation anim) {
+                                                            // Post your bytes to a background thread and upload them here.
+                                                            final ParseFile coverPic = new ParseFile("cover_pic.jpg", data);
+                                                            coverPic.saveInBackground(new SaveCallback() {
+                                                                @Override
+                                                                public void done(ParseException e) {
+                                                                    parseUser.put("coverPic", coverPic);
+                                                                    parseUser.saveInBackground(new SaveCallback() {
+                                                                        @Override
+                                                                        public void done(ParseException e) {
+                                                                        }
+                                                                    });
+                                                                    Log.v("Save", "2");
+                                                                    completeLogin();
+                                                                }
+                                                            });
+                                                        }
+                                                    });
+                                        } else {
+                                            //Loaded profile pic but no cover pic to load
+                                            parseUser.saveInBackground(new SaveCallback() {
+                                                @Override
+                                                public void done(ParseException e) {
+                                                }
+                                            });
+                                            Log.v("Save", "1");
+                                            completeLogin();
+                                        }
                                     }
-                                }
-                            });
-                        }
-                    });
+                                });
+                            }
+                        });
+            } else {
+                //No profile pic exists.  Don't bother with Cover pic.  Save user data to cloud.
+                parseUser.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                    }
+                });
+                Log.v("Save", "0");
+                completeLogin();
+            }
         }else{
-            //No profile pic exists.  Don't bother with Cover pic.  Save user data to cloud.
+            //Not a new user so will only update name & email
+            //User can choose to update a profile pic on the device
             parseUser.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(ParseException e) {
-//                    completeLogin();
                 }
             });
             Log.v("Save", "0");
             completeLogin();
         }
-
 //        // Saving profile photo as a ParseFile
 //        ByteArrayOutputStream stream = new ByteArrayOutputStream();
 //        Bitmap bitmap = ((BitmapDrawable) viewHolder.ivProfilePic.getDrawable()).getBitmap();
@@ -695,15 +727,18 @@ public class KurtinLoginFragment extends Fragment {
         if (progressDialog != null) {
             progressDialog.dismiss();
         }
-        mLoginLogoutListener.onCompletedLoginLogout(Preferences.readBoolean(getActivity(), Preferences.User.LOG_IN_STATUS));
+        mLoginLogoutListener.onCompletedLoginLogout(
+                Preferences.readBoolean(getActivity(), Preferences.User.LOG_IN_STATUS),
+                mIsNewUser);
     }
 
     private void completeLogin (Context context){
         if (progressDialog != null) {
             progressDialog.dismiss();
         }
-        Log.v("CompleteLogin", "Called");
-        mLoginLogoutListener.onCompletedLoginLogout(Preferences.readBoolean(context, Preferences.User.LOG_IN_STATUS));
+        mLoginLogoutListener.onCompletedLoginLogout(
+                Preferences.readBoolean(getActivity(), Preferences.User.LOG_IN_STATUS),
+                mIsNewUser);
     }
 
 //    private void dismissDialog(Context context) {

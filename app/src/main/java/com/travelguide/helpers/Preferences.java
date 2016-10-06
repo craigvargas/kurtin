@@ -39,5 +39,7 @@ public class Preferences {
         public static final String NAME = "name";
         public static final String EMAIL = "email";
         public static final String LOG_IN_STATUS = "login_status";
+        public static final String PROFILE_PIC_LOCAL_PATH = "localProfilePicPath";
     }
+
 }

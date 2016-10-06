@@ -20,7 +20,7 @@
         android:src="@drawable/profile_placeholder"/>
 
     <Button
-        android:id="@+id/btnChangeProfilePic"
+        android:id="@+id/btnChangePic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/ivProfilePic"
@@ -30,5 +30,22 @@
         android:textColor="@color/dogwood_rose"
         android:textSize="16sp"
         android:textStyle="bold"/>
+
+    <Button
+        android:id="@+id/btnFinish"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/btn_round_dark_white_edge"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/btnChangePic"
+        android:layout_marginTop="160dp"
+        android:layout_marginLeft="96dp"
+        android:layout_marginRight="96dp"
+        android:text="@string/finish_login"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        />
 
 </RelativeLayout>

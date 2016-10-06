@@ -229,7 +229,7 @@
         android:layout_marginRight="48dp"
         android:layout_marginTop="64dp"
         android:layout_below="@+id/tvConfirmPasswordDecoration"
-        android:background="@drawable/btn_rounded"
+        android:background="@drawable/btn_round"
         android:backgroundTint="@color/kurtin_primary_light"
         android:text="@string/action_sign_up"
         android:textColor="@color/white"

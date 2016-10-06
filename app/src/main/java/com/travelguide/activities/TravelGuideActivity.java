@@ -55,6 +55,7 @@ import com.travelguide.R;
 import com.travelguide.foursquare.constants.FoursquareConstants;
 import com.travelguide.fragments.FullscreenFragment;
 import com.travelguide.fragments.KurtinLoginFragment;
+import com.travelguide.fragments.KurtinProfileFragment;
 import com.travelguide.fragments.KurtinSignUpFragment;
 import com.travelguide.fragments.LeaderBoardFragment;
 import com.travelguide.fragments.LoginFragment;
@@ -91,7 +92,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
     private NavigationView nvDrawer;
     private Toolbar toolbar;
     private ActionBarDrawerToggle drawerToggle;
-    private ImageView ivProfile;
+    private ImageView ivNavHeaderPic;
     private TextView tvProfileUsername;
     private TextView tvProfileEmail;
 
@@ -117,10 +118,16 @@ public class TravelGuideActivity extends AppCompatActivity implements
     private String email = null;
     private String profilePicUrl = null;
     private String coverPicUrl = null;
+    private String profilePicLocalPath = null;
 
     private boolean mLoginStatus = false;
 
+    private String referenceFragmentNameTag;
+
     private static int NO_FLAGS = 0;
+
+    private static String HOME_TAG = "home";
+    private static String HUNT_DETAIL_TAG = "huntDetail";
 
 
     @Override
@@ -146,7 +153,8 @@ public class TravelGuideActivity extends AppCompatActivity implements
         ivProfilePic = (CircleImageView) findViewById(R.id.ivProfilePicInProfile);
         tvName = (TextView) findViewById(R.id.tvNameInProfile);
         tvEmail = (TextView) findViewById(R.id.tvEmailInProfile);
-        loadBackdrop();
+//        loadBackdrop();
+        refreshBackdrop();
 
         // Find our drawer view
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -159,9 +167,10 @@ public class TravelGuideActivity extends AppCompatActivity implements
         // Setup drawer view
         setupDrawerContent(nvDrawer);
 
-        ivProfile = (ImageView) header.findViewById(R.id.ivProfile);
+        ivNavHeaderPic = (ImageView) header.findViewById(R.id.ivNavHeaderPic);
         tvProfileUsername = (TextView) header.findViewById(R.id.tvProfileUsername);
         tvProfileEmail = (TextView) header.findViewById(R.id.tvProfileEmail);
+        refreshNavHeader();
 
         // Tie DrawerLayout events to the ActionBarToggle
         mDrawer.setDrawerListener(drawerToggle);
@@ -193,8 +202,10 @@ public class TravelGuideActivity extends AppCompatActivity implements
         super.onResume();
         mLoginStatus = Preferences.readBoolean(this, Preferences.User.LOG_IN_STATUS);
 //        setMenuItemLoginTitle();
-        setHeaderProfileInfo(true);
-        loadBackdrop();
+//        setHeaderProfileInfo(true);
+//        loadBackdrop();
+        refreshNavHeader();
+        refreshBackdrop();
     }
 
     @Override
@@ -236,7 +247,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
                 });
     }
 
-    //Nav options
+    //Nav menu options
     public void selectDrawerItem(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.login_fragment:
@@ -251,7 +262,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
             case R.id.home_fragment:
                 setContentFragment(R.id.fragment_frame, new TripPlanListFragment());
             case R.id.profile_fragment:
-                setContentFragment(R.id.fragment_frame, new ProfileFragment());
+                setContentFragment(R.id.fragment_frame, new KurtinProfileFragment());
                 break;
             case R.id.settings_fragment:
                 showSettingsDialog();
@@ -517,16 +528,26 @@ public class TravelGuideActivity extends AppCompatActivity implements
     }
 
     private void setContentFragment(int fragmentFrame, Fragment fragment) {
+        //Setup the Fragment Transaction
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out);
         fragmentTransaction.replace(fragmentFrame, fragment);
+
+        //Decide whether or not to put a tag on the backstack
         if(fragment instanceof TripPlanListFragment){
-            fragmentTransaction.addToBackStack("home");
-        }else {
+            referenceFragmentNameTag = HOME_TAG;
+            fragmentTransaction.addToBackStack(referenceFragmentNameTag);
+        }else if(fragment instanceof TripPlanDetailsFragment) {
+            referenceFragmentNameTag = HUNT_DETAIL_TAG;
+            fragmentTransaction.addToBackStack(referenceFragmentNameTag);
+        }else{
             fragmentTransaction.addToBackStack(null);
         }
+
+        //Commit the transaction and load the fragment
         fragmentTransaction.commit();
-//        lockUnlockNavigationDrawer(fragment);
+
+        //Decide which view needs to be visible
         if (fragment instanceof FullscreenFragment) {
             coordinatorLayout.setVisibility(View.GONE);
             fragmentFrameFullscreen.setVisibility(View.VISIBLE);
@@ -536,6 +557,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
             fragmentFrameFullscreen.setVisibility(View.GONE);
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
+
     }
 
     private void lockUnlockNavigationDrawer(Fragment fragment) {
@@ -623,7 +645,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
                     ParseFile parseFile = currentUser.getParseFile("profileThumb");
                     byte[] data = parseFile.getData();
                     Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                    ivProfile.setImageBitmap(bitmap);
+                    ivNavHeaderPic.setImageBitmap(bitmap);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -631,7 +653,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
                 tvProfileEmail.setText(currentUser.getEmail());
                 loadBackdrop();
             } else {
-                ivProfile.setImageResource(R.drawable.profile_placeholder);
+                ivNavHeaderPic.setImageResource(R.drawable.profile_placeholder);
                 tvProfileUsername.setText("");
                 tvProfileEmail.setText("");
             }
@@ -674,6 +696,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
         email = Preferences.readString(this, Preferences.User.EMAIL);
         profilePicUrl = Preferences.readString(this, Preferences.User.PROFILE_PIC_URL);
         coverPicUrl = Preferences.readString(this, Preferences.User.COVER_PIC_URL);
+        profilePicLocalPath = Preferences.readString(this, Preferences.User.PROFILE_PIC_LOCAL_PATH);
     }
 
     private void loadBackdrop() {
@@ -790,15 +813,21 @@ public class TravelGuideActivity extends AppCompatActivity implements
 
     //Listener for Kurtin Logins and Logouts
     @Override
-    public void onCompletedLoginLogout(boolean loginStatus) {
-        mLoginStatus = loginStatus;
+    public void onCompletedLoginLogout(boolean isLoggedIn, boolean isNewUser) {
+        mLoginStatus = isLoggedIn;
 //        setMenuItemLoginTitle();
         prepareNavMenu();
-        setHeaderProfileInfo(false);
+//        setHeaderProfileInfo(false);
         refreshBackdrop();
+        refreshNavHeader();
         hideOrShowFAB();
         if(mLoginStatus) {
             getSupportFragmentManager().popBackStack();
+        }
+
+        if(isNewUser){
+            KurtinProfileFragment kurtinProfileFragment = KurtinProfileFragment.newInstance(isNewUser);
+            setContentFragment(R.id.fragment_frame, kurtinProfileFragment);
         }
     }
 
@@ -843,18 +872,45 @@ public class TravelGuideActivity extends AppCompatActivity implements
         } else {
             tvEmail.setText("Email");
         }
-        if (!Preferences.DEF_VALUE.equals(profilePicUrl)) {
-            Glide.with(this).load(profilePicUrl).into(ivProfilePic);
+        if (!Preferences.DEF_VALUE.equals(profilePicLocalPath)) {
+//            Glide.with(this).load(profilePicUrl).into(ivProfilePic);
 //            Glide.with(getApplicationContext())
 //                    .load(profilePicUrl)
 //                    .asBitmap()
 //                    .fitCenter()
 //                    .into(ivProfilePic);
+            KurtinProfileFragment.loadImageFromStorageIntoView(profilePicLocalPath, ivProfilePic);
         } else {
             ivProfilePic.setImageResource(R.drawable.profile_placeholder);
         }
         if (!Preferences.DEF_VALUE.equals(coverPicUrl)) {
-            Picasso.with(this).load(coverPicUrl).resize(DeviceDimensionsHelper.getDisplayWidth(this), 0).into(ivCoverPic);
+//            Picasso.with(this).load(coverPicUrl).resize(DeviceDimensionsHelper.getDisplayWidth(this), 0).into(ivCoverPic);
+            ivCoverPic.setImageResource(android.R.color.transparent);
+        } else {
+            ivCoverPic.setImageResource(android.R.color.transparent);
+        }
+    }
+
+    private void refreshNavHeader(){
+        getSharedPreferences();
+        if (!Preferences.DEF_VALUE.equals(name)) {
+            tvProfileUsername.setText(name);
+        } else {
+            tvProfileUsername.setText("");
+        }
+        if (!Preferences.DEF_VALUE.equals(email)) {
+            tvProfileEmail.setText(email);
+        } else {
+            tvProfileEmail.setText("");
+        }
+        if (!Preferences.DEF_VALUE.equals(profilePicLocalPath)) {
+            KurtinProfileFragment.loadImageFromStorageIntoView(profilePicLocalPath, ivNavHeaderPic);
+        } else {
+            ivNavHeaderPic.setImageResource(R.drawable.profile_placeholder);
+        }
+        if (!Preferences.DEF_VALUE.equals(coverPicUrl)) {
+//            Picasso.with(this).load(coverPicUrl).resize(DeviceDimensionsHelper.getDisplayWidth(this), 0).into(ivCoverPic);
+            ivCoverPic.setImageResource(android.R.color.transparent);
         } else {
             ivCoverPic.setImageResource(android.R.color.transparent);
         }
@@ -868,12 +924,18 @@ public class TravelGuideActivity extends AppCompatActivity implements
     public void onSignUpCompleted(Boolean isLoggedIn){
         mLoginStatus = isLoggedIn;
         prepareNavMenu();
-        setHeaderProfileInfo(false);
+//        setHeaderProfileInfo(false);
         refreshBackdrop();
+        refreshNavHeader();
         hideOrShowFAB();
         if(mLoginStatus) {
             getSupportFragmentManager().popBackStack("home", NO_FLAGS);
         }
+
+        Boolean isNewUser = true;
+        KurtinProfileFragment kurtinProfileFragment = KurtinProfileFragment.newInstance(isNewUser);
+
+        setContentFragment(R.id.fragment_frame, kurtinProfileFragment);
     }
 
     ////////////////////////
