@@ -6,6 +6,7 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -34,6 +35,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import static com.facebook.FacebookSdk.getApplicationContext;
+import static com.travelguide.R.id.tvHuntName;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -104,6 +106,9 @@ public class KurtinProfileFragment extends Fragment {
             ivProfilePic = (ImageView) view.findViewById(R.id.ivProfilePic);
             btnChangePic = (Button) view.findViewById(R.id.btnChangePic);
             btnFinish = (Button) view.findViewById(R.id.btnFinish);
+
+            Typeface cabinBoldFont = Typeface.createFromAsset(getContext().getAssets(), "fonts/cabin_bold.ttf");
+            btnFinish.setTypeface(cabinBoldFont);
 
             try {
                 mIsNewUser = arguments.getBoolean(IS_NEW_USER_KEY);
@@ -328,7 +333,7 @@ public class KurtinProfileFragment extends Fragment {
     }
 
 
-    public static Bitmap loadPicFromParse(ParseUser parseUser, String fieldKey) {
+    public static Bitmap getBitmapFromParseUser(ParseUser parseUser, String fieldKey) {
         Boolean userIsLoggedIn = (parseUser != null);
 
         //If parseUser is logged in then try to retrieve the profile pic
@@ -346,6 +351,18 @@ public class KurtinProfileFragment extends Fragment {
         }else{
             return null;
         }
+    }
+
+    public static void loadImageFromParseFileIntoImageView(ParseFile parseFile, ImageView imageView) {
+            try {
+                byte[] profilePicBytes = parseFile.getData();
+                Bitmap profilePicBitmap = BitmapFactory.decodeByteArray(profilePicBytes, 0, profilePicBytes.length);
+                imageView.setImageBitmap(profilePicBitmap);
+                return ;
+            }catch (Exception e) {
+                e.printStackTrace();
+                return;
+            }
     }
 
     private void loadProfilePicFromParse() {

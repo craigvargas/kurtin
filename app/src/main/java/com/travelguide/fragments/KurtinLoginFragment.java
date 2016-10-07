@@ -230,7 +230,7 @@ public class KurtinLoginFragment extends Fragment {
             Preferences.writeBoolean(context, Preferences.User.LOG_IN_STATUS, mIsLoggedIn);
 
             //Profile pic
-            Bitmap profilePicBitmap = KurtinProfileFragment.loadPicFromParse(parseUser, AppCodesKeys.PARSE_USER_PROFILE_PIC_KEY);
+            Bitmap profilePicBitmap = KurtinProfileFragment.getBitmapFromParseUser(parseUser, AppCodesKeys.PARSE_USER_PROFILE_PIC_KEY);
             if (profilePicBitmap != null){
                 KurtinProfileFragment.savePicToInternalStorage(profilePicBitmap, AppCodesKeys.PROFILE_PIC_FILE_NAME, context);
             }
@@ -732,12 +732,13 @@ public class KurtinLoginFragment extends Fragment {
                 mIsNewUser);
     }
 
+    //This version of completeLogin is used when you logout through a static method from another Activity or Fragment
     private void completeLogin (Context context){
         if (progressDialog != null) {
             progressDialog.dismiss();
         }
         mLoginLogoutListener.onCompletedLoginLogout(
-                Preferences.readBoolean(getActivity(), Preferences.User.LOG_IN_STATUS),
+                Preferences.readBoolean(context, Preferences.User.LOG_IN_STATUS),
                 mIsNewUser);
     }
 

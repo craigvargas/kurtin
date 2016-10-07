@@ -261,11 +261,23 @@ public class TravelGuideActivity extends AppCompatActivity implements
                 break;
             case R.id.home_fragment:
                 setContentFragment(R.id.fragment_frame, new TripPlanListFragment());
+                break;
+            case R.id.my_hunts_fragment:
+                break;
+            case R.id.favorites_fragment:
+                break;
+            case R.id.leaders_fragment:
+                setContentFragment(R.id.fragment_frame, new LeaderBoardFragment());
+                break;
+            case R.id.private_fragment:
+                break;
+            case R.id.invite_friends_fragment:
+                break;
             case R.id.profile_fragment:
                 setContentFragment(R.id.fragment_frame, new KurtinProfileFragment());
                 break;
             case R.id.settings_fragment:
-                showSettingsDialog();
+//                showSettingsDialog();
                 break;
             case R.id.logout_fragment:
                 new KurtinLoginFragment().logoutKurtin(ParseUser.getCurrentUser(), this);
@@ -502,6 +514,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
     }
     **/
 
+    //Function below is associated with the FAB (Oct 06, 2016)
     @Override
     public void onTripPlanNew() {
         setContentFragment(R.id.fragment_frame, new LeaderBoardFragment());

@@ -35,13 +35,13 @@
             android:icon="@drawable/ic_kurtin_profile_white"
             android:title="@string/action_profile" />
         <item
-            android:id="@+id/logout_fragment"
-            android:icon="@drawable/ic_kurtin_key_white"
-            android:title="@string/action_logout" />
-        <item
             android:id="@+id/settings_fragment"
             android:icon="@drawable/ic_settings_white_24dp"
             android:title="@string/action_settings" />
+        <item
+            android:id="@+id/logout_fragment"
+            android:icon="@drawable/ic_kurtin_key_white"
+            android:title="@string/action_logout" />
     </group>
 </menu>
 

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Travel Guide</string>
     <string name="kurtin_app_name">Kurtin</string>
-    <string name="action_settings">Settings</string>
+    <!--<string name="action_settings">Settings</string>-->
     <!--<string name="action_login">Login</string>-->
     <!--<string name="action_profile">Profile</string>-->
     <string name="action_done">Done</string>
@@ -26,7 +26,7 @@
     <string name="family">Family</string>
     <string name="group">Group</string>
     <string name="creating_plan">Creating Plan…</string>
-    <string name="loading_plans">Loading Plans…</string>
+    <string name="loading_plans">Kurtin is hunting…</string>
     <string name="please_wait">Please wait.</string>
     <string name="no_data_available">No data available.</string>
     <string name="label_settings">Select filters</string>
@@ -82,6 +82,7 @@
     <string name="action_invite_friends">INVITE FRIENDS</string>
     <string name="action_profile">PROFILE</string>
     <string name="action_logout">LOGOUT</string>
+    <string name="action_settings">SETTINGS</string>
 
     <!--Login and Signup Strings-->
     <string name="login_instruction_one">Login Using</string>
