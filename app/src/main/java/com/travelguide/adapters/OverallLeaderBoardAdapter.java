@@ -19,6 +19,9 @@ import com.parse.ParseFile;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.travelguide.R;
+import com.travelguide.fragments.KurtinProfileFragment;
+import com.travelguide.fragments.OverallLeaderBoardFragment;
+import com.travelguide.models.Competitor;
 import com.travelguide.models.MasterLeaderBoard;
 
 import java.util.List;
@@ -26,10 +29,10 @@ import java.util.List;
 public class OverallLeaderBoardAdapter extends RecyclerView.Adapter<OverallLeaderBoardAdapter.ViewHolder> {
 
     private final Context mContext;
-    private final List<MasterLeaderBoard> mTripPlans;
+    private final List<Competitor> mCompetitors;
 
-    public OverallLeaderBoardAdapter(List<MasterLeaderBoard> mTripPlans, Context context) {
-        this.mTripPlans = mTripPlans;
+    public OverallLeaderBoardAdapter(List<Competitor> tripPlans, Context context) {
+        this.mCompetitors = tripPlans;
         this.mContext = context;
     }
 
@@ -44,14 +47,21 @@ public class OverallLeaderBoardAdapter extends RecyclerView.Adapter<OverallLeade
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        final MasterLeaderBoard tripPlan = mTripPlans.get(position);
+        final Competitor competitor = mCompetitors.get(position);
 
-        Integer currentPosition = position+1;
+        Integer currentPosition = position + 1;
 
 
-        holder.tvPoints.setText(tripPlan.getPoints().toString());
-        holder.tvPosition.setText("#"+currentPosition);
+        holder.tvPoints.setText(competitor.getPoints().toString());
+        holder.tvPosition.setText("#" + currentPosition);
         holder.rlHuntItem.setBackgroundColor(Color.TRANSPARENT);
+        holder.tvName.setText(competitor.getName());
+        if (competitor.getParseFilePic() != null) {
+            KurtinProfileFragment.loadImageFromParseFileIntoImageView(
+                    competitor.getParseFilePic(),
+                    holder.ivUserImage);
+        }
+    }
 
         //Get Hunt Name
         //holder.tvHuntName.setText(tripPlan.getHuntID().toString());
@@ -73,95 +83,95 @@ public class OverallLeaderBoardAdapter extends RecyclerView.Adapter<OverallLeade
 
         //ParseUser parseUser = tripPlan.getParseUser("userID");
 
-        if(tripPlan.getTempDetails()!=null)
-        {
-            //used for overall
-            String userID = tripPlan.getTempDetails();
-            if(userID.equals(ParseUser.getCurrentUser().getObjectId().toString())){
-                holder.rlHuntItem.setBackgroundColor(Color.LTGRAY);
-            }
-            ParseQuery<ParseUser> query = ParseUser.getQuery();
-            query.whereEqualTo("objectId", userID);
-            query.findInBackground(new FindCallback<ParseUser>() {
-                public void done(List<ParseUser> objects, ParseException e) {
-                    if (e == null) {
-                        objects.get(0).get("username");
-                        holder.tvName.setText(objects.get(0).get("username").toString());
-                        ParseFile parseFile = objects.get(0).getParseFile("profileThumb");
-                        if(parseFile!=null){
-                            byte[] data = new byte[0];
-                            try {
-                                data = parseFile.getData();
-                            } catch (ParseException error) {
-                                error.printStackTrace();
-                            }
-                            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                            holder.ivUserImage.setImageBitmap(bitmap);
-
-                        }else{
-
-                        }
-
-
-                        // The query was successful.
-                    } else {
-                        // Something went wrong.
-                    }
-                }
-            });
-        }else{
-            //used for user hunt list
-            ParseUser parseUser = tripPlan.getParseUser("userID");
-            String userID = parseUser.getObjectId().toString();
-            if(userID.equals(ParseUser.getCurrentUser().getObjectId().toString())){
-                holder.rlHuntItem.setBackgroundColor(Color.LTGRAY);
-            }
-            ParseQuery<ParseUser> query = ParseUser.getQuery();
-            query.whereEqualTo("objectId", userID);
-            query.findInBackground(new FindCallback<ParseUser>() {
-                public void done(List<ParseUser> objects, ParseException e) {
-                    if (e == null) {
-                        objects.get(0).get("username");
-                        holder.tvName.setText(objects.get(0).get("username").toString());
-                        ParseFile parseFile = objects.get(0).getParseFile("profileThumb");
-                        if(parseFile!=null){
-                            byte[] data = new byte[0];
-                            try {
-                                data = parseFile.getData();
-                            } catch (ParseException error) {
-                                error.printStackTrace();
-                            }
-                            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                            holder.ivUserImage.setImageBitmap(bitmap);
-
-                        }else{
-
-                        }
-
-
-                        // The query was successful.
-                    } else {
-                        // Something went wrong.
-                    }
-                }
-            });
-        }
-
-
-    }
+//        if(tripPlan.getTempDetails()!=null)
+//        {
+//            //used for overall
+//            String userID = tripPlan.getTempDetails();
+//            if(userID.equals(ParseUser.getCurrentUser().getObjectId().toString())){
+//                holder.rlHuntItem.setBackgroundColor(Color.LTGRAY);
+//            }
+//            ParseQuery<ParseUser> query = ParseUser.getQuery();
+//            query.whereEqualTo("objectId", userID);
+//            query.findInBackground(new FindCallback<ParseUser>() {
+//                public void done(List<ParseUser> objects, ParseException e) {
+//                    if (e == null) {
+//                        objects.get(0).get("username");
+//                        holder.tvName.setText(objects.get(0).get("username").toString());
+//                        ParseFile parseFile = objects.get(0).getParseFile("profileThumb");
+//                        if(parseFile!=null){
+//                            byte[] data = new byte[0];
+//                            try {
+//                                data = parseFile.getData();
+//                            } catch (ParseException error) {
+//                                error.printStackTrace();
+//                            }
+//                            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+//                            holder.ivUserImage.setImageBitmap(bitmap);
+//
+//                        }else{
+//
+//                        }
+//
+//
+//                        // The query was successful.
+//                    } else {
+//                        // Something went wrong.
+//                    }
+//                }
+//            });
+//        }else{
+//            //used for user hunt list
+//            ParseUser parseUser = tripPlan.getParseUser("userID");
+//            String userID = parseUser.getObjectId().toString();
+//            if(userID.equals(ParseUser.getCurrentUser().getObjectId().toString())){
+//                holder.rlHuntItem.setBackgroundColor(Color.LTGRAY);
+//            }
+//            ParseQuery<ParseUser> query = ParseUser.getQuery();
+//            query.whereEqualTo("objectId", userID);
+//            query.findInBackground(new FindCallback<ParseUser>() {
+//                public void done(List<ParseUser> objects, ParseException e) {
+//                    if (e == null) {
+//                        objects.get(0).get("username");
+//                        holder.tvName.setText(objects.get(0).get("username").toString());
+//                        ParseFile parseFile = objects.get(0).getParseFile("profileThumb");
+//                        if(parseFile!=null){
+//                            byte[] data = new byte[0];
+//                            try {
+//                                data = parseFile.getData();
+//                            } catch (ParseException error) {
+//                                error.printStackTrace();
+//                            }
+//                            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+//                            holder.ivUserImage.setImageBitmap(bitmap);
+//
+//                        }else{
+//
+//                        }
+//
+//
+//                        // The query was successful.
+//                    } else {
+//                        // Something went wrong.
+//                    }
+//                }
+//            });
+//        }
+//
+//
+//    }
 
     @Override
     public int getItemCount() {
-        return mTripPlans.size();
+        return mCompetitors.size();
     }
 
     @Override
     public long getItemId(int position) {
-        return mTripPlans.get(position).getCreatedAt().getTime();
+        return mCompetitors.get(position).getObjId();
     }
 
-    public MasterLeaderBoard get(int position) {
-        return mTripPlans.get(position);
+    public Competitor get(int position) {
+        return mCompetitors.get(position);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

@@ -19,6 +19,7 @@ public class MasterLeaderBoard extends ParseObject {
     public Integer getPoints() {return getInt("points");}
     public String getHuntID() {return getString("huntID");}
     public String getTempDetails(){return getString("tempDetails");}
+    public String getUserIdLinkToString(){return get("userID").toString();}
     //Saving Data
     //public void putPlayerID(String playerID) { put("playerID", playerID);}
     public void putPoints(Integer points) {put("points",points);}

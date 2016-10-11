@@ -26,6 +26,7 @@ import com.travelguide.R;
 import com.travelguide.adapters.OverallLeaderBoardAdapter;
 import com.travelguide.decorations.VerticalSpaceItemDecoration;
 import com.travelguide.helpers.NetworkAvailabilityCheck;
+import com.travelguide.models.Competitor;
 import com.travelguide.models.MasterLeaderBoard;
 import com.travelguide.models.TripPlan;
 
@@ -45,6 +46,7 @@ public class MyHuntsLeaderBoardFragment extends LeaderBoardFragment {
     private MaterialDialog progressDialog;
     private OverallLeaderBoardAdapter mTripPlanAdapter;
     private List<MasterLeaderBoard> mTripPlans;
+    private List<Competitor> mCompetitors;
     ArrayList<String> huntName;
     private TextView tvEmptyLeaderBoard;
     private  TextView tvEmptyInProfile;
@@ -66,7 +68,8 @@ public class MyHuntsLeaderBoardFragment extends LeaderBoardFragment {
         View view = inflater.inflate(R.layout.fragment_myhunts_leaderboard, container, false);
 
         mTripPlans = new ArrayList<>();
-        mTripPlanAdapter = new OverallLeaderBoardAdapter(mTripPlans, getContext());
+        mCompetitors = new ArrayList<>();
+        mTripPlanAdapter = new OverallLeaderBoardAdapter(mCompetitors, getContext());
 
         rvTripPlans = (RecyclerView) view.findViewById(R.id.rvTripPlansInProfile);
         rvTripPlans.setAdapter(mTripPlanAdapter);

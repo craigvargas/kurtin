@@ -48,8 +48,11 @@
             android:layout_marginRight="16dp"
             android:layout_marginTop="16dp"
             android:fitsSystemWindows="true"
+            android:background="@drawable/background_profile"
             android:src="@drawable/profile_placeholder"
-            app:border_width="1dp" />
+            app:border_width="1dp"
+            app:border_color="@color/translucent"
+            />
 
         <TextView
             android:id="@+id/tvFirstPlaceName"
@@ -60,7 +63,8 @@
             android:layout_marginTop="8dp"
             android:ellipsize="marquee"
             android:gravity="center"
-            android:text="#1 Placeholder" />
+            android:text="#1 Placeholder"
+            android:textColor="@color/kurtin_text_primary"/>
 
         <TextView
             android:id="@+id/tvFirstPlacePoints"
@@ -70,7 +74,10 @@
             android:layout_centerHorizontal="true"
             android:ellipsize="marquee"
             android:gravity="center"
-            android:text="1,000" />
+            android:text="1,000"
+            android:textSize="24sp"
+            android:textColor="@color/usc_gold"
+            />
 
         <!--Second Place-->
         <de.hdodenhof.circleimageview.CircleImageView
@@ -80,8 +87,11 @@
             android:layout_marginTop="32dp"
             android:layout_toLeftOf="@+id/ivFirstPlacePic"
             android:fitsSystemWindows="true"
+            android:background="@drawable/background_profile"
             android:src="@drawable/profile_placeholder"
-            app:border_width="1dp" />
+            app:border_width="1dp"
+            app:border_color="@color/translucent"
+            />
 
         <TextView
             android:id="@+id/tvSecondPlaceName"
@@ -92,7 +102,9 @@
             android:layout_toLeftOf="@id/ivFirstPlacePic"
             android:ellipsize="marquee"
             android:gravity="center"
-            android:text="#2 Placeholder" />
+            android:text="#2 Placeholder"
+            android:textColor="@color/kurtin_text_primary"
+            />
 
         <TextView
             android:id="@+id/tvSecondPlacePoints"
@@ -102,18 +114,24 @@
             android:layout_toLeftOf="@id/ivFirstPlacePic"
             android:ellipsize="marquee"
             android:gravity="center"
-            android:text="700" />
+            android:text="700"
+            android:textSize="24sp"
+            android:textColor="@color/kurtin_text_primary"
+            />
 
         <!--Third Place-->
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/ivThirdPlacePic"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginTop="32dp"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_marginTop="42dp"
             android:layout_toRightOf="@+id/ivFirstPlacePic"
             android:fitsSystemWindows="true"
+            android:background="@drawable/background_profile"
             android:src="@drawable/profile_placeholder"
-            app:border_width="1dp" />
+            app:border_width="1dp"
+            app:border_color="@color/translucent"
+            />
 
         <TextView
             android:id="@+id/tvThirdPlaceName"
@@ -124,7 +142,8 @@
             android:layout_toRightOf="@id/ivFirstPlacePic"
             android:ellipsize="marquee"
             android:gravity="center"
-            android:text="#2 Placeholder" />
+            android:text="#2 Placeholder"
+            android:textColor="@color/kurtin_text_primary"/>
 
         <TextView
             android:id="@+id/tvThirdPlacePoints"
@@ -134,7 +153,10 @@
             android:layout_toRightOf="@id/ivFirstPlacePic"
             android:ellipsize="marquee"
             android:gravity="center"
-            android:text="400" />
+            android:text="400"
+            android:textSize="24sp"
+            android:textColor="@color/kurtin_text_primary"
+            />
 
     </RelativeLayout>
 

@@ -52,19 +52,30 @@ public class TripPlanAdapter extends RecyclerView.Adapter<TripPlanAdapter.ViewHo
         String cityName = tripPlan.getCityName();
         String prize = tripPlan.getPrices();
 
-        //Commented out 4 lines below because no longer concatenating two lines into one String variable
-//        String planName = tripPlan.getPlanName() + "\n" + tripPlan.getCityName();
-//        Spannable span = new SpannableString(planName);
-//        span.setSpan(new RelativeSizeSpan(0.75f), planName.indexOf("\n"), planName.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//        holder.tvPlanName.setText(span);
-
         holder.tvPlanName.setText(planName);
         holder.tvHuntDistance.setText(cityName);
         holder.tvHuntPrize.setText(prize);
         holder.ivPlace.setImageResource(R.drawable.city_placeholder);
         holder.ivStatusIcon.setVisibility(View.INVISIBLE);
 
+        Glide.with(mContext)
+                .load(tripPlan.getCityImageUrl())
+                .placeholder(R.drawable.city_placeholder)
+                .centerCrop()
+                .crossFade(600)
+                .into(new ImageViewTarget<GlideDrawable>(holder.ivPlace) {
+                    @Override
+                    public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+                        super.onResourceReady(resource, glideAnimation);
+                        //Line below puts a dimming filter over the image.
+                        //holder.ivPlace.setColorFilter(Color.argb(145, 50, 50, 50));
+                    }
 
+                    @Override
+                    protected void setResource(GlideDrawable resource) {
+                        holder.ivPlace.setImageDrawable(resource);
+                    }
+                });
 
         if(ParseUser.getCurrentUser()!=null && mTripPlans.get(position).getObjectId()!= null){
             //String huntID = mTripPlans.get(position).getObjectId();
@@ -116,23 +127,23 @@ public class TripPlanAdapter extends RecyclerView.Adapter<TripPlanAdapter.ViewHo
 
         }
 
-        Glide.with(mContext)
-                .load(tripPlan.getCityImageUrl())
-                .placeholder(R.drawable.city_placeholder)
-                .centerCrop()
-                .crossFade(600)
-                .into(new ImageViewTarget<GlideDrawable>(holder.ivPlace) {
-                    @Override
-                    public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
-                        super.onResourceReady(resource, glideAnimation);
-//                        holder.ivPlace.setColorFilter(Color.argb(145, 50, 50, 50));
-                    }
-
-                    @Override
-                    protected void setResource(GlideDrawable resource) {
-                        holder.ivPlace.setImageDrawable(resource);
-                    }
-                });
+//        Glide.with(mContext)
+//                .load(tripPlan.getCityImageUrl())
+//                .placeholder(R.drawable.city_placeholder)
+//                .centerCrop()
+//                .crossFade(600)
+//                .into(new ImageViewTarget<GlideDrawable>(holder.ivPlace) {
+//                    @Override
+//                    public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+//                        super.onResourceReady(resource, glideAnimation);
+////                        holder.ivPlace.setColorFilter(Color.argb(145, 50, 50, 50));
+//                    }
+//
+//                    @Override
+//                    protected void setResource(GlideDrawable resource) {
+//                        holder.ivPlace.setImageDrawable(resource);
+//                    }
+//                });
 
     }
 

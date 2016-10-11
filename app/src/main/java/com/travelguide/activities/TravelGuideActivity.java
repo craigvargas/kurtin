@@ -251,13 +251,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
     public void selectDrawerItem(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.login_fragment:
-                if (!mLoginStatus) {
-                    setContentFragment(R.id.fragment_frame, new KurtinLoginFragment());
-//                    new LoginFragment().show(getSupportFragmentManager(), "Login_with_Facebook");
-                }
-                else {
-//                    new LoginFragment().logout(ParseUser.getCurrentUser(), this);
-                }
+                setContentFragment(R.id.fragment_frame, new KurtinLoginFragment());
                 break;
             case R.id.home_fragment:
                 setContentFragment(R.id.fragment_frame, new TripPlanListFragment());
