@@ -184,35 +184,42 @@ public class OverallLeaderBoardFragment extends LeaderBoardFragment {
     private void refreshLeaderBoardPage() {
         //Pull in data from leaderboard table
         ParseQuery<MasterLeaderBoard> query = ParseQuery.getQuery(MasterLeaderBoard.class);
+        query.include(AppCodesKeys.PARSE_LEADER_BOARD_USER_POINTER_KEY);
         query.setLimit(1000);
         query.findInBackground(new FindCallback<MasterLeaderBoard>() {
             @Override
             public void done(List<MasterLeaderBoard> huntEntries, ParseException e) {
                 progressDialog.dismiss();
                 if (e == null) {
-                    hideEmptyView();
+                    if(huntEntries.isEmpty()){
+                        showEmptyView();
+                    }else {
+                        hideEmptyView();
 
-                    //Create a hashmap of UserIds and Competitors
-                    HashMap<String, Competitor> linkPointsMap = listToHashMap(huntEntries);
-                    //Put Competitors from hashmap into a list
-                    List<Competitor> competitors = new ArrayList<Competitor>(linkPointsMap.values());
-                    //Sort list in descending order
-                    Collections.sort(competitors, new Comparator<Competitor>() {
-                        @Override
-                        public int compare(Competitor lhs, Competitor rhs) {
-                            return rhs.getPoints().compareTo(lhs.getPoints());
-                        }
-                    });
-                    //Update the list that the adapter references
-                    mCompetitors2.clear();
-                    mCompetitors2.addAll(competitors);
-                    mLeaderBoardAdapter.notifyDataSetChanged();
-                    //Fill the podium: 1st, 2nd, and 3rd place
-                    fillPodiumViews();
-                    //Load the user's pic and points
-                    loadUserData();
+                        //Create a hashmap of UserIds and Competitors
+                        HashMap<String, Competitor> linkPointsMap = listToHashMap(huntEntries);
+                        //Put Competitors from hashmap into a list
+                        List<Competitor> competitors = new ArrayList<Competitor>(linkPointsMap.values());
+                        //Sort list in descending order
+                        Collections.sort(competitors, new Comparator<Competitor>() {
+                            @Override
+                            public int compare(Competitor lhs, Competitor rhs) {
+                                return rhs.getPoints().compareTo(lhs.getPoints());
+                            }
+                        });
+                        //Update the list that the adapter references
+                        mCompetitors2.clear();
+                        mCompetitors2.addAll(competitors);
+                        mLeaderBoardAdapter.notifyDataSetChanged();
+                        //Fill the podium: 1st, 2nd, and 3rd place
+                        fillPodiumViews();
+                        //Load the user's pic and points
+                        loadUserData();
 
-                    swipeContainer.setRefreshing(false);
+                        swipeContainer.setRefreshing(false);
+                    }
+                } else {
+                    e.printStackTrace();
                 }
             }
         });
@@ -233,7 +240,7 @@ public class OverallLeaderBoardFragment extends LeaderBoardFragment {
         //Create a HashMap of UserIds and Competitor objects
         for (int i = 0; i < huntEntries.size(); i++) {
             huntEntry = huntEntries.get(i);
-            parseUser = huntEntry.getParseUser(AppCodesKeys.PARSE_HUNT_ENTRY_USER_LINK_KEY);
+            parseUser = huntEntry.getParseUser(AppCodesKeys.PARSE_LEADER_BOARD_USER_POINTER_KEY);
             userId = parseUser.getObjectId();
             points = huntEntry.getPoints();
             if (linkPointsMap.containsKey(userId)) {
@@ -242,16 +249,20 @@ public class OverallLeaderBoardFragment extends LeaderBoardFragment {
                 currentCompetitor.setPoints(oldPoints + points);
                 linkPointsMap.put(userId, currentCompetitor);
             } else {
-                try {
-                    parseUser = parseUser.fetchIfNeeded();
-                } catch (Exception eFetchIfNeeded) {
-                    eFetchIfNeeded.printStackTrace();
-                }
-                if (parseUser != null) {
-                    name = parseUser.get(AppCodesKeys.PARSE_USER_USERNAME_KEY).toString();
-                    profilePicFile = (ParseFile) parseUser.get(AppCodesKeys.PARSE_USER_PROFILE_PIC_KEY);
-                    linkPointsMap.put(userId, new Competitor(userId, name, points, profilePicFile, rank));
-                }
+                name = parseUser.get(AppCodesKeys.PARSE_USER_USERNAME_KEY).toString();
+                profilePicFile = (ParseFile) parseUser.get(AppCodesKeys.PARSE_USER_PROFILE_PIC_KEY);
+                linkPointsMap.put(userId, new Competitor(userId, name, points, profilePicFile, rank));
+
+//                try {
+//                    parseUser = parseUser.fetchIfNeeded();
+//                } catch (Exception eFetchIfNeeded) {
+//                    eFetchIfNeeded.printStackTrace();
+//                }
+//                if (parseUser != null) {
+//                    name = parseUser.get(AppCodesKeys.PARSE_USER_USERNAME_KEY).toString();
+//                    profilePicFile = (ParseFile) parseUser.get(AppCodesKeys.PARSE_USER_PROFILE_PIC_KEY);
+//                    linkPointsMap.put(userId, new Competitor(userId, name, points, profilePicFile, rank));
+//                }
             }
         }
         return linkPointsMap;
@@ -545,7 +556,7 @@ public class OverallLeaderBoardFragment extends LeaderBoardFragment {
             userId = mCompetitors2.get(i).getUserId();
             if (userId != null) {
                 if (userId.equals(currentUserId)) {
-                    info = "#" + i + ":  " + mCompetitors2.get(i).getPoints().toString() + " pts";
+                    info = "(#" + i + ")  " + mCompetitors2.get(i).getPoints().toString() + " pts";
                 }
             }
         }

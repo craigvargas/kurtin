@@ -15,8 +15,11 @@ public class AppCodesKeys {
 
     //Parse Hunt Entry Keys
     //A Hunt Entry is a unique player signing up to participate in a hunt
-    public static final String PARSE_HUNT_ENTRY_POINTS_KEY = "points";
-    public static final String PARSE_HUNT_ENTRY_USER_LINK_KEY = "userID";
+    public static final String PARSE_LEADER_BOARD_POINTS_KEY = "points";
+    public static final String PARSE_LEADER_BOARD_USER_POINTER_KEY = "userID";
+    public static final String PARSE_LEADER_BOARD_HUNT_POINTER_KEY = "huntPointer";
+    public static final String PARSE_LEADER_BOARD_USER_POINTER_PROFILE_PIC_KEY =
+            PARSE_LEADER_BOARD_USER_POINTER_KEY + "." + PARSE_USER_PROFILE_PIC_KEY;
 
     public static final String PROFILE_PIC_FILE_NAME = "profile.jpg";
 }

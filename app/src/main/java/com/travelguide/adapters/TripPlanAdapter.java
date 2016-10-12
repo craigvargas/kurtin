@@ -3,6 +3,7 @@ package com.travelguide.adapters;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,15 +14,11 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.ImageViewTarget;
-import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.travelguide.R;
-import com.travelguide.models.Day;
-import com.travelguide.models.LeaderBoard;
 import com.travelguide.models.TripPlan;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class TripPlanAdapter extends RecyclerView.Adapter<TripPlanAdapter.ViewHolder> {
@@ -29,9 +26,17 @@ public class TripPlanAdapter extends RecyclerView.Adapter<TripPlanAdapter.ViewHo
     private final Context mContext;
     private final List<TripPlan> mTripPlans;
 
+    private HashMap<String, Boolean> mUserHuntData;
+
 
     public TripPlanAdapter(List<TripPlan> mTripPlans, Context context) {
         this.mTripPlans = mTripPlans;
+        this.mContext = context;
+    }
+
+    public TripPlanAdapter(List<TripPlan> hunts, HashMap<String, Boolean> userHuntData, Context context) {
+        this.mTripPlans = hunts;
+        this.mUserHuntData = userHuntData;
         this.mContext = context;
     }
 
@@ -47,17 +52,20 @@ public class TripPlanAdapter extends RecyclerView.Adapter<TripPlanAdapter.ViewHo
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         final TripPlan tripPlan = mTripPlans.get(position);
+        String huntId;
 
         String planName = tripPlan.getPlanName();
         String cityName = tripPlan.getCityName();
         String prize = tripPlan.getPrices();
 
+        //Load hunt details
         holder.tvPlanName.setText(planName);
         holder.tvHuntDistance.setText(cityName);
         holder.tvHuntPrize.setText(prize);
         holder.ivPlace.setImageResource(R.drawable.city_placeholder);
         holder.ivStatusIcon.setVisibility(View.INVISIBLE);
 
+        //Load background Image
         Glide.with(mContext)
                 .load(tripPlan.getCityImageUrl())
                 .placeholder(R.drawable.city_placeholder)
@@ -77,74 +85,18 @@ public class TripPlanAdapter extends RecyclerView.Adapter<TripPlanAdapter.ViewHo
                     }
                 });
 
-        if(ParseUser.getCurrentUser()!=null && mTripPlans.get(position).getObjectId()!= null){
-            //String huntID = mTripPlans.get(position).getObjectId();
-
-            //get no of levels first
-
-            ParseQuery<Day> query1 = ParseQuery.getQuery(Day.class);
-            query1.whereEqualTo("parent",mTripPlans.get(position));
-            //query1.orderByAscending("planName");
-            query1.findInBackground(new FindCallback<Day>() {
-                @Override
-                public void done(List<Day> list, ParseException e) {
-
-                    Integer totalLevelsInGame = list.size();
-                    final Integer totalQuesionsInGame = totalLevelsInGame*4;
-                    //final Integer totalQuesionsInGame = 5;
-                    if(totalLevelsInGame!=0 && totalQuesionsInGame!=0)
-                    {
-                        //now make a call to LeaderBoard to see if user answered any questions--
-
-                        ParseQuery<LeaderBoard> query2 = ParseQuery.getQuery(LeaderBoard.class);
-
-                        query2.whereEqualTo("huntID",mTripPlans.get(position).getObjectId());
-                        //query1.orderByAscending("planName");
-                        query2.findInBackground(new FindCallback<LeaderBoard>() {
-                            @Override
-                            public void done(List<LeaderBoard> list1, ParseException e) {
-
-                                if(totalQuesionsInGame == list1.size()){
-                                    holder.ivStatusIcon.setImageResource(R.drawable.completed);
-                                    holder.ivStatusIcon.setVisibility(View.VISIBLE);
-                                }else if ((list1.size()!=0) && (totalQuesionsInGame != list1.size())){
-                                    holder.ivStatusIcon.setImageResource(R.drawable.in_progress_2);
-                                    holder.ivStatusIcon.setVisibility(View.VISIBLE);
-                                }else if(list1.size() == 0){
-                                    //do nothing.....
-                                }
-                            }
-                        });
-                    }
-
-
-                }
-            });
-
-
-
-        }else{
-
+        //Load Status Icon
+        huntId = mTripPlans.get(position).getObjectId();
+        if (mUserHuntData.containsKey(huntId)){
+            Log.v("Public Hunts Adapter", "User started: " + huntId);
+            if (mUserHuntData.get(huntId)){
+                holder.ivStatusIcon.setImageResource(R.drawable.ic_kurtin_completed);
+                holder.ivStatusIcon.setVisibility(View.VISIBLE);
+            }else{
+                holder.ivStatusIcon.setImageResource(R.drawable.ic_kurtin_progress);
+                holder.ivStatusIcon.setVisibility(View.VISIBLE);
+            }
         }
-
-//        Glide.with(mContext)
-//                .load(tripPlan.getCityImageUrl())
-//                .placeholder(R.drawable.city_placeholder)
-//                .centerCrop()
-//                .crossFade(600)
-//                .into(new ImageViewTarget<GlideDrawable>(holder.ivPlace) {
-//                    @Override
-//                    public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
-//                        super.onResourceReady(resource, glideAnimation);
-////                        holder.ivPlace.setColorFilter(Color.argb(145, 50, 50, 50));
-//                    }
-//
-//                    @Override
-//                    protected void setResource(GlideDrawable resource) {
-//                        holder.ivPlace.setImageDrawable(resource);
-//                    }
-//                });
-
     }
 
     @Override
