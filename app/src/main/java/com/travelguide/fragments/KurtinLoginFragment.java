@@ -49,6 +49,8 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.travelguide.fragments.KurtinProfileFragment.getBitmapFromParseUser;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -230,7 +232,7 @@ public class KurtinLoginFragment extends Fragment {
             Preferences.writeBoolean(context, Preferences.User.LOG_IN_STATUS, mIsLoggedIn);
 
             //Profile pic
-            Bitmap profilePicBitmap = KurtinProfileFragment.getBitmapFromParseUser(parseUser, AppCodesKeys.PARSE_USER_PROFILE_PIC_KEY);
+            Bitmap profilePicBitmap = getBitmapFromParseUser(parseUser, AppCodesKeys.PARSE_USER_PROFILE_PIC_KEY);
             if (profilePicBitmap != null){
                 KurtinProfileFragment.savePicToInternalStorage(profilePicBitmap, AppCodesKeys.PROFILE_PIC_FILE_NAME, context);
             }
@@ -289,11 +291,12 @@ public class KurtinLoginFragment extends Fragment {
     }
 
     private void login(LoginFragment.RequestType requestType) {
-        if (requestType == LoginFragment.RequestType.UPDATE)
+        if (requestType == LoginFragment.RequestType.UPDATE) {
             getUserDetailsFromParse();
-        if (requestType == LoginFragment.RequestType.NEW)
+        }else if (requestType == LoginFragment.RequestType.NEW) {
             mIsNewUser = true;
             getUserDetailsFromFB(requestType);
+        }
     }
 
     public void logoutKurtin(ParseUser parseUser, final Context context){
@@ -677,25 +680,59 @@ public class KurtinLoginFragment extends Fragment {
         parseUser = ParseUser.getCurrentUser();
         // Fetch profile photo
         try {
-            ParseFile parseFile = parseUser.getParseFile("profileThumb");
-            byte[] data = parseFile.getData();
-            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-            viewHolder.ivProfilePic.setImageBitmap(bitmap);
+            //Download profile pic and store as bitmap
+            Bitmap bitmapProfilePic = KurtinProfileFragment.getBitmapFromParseUser(
+                    parseUser, AppCodesKeys.PARSE_USER_PROFILE_PIC_KEY);
+            //Save bitmap to storage
+            KurtinProfileFragment.savePicToInternalStorage(
+                    bitmapProfilePic,
+                    AppCodesKeys.PROFILE_PIC_FILE_NAME,
+                    getContext());
+            //Load bitmap into view
+            viewHolder.ivProfilePic.setImageBitmap(bitmapProfilePic);
+//            ParseFile parseFile = parseUser.getParseFile(AppCodesKeys.PARSE_USER_PROFILE_PIC_KEY);
+//            byte[] data = parseFile.getData();
+//            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+//            viewHolder.ivProfilePic.setImageBitmap(bitmap);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        try {
-            ParseFile parseFile = parseUser.getParseFile("coverPic");
-            if (parseFile != null) {
-                byte[] data = parseFile.getData();
-                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                viewHolder.ivCoverPic.setImageBitmap(bitmap);
+//        try {
+//            ParseFile parseFile = parseUser.getParseFile("coverPic");
+//            if (parseFile != null) {
+//                byte[] data = parseFile.getData();
+//                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+//                viewHolder.ivCoverPic.setImageBitmap(bitmap);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+        try{
+            name = parseUser.getString(AppCodesKeys.PARSE_USER_NICKNAME_KEY);
+            if (name == null){
+                name = parseUser.getUsername();
+                if(name == null){
+                    name = "Name not found";
+                }
             }
-        } catch (Exception e) {
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        try{
+            email = parseUser.getEmail();
+            if (email == null){
+                email = "";
+            }
+        }catch (Exception e){
             e.printStackTrace();
         }
         Toast.makeText(getActivity(), "Welcome back " + parseUser.getUsername(), Toast.LENGTH_SHORT).show();
-        getUserDetailsFromFB(LoginFragment.RequestType.UPDATE);
+//        getUserDetailsFromFB(LoginFragment.RequestType.UPDATE);
+        Context context = getContext();
+        Preferences.writeBoolean(context, Preferences.User.LOG_IN_STATUS, true);
+        Preferences.writeString(context, Preferences.User.NAME, name);
+        Preferences.writeString(context, Preferences.User.EMAIL, email);
+        completeLogin();
     }
 
     enum RequestType {
@@ -724,6 +761,7 @@ public class KurtinLoginFragment extends Fragment {
     }
 
     private void completeLogin (){
+        Log.v("Login Completed", "Called");
         if (progressDialog != null) {
             progressDialog.dismiss();
         }

@@ -146,22 +146,23 @@
 
                         <ImageView
                             android:id="@+id/ivKurtinLogoBanner"
-                            android:layout_width="@dimen/banner_logo_width"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="0dp"
-                            android:layout_centerVertical="true"
-                            android:src="@drawable/kurtin_logo_white_small" />
-
-                        <TextView
-                            android:id="@+id/tvFragmentInfo"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginRight="8dp"
+                            android:layout_centerVertical="true"
+                            android:layout_alignParentRight="true"
+                            android:src="@drawable/ic_kurtin_k_2_white" />
+
+                        <TextView
+                            android:id="@+id/tvToolbarTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="0dp"
                             android:textColor="@color/white"
-                            android:textSize="12sp"
+                            android:textSize="20sp"
                             android:text="KurtinTestText"
                             android:layout_centerVertical="true"
-                            android:layout_marginLeft="4dp"
-                            android:layout_toRightOf="@+id/ivKurtinLogoBanner"/>
+                            />
 
                     </RelativeLayout>
 

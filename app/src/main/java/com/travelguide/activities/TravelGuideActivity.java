@@ -9,6 +9,7 @@ import android.content.res.Configuration;
 import android.database.MatrixCursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
@@ -63,6 +64,7 @@ import com.travelguide.fragments.ProfileFragment;
 import com.travelguide.fragments.SearchListFragment;
 import com.travelguide.fragments.TripPlanDetailsFragment;
 import com.travelguide.fragments.TripPlanListFragment;
+import com.travelguide.helpers.AppCodesKeys;
 import com.travelguide.helpers.DeviceDimensionsHelper;
 import com.travelguide.helpers.NetworkAvailabilityCheck;
 import com.travelguide.helpers.Preferences;
@@ -76,6 +78,9 @@ import java.util.StringTokenizer;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
+import static com.travelguide.R.id.btnFinish;
+import static java.security.AccessController.getContext;
 
 public class TravelGuideActivity extends AppCompatActivity implements
         OnTripPlanListener,
@@ -95,6 +100,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
     private ImageView ivNavHeaderPic;
     private TextView tvProfileUsername;
     private TextView tvProfileEmail;
+    private TextView tvToolbarTitle;
 
     private FrameLayout fragmentFrameFullscreen;
     private CustomCoordinatorLayout coordinatorLayout;
@@ -119,6 +125,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
     private String profilePicUrl = null;
     private String coverPicUrl = null;
     private String profilePicLocalPath = null;
+    private String mScannerParentTitle = "";
 
     private boolean mLoginStatus = false;
 
@@ -126,8 +133,8 @@ public class TravelGuideActivity extends AppCompatActivity implements
 
     private static int NO_FLAGS = 0;
 
-    private static String HOME_TAG = "home";
-    private static String HUNT_DETAIL_TAG = "huntDetail";
+    private static String HOME_FRAGMENT_TAG = "home";
+    private static String HUNT_DETAIL_FRAGMENT_TAG = "huntDetail";
 
 
     @Override
@@ -138,6 +145,10 @@ public class TravelGuideActivity extends AppCompatActivity implements
         // Set a Toolbar to replace the ActionBar.
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        tvToolbarTitle = (TextView) findViewById(R.id.tvToolbarTitle);
+        Typeface cabinBoldFont = Typeface.createFromAsset(getAssets(), "fonts/cabin_bold.ttf");
+        tvToolbarTitle.setTypeface(cabinBoldFont);
 
         // Set the collapsing Toolbar animation views
         coordinatorLayout = (CustomCoordinatorLayout) findViewById(R.id.main_content);
@@ -189,7 +200,11 @@ public class TravelGuideActivity extends AppCompatActivity implements
 
         prepareNavMenu();
 
-        setContentFragment(R.id.fragment_frame, new TripPlanListFragment());
+//        setContentFragment(R.id.fragment_frame, new TripPlanListFragment());
+        setContentFragment(
+                R.id.fragment_frame,
+                new TripPlanListFragment(),
+                AppCodesKeys.TRIP_PLAN_LIST_FRAGMENT_ID);
     }
 
     @Override
@@ -251,24 +266,40 @@ public class TravelGuideActivity extends AppCompatActivity implements
     public void selectDrawerItem(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.login_fragment:
-                setContentFragment(R.id.fragment_frame, new KurtinLoginFragment());
+//                setContentFragment(R.id.fragment_frame, new KurtinLoginFragment());
+                setContentFragment(
+                        R.id.fragment_frame,
+                        new KurtinLoginFragment(),
+                        AppCodesKeys.KURTIN_LOGIN_FRAGMENT_ID);
                 break;
             case R.id.home_fragment:
-                setContentFragment(R.id.fragment_frame, new TripPlanListFragment());
+//                setContentFragment(R.id.fragment_frame, new TripPlanListFragment());
+                setContentFragment(
+                        R.id.fragment_frame,
+                        new TripPlanListFragment(),
+                        AppCodesKeys.TRIP_PLAN_LIST_FRAGMENT_ID);
                 break;
             case R.id.my_hunts_fragment:
                 break;
             case R.id.favorites_fragment:
                 break;
             case R.id.leaders_fragment:
-                setContentFragment(R.id.fragment_frame, new LeaderBoardFragment());
+//                setContentFragment(R.id.fragment_frame, new LeaderBoardFragment());
+                setContentFragment(
+                        R.id.fragment_frame,
+                        new LeaderBoardFragment(),
+                        AppCodesKeys.LEADER_BOARD_FRAGMENT_ID);
                 break;
             case R.id.private_fragment:
                 break;
             case R.id.invite_friends_fragment:
                 break;
             case R.id.profile_fragment:
-                setContentFragment(R.id.fragment_frame, new KurtinProfileFragment());
+//                setContentFragment(R.id.fragment_frame, new KurtinProfileFragment());
+                setContentFragment(
+                        R.id.fragment_frame,
+                        new KurtinProfileFragment(),
+                        AppCodesKeys.KURTIN_PROFILE_FRAGMENT_ID);
                 break;
             case R.id.settings_fragment:
 //                showSettingsDialog();
@@ -292,7 +323,11 @@ public class TravelGuideActivity extends AppCompatActivity implements
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
-                        setContentFragment(R.id.fragment_frame, SearchListFragment.newInstance(city, group, season));
+//                        setContentFragment(R.id.fragment_frame, SearchListFragment.newInstance(city, group, season));
+                        setContentFragment(
+                                R.id.fragment_frame,
+                                SearchListFragment.newInstance(city, group, season),
+                                AppCodesKeys.SETTINGS_FRAGMENT_ID);
                     }
                 })
                 .onNegative(new MaterialDialog.SingleButtonCallback() {
@@ -373,6 +408,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
                     query = "Any";
                 city = formatQueryForSearch(query.trim());
                 searchItem.collapseActionView();
+                //Figure out how to set the title in the call below
                 setContentFragment(R.id.fragment_frame, SearchListFragment.newInstance(city, group, season));
                 return true;
             }
@@ -498,7 +534,11 @@ public class TravelGuideActivity extends AppCompatActivity implements
     @Override
     public void onTripPlanItemSelected(String tripPlanObjectId) {
         TripPlanDetailsFragment fragment = TripPlanDetailsFragment.newInstance(tripPlanObjectId);
-        setContentFragment(R.id.fragment_frame, fragment);
+//        setContentFragment(R.id.fragment_frame, fragment);
+        setContentFragment(
+                R.id.fragment_frame,
+                fragment,
+                AppCodesKeys.TRIP_PLAN_DETAILS_FRAGMENT_ID);
     }
 
     /* Comented on 09/23 by hemanth fto bring use overallleaderboard in place of ..
@@ -511,13 +551,21 @@ public class TravelGuideActivity extends AppCompatActivity implements
     //Function below is associated with the FAB (Oct 06, 2016)
     @Override
     public void onTripPlanNew() {
-        setContentFragment(R.id.fragment_frame, new LeaderBoardFragment());
+//        setContentFragment(R.id.fragment_frame, new LeaderBoardFragment());
+        setContentFragment(
+                R.id.fragment_frame,
+                new LeaderBoardFragment(),
+                AppCodesKeys.LEADER_BOARD_FRAGMENT_ID);
     }
 
     @Override
     public void onDisplayLeaderBoardFromHuntDetails(String currentHuntID) {
         LeaderBoardFragment fragment = LeaderBoardFragment.newInstance(currentHuntID);
-        setContentFragment(R.id.fragment_frame, fragment);
+//        setContentFragment(R.id.fragment_frame, fragment);
+        setContentFragment(
+                R.id.fragment_frame,
+                fragment,
+                AppCodesKeys.LEADER_BOARD_FRAGMENT_ID);
     }
 
 
@@ -525,7 +573,11 @@ public class TravelGuideActivity extends AppCompatActivity implements
     public void onTripPlanCreated(String tripPlanObjectId, String imageUrl) {
         //Opening details passing ID of new item
         TripPlanDetailsFragment fragment = TripPlanDetailsFragment.newInstance(tripPlanObjectId, imageUrl);
-        setContentFragment(R.id.fragment_frame, fragment);
+//        setContentFragment(R.id.fragment_frame, fragment);
+        setContentFragment(
+                R.id.fragment_frame,
+                fragment,
+                AppCodesKeys.TRIP_PLAN_DETAILS_FRAGMENT_ID);
     }
 
     @Override
@@ -534,7 +586,10 @@ public class TravelGuideActivity extends AppCompatActivity implements
         setContentFragment(R.id.fragment_frame_fullscreen, fragment);
     }
 
+    //Fragment Frame Loader
+    //Central location to utilize the Fragment Manager to swap fragments in and out of the frame
     private void setContentFragment(int fragmentFrame, Fragment fragment) {
+
         //Setup the Fragment Transaction
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out);
@@ -542,10 +597,10 @@ public class TravelGuideActivity extends AppCompatActivity implements
 
         //Decide whether or not to put a tag on the backstack
         if(fragment instanceof TripPlanListFragment){
-            referenceFragmentNameTag = HOME_TAG;
+            referenceFragmentNameTag = HOME_FRAGMENT_TAG;
             fragmentTransaction.addToBackStack(referenceFragmentNameTag);
         }else if(fragment instanceof TripPlanDetailsFragment) {
-            referenceFragmentNameTag = HUNT_DETAIL_TAG;
+            referenceFragmentNameTag = HUNT_DETAIL_FRAGMENT_TAG;
             fragmentTransaction.addToBackStack(referenceFragmentNameTag);
         }else{
             fragmentTransaction.addToBackStack(null);
@@ -553,6 +608,50 @@ public class TravelGuideActivity extends AppCompatActivity implements
 
         //Commit the transaction and load the fragment
         fragmentTransaction.commit();
+
+        //Decide which view needs to be visible
+        if (fragment instanceof FullscreenFragment) {
+            coordinatorLayout.setVisibility(View.GONE);
+            fragmentFrameFullscreen.setVisibility(View.VISIBLE);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        } else {
+            coordinatorLayout.setVisibility(View.VISIBLE);
+            fragmentFrameFullscreen.setVisibility(View.GONE);
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
+
+    }
+
+    //Fragment Frame Loader
+    //Central location to utilize the Fragment Manager to swap fragments in and out of the frame
+    //The third parameter "fragmentId" allows the function to personalize:
+    //    1. tags for the fragment manager
+    //    2. the toolbar title
+    private void setContentFragment(int fragmentFrame, Fragment fragment, String fragmentId) {
+
+        //Setup the Fragment Transaction
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out);
+        fragmentTransaction.replace(fragmentFrame, fragment);
+
+//        //Decide whether or not to put a tag on the backstack
+//        if(fragment instanceof TripPlanListFragment){
+//            referenceFragmentNameTag = HOME_FRAGMENT_TAG;
+//            fragmentTransaction.addToBackStack(referenceFragmentNameTag);
+//        }else if(fragment instanceof TripPlanDetailsFragment) {
+//            referenceFragmentNameTag = HUNT_DETAIL_FRAGMENT_TAG;
+//            fragmentTransaction.addToBackStack(referenceFragmentNameTag);
+//        }else{
+//            fragmentTransaction.addToBackStack(null);
+//        }
+
+        fragmentTransaction.addToBackStack(fragmentId);
+
+        //Commit the transaction and load the fragment
+        fragmentTransaction.commit();
+
+        //setup the toolbar title
+        setToolbarTitle(fragmentId);
 
         //Decide which view needs to be visible
         if (fragment instanceof FullscreenFragment) {
@@ -612,9 +711,18 @@ public class TravelGuideActivity extends AppCompatActivity implements
                     @Override
                     public void onClick(View v) {
                         if(checkcurrentFrag()){
+                            //current fragment is the embedded scanner
                             removeFrag();
+                            tvToolbarTitle.setText(mScannerParentTitle);
                         }else {
+                            int numEntries = getSupportFragmentManager().getBackStackEntryCount();
+                            int indexLastFragment = numEntries - 2;
+                            String fragmentId = getSupportFragmentManager()
+                                    .getBackStackEntryAt(indexLastFragment)
+                                    .getName();
                             getSupportFragmentManager().popBackStack();
+                            setToolbarTitle(fragmentId);
+//                            getSupportFragmentManager().popBackStack();
                         }
                     }
                 });
@@ -753,6 +861,8 @@ public class TravelGuideActivity extends AppCompatActivity implements
         settingsFrag.setArguments(bundle);
         ft.replace(R.id.fragment_frame_scanner, settingsFrag,"OnClickCloudTrackingActivity");
         ft.commit();
+        mScannerParentTitle = tvToolbarTitle.getText().toString();
+        setToolbarTitle(AppCodesKeys.SCANNER_FRAGMENT_ID);
 
     }
 
@@ -834,20 +944,33 @@ public class TravelGuideActivity extends AppCompatActivity implements
 
         if(isNewUser){
             KurtinProfileFragment kurtinProfileFragment = KurtinProfileFragment.newInstance(isNewUser);
-            setContentFragment(R.id.fragment_frame, kurtinProfileFragment);
+//            setContentFragment(R.id.fragment_frame, kurtinProfileFragment);
+            setContentFragment(
+                    R.id.fragment_frame,
+                    kurtinProfileFragment,
+                    AppCodesKeys.KURTIN_PROFILE_FRAGMENT_ID);
         }
     }
 
     @Override
     public void onSignUpRequested(){
         KurtinSignUpFragment fragment = new KurtinSignUpFragment();
-        setContentFragment(R.id.fragment_frame, fragment);
+//        setContentFragment(R.id.fragment_frame, fragment);
+        setContentFragment(
+                R.id.fragment_frame,
+                fragment,
+                AppCodesKeys.KURTIN_SIGN_UP_FRAGMENT_ID);
     }
 
     @Override
     public void onLoginRequested(){
-        KurtinLoginFragment fragment = new KurtinLoginFragment();
-        setContentFragment(R.id.fragment_frame, fragment);
+//        KurtinLoginFragment fragment = new KurtinLoginFragment();
+//        setContentFragment(R.id.fragment_frame, fragment);
+        setContentFragment(
+                R.id.fragment_frame,
+                new KurtinLoginFragment(),
+                AppCodesKeys.KURTIN_LOGIN_FRAGMENT_ID);
+
     }
 
     //Setup the navigation menu depending on the whether or not the user is logged in
@@ -936,13 +1059,21 @@ public class TravelGuideActivity extends AppCompatActivity implements
         refreshNavHeader();
         hideOrShowFAB();
         if(mLoginStatus) {
-            getSupportFragmentManager().popBackStack("home", NO_FLAGS);
+//            getSupportFragmentManager().popBackStack("home", NO_FLAGS);
+            getSupportFragmentManager().popBackStack(AppCodesKeys.TRIP_PLAN_LIST_FRAGMENT_ID, NO_FLAGS);
         }
 
         Boolean isNewUser = true;
         KurtinProfileFragment kurtinProfileFragment = KurtinProfileFragment.newInstance(isNewUser);
+//        setContentFragment(R.id.fragment_frame, kurtinProfileFragment);
+        setContentFragment(
+                R.id.fragment_frame,
+                kurtinProfileFragment,
+                AppCodesKeys.KURTIN_PROFILE_FRAGMENT_ID);
+    }
 
-        setContentFragment(R.id.fragment_frame, kurtinProfileFragment);
+    private void setToolbarTitle(String fragmentId){
+        tvToolbarTitle.setText(AppCodesKeys.FRAGMENT_TITLE_MAP.get(fragmentId));
     }
 
     ////////////////////////

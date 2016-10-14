@@ -117,6 +117,8 @@ public class KurtinProfileFragment extends Fragment {
             }finally {
                 if (mIsNewUser){
                     btnFinish.setVisibility(View.VISIBLE);
+                }else {
+                    btnFinish.setVisibility(View.GONE);
                 }
             }
         }
