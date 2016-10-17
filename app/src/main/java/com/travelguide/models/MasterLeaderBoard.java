@@ -2,6 +2,7 @@ package com.travelguide.models;
 
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 import com.travelguide.helpers.AppCodesKeys;
 
 /**
@@ -29,4 +30,6 @@ public class MasterLeaderBoard extends ParseObject {
     public void putHuntID(String huntID) {put("huntID",huntID);}
     public void putTempDetails(String tempDetails) {put("tempDetails",tempDetails);}
     public void putCompletionStatus(boolean isCompleted) {put("completed", isCompleted);}
+    public void putUser(ParseUser parseUser) {put("userID", parseUser);}
+    public void putHunt(TripPlan hunt) {put("huntPointer", hunt);}
 }

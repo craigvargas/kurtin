@@ -43,6 +43,7 @@ import com.travelguide.adapters.LevelAdapter;
 import com.travelguide.adapters.PlaceAdapter;
 import com.travelguide.adapters.QuestionsAdapter;
 import com.travelguide.decorations.DividerItemDecoration;
+import com.travelguide.helpers.AppCodesKeys;
 import com.travelguide.helpers.GoogleImageSearch;
 import com.travelguide.helpers.ItemClickSupport;
 import com.travelguide.helpers.NetworkAvailabilityCheck;
@@ -50,6 +51,7 @@ import com.travelguide.helpers.Preferences;
 import com.travelguide.helpers.UpdatePointsandLeaderBoard;
 import com.travelguide.listener.OnTripPlanListener;
 import com.travelguide.models.Day;
+import com.travelguide.models.MasterLeaderBoard;
 import com.travelguide.models.Place;
 import com.travelguide.models.Questions;
 import com.travelguide.models.TripPlan;
@@ -57,6 +59,7 @@ import com.travelguide.models.TripPlan;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.R.id.list;
 import static com.facebook.FacebookSdk.getApplicationContext;
 import static com.wikitude.common.rendering.RenderSurfaceView.TAG;
 
@@ -81,6 +84,9 @@ public class TripPlanDetailsFragment extends TripBaseFragment
     private String mSelectedDayObjectId;
 
     private TripPlan mTripPlan;
+
+    private TripPlan mHuntTripPlan;
+    private ParseUser mCurrentUser;
 
     private List<Day> mDayList;
     private List<Place> mPlaceList;
@@ -252,10 +258,12 @@ public class TripPlanDetailsFragment extends TripBaseFragment
         scanbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ParseUser parseUser = ParseUser.getCurrentUser();
-                if (parseUser == null){
+//                ParseUser parseUser = ParseUser.getCurrentUser();
+                mCurrentUser = ParseUser.getCurrentUser();
+                if (mCurrentUser == null){
                     mLoginListener.onLoginRequested();
                 }else {
+                    updateHuntLeaderboard();
                     scanImage();
                 }
             }
@@ -714,10 +722,11 @@ public class TripPlanDetailsFragment extends TripBaseFragment
                                 }
                             });
                     mTripPlan = tripPlan;
+                    mHuntTripPlan = mTripPlan;
                     hideOrShowFAB();
                     bindFavoriteIcon();
-                    tvGroupType.setText(mTripPlan.getGroupType());
-                    tvTravelSeason.setText(mTripPlan.getTravelSeason());
+//                    tvGroupType.setText(mTripPlan.getGroupType());
+//                    tvTravelSeason.setText(mTripPlan.getTravelSeason());
                     tvHuntName.setText(mTripPlan.getHuntName());
                     tvHuntDescription.setText(mTripPlan.getHuntDescription());
                     tvHuntAddress.setText(mTripPlan.getHuntAddress());
@@ -826,6 +835,51 @@ public class TripPlanDetailsFragment extends TripBaseFragment
     }
     public void hideScanButton(){
 //        scanbtn.setVisibility(View.GONE);
+    }
+
+    private void updateHuntLeaderboard(){
+        ParseQuery huntLeaderBoardQuery = ParseQuery.getQuery(MasterLeaderBoard.class);
+        huntLeaderBoardQuery.whereEqualTo(AppCodesKeys.PARSE_LEADER_BOARD_USER_POINTER_KEY, mCurrentUser);
+        huntLeaderBoardQuery.whereEqualTo(AppCodesKeys.PARSE_LEADER_BOARD_HUNT_POINTER_KEY, mHuntTripPlan);
+
+        huntLeaderBoardQuery.findInBackground(new FindCallback<MasterLeaderBoard>() {
+            @Override
+            public void done(List<MasterLeaderBoard> huntLeaderBoardList, ParseException e) {
+                if(e==null){
+                    if(huntLeaderBoardList.size() == 0){
+                        createHuntLeaderBoardRecord();
+                    }else{
+                        Toast.makeText(getContext(), "Welcome back to the hunt", Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+                    e.printStackTrace();
+                }
+            }
+
+//            @Override
+//            public void done(Object o, Throwable throwable) {
+//                Log.v("Update Leader Board", "Inside unkown DONE function. object = " + o.toString());
+//
+//            }
+        });
+    }
+
+    private void createHuntLeaderBoardRecord(){
+        MasterLeaderBoard huntLeaderBoardRecord = new MasterLeaderBoard();
+        huntLeaderBoardRecord.putUser(mCurrentUser);
+        huntLeaderBoardRecord.putHunt(mHuntTripPlan);
+        huntLeaderBoardRecord.putCompletionStatus(false);
+        huntLeaderBoardRecord.putPoints(0);
+        huntLeaderBoardRecord.putHuntID(mHuntTripPlan.getObjectId());
+        huntLeaderBoardRecord.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e==null){
+                }else{
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
 }
