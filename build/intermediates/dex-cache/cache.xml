@@ -2,15 +2,6 @@
 <items version="2" >
 
     <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.android.support/support-media-compat/24.2.1/jars/libs/internal_impl-24.2.1.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="fbf8da429efd5ad21e02e3e5ecaa1efc4167878d">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/internal_impl-24.2.1_7b7599beab045e310d38e75fa299085da5dbcad7/classes.dex" />
-    </item>
-    <item
         is-multidex="false"
         jar="/Users/cvar/.gradle/caches/modules-2/files-2.1/com.nineoldandroids/library/2.4.0/e9b63380f3a242dbdbf103a2355ad7e43bad17cb/library-2.4.0.jar"
         jumboMode="false"
@@ -38,15 +29,6 @@
         <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/pre-dexed/debug/com.android.support-cardview-v7-24.2.1_96407520dfa8a90f4ee05facb5a6348a894d0e6f.jar" />
     </item>
     <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="e9f4361610a6c3c826e909527464ac8d86c3ddfe">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run_3bb77b5217718eaee26c730945dc8ff22e798f70/classes.dex" />
-    </item>
-    <item
         is-multidex="false"
         jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/libs/gson-2.2.1.jar"
         jumboMode="false"
@@ -54,24 +36,6 @@
         revision="24.0.3"
         sha1="42a24d508f5e05bd22cc42bd2e2babd7b5466ec9">
         <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/pre-dexed/debug/gson-2.2.1_ad45068b1a57bbc0d7fb864cdd89ed1eb562d806.jar" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.astuetz/pagerslidingtabstrip/1.0.1/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="7912610ed96381c25c36d986eba422731b9641b6">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.astuetz-pagerslidingtabstrip-1.0.1_3c3580babd4cdabd61075d3c7c94d397a7797ad1/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.android.support/support-fragment/24.2.1/jars/libs/internal_impl-24.2.1.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="5f64d657e838e8375135c0f6057a7ff8fab6a50e">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/internal_impl-24.2.1_1407bb2cb5bbe1adcf3601643f69fae49cf4a4b7/classes.dex" />
     </item>
     <item
         is-multidex="false"
@@ -99,42 +63,6 @@
         revision="24.0.3"
         sha1="f2b64f6a762f61a2379d6a79af03e2ee56eefe0b">
         <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/pre-dexed/debug/com.android.support.constraint-constraint-layout-1.0.0-alpha9_b27a1e5d731b967c44b2c2c47029c4ca3dcf92de.jar" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/.gradle/caches/modules-2/files-2.1/com.squareup.picasso/picasso/2.5.2/7446d06ec8d4f7ffcc53f1da37c95f200dcb9387/picasso-2.5.2.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="7446d06ec8d4f7ffcc53f1da37c95f200dcb9387">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/picasso-2.5.2_70d10bd0987f867652bbb8e669a07581bb576b37/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/de.hdodenhof/circleimageview/1.3.0/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="ac6948cce36f694f3eb3d73a135e298dc4b3527a">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/de.hdodenhof-circleimageview-1.3.0_8284e26c6177cd70da84714c4775dfac05f9a303/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/libs/Parse-1.10.3.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="dfef23b83f8434c6e881096e1ac6d54dc3e52041">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/2/Parse-1.10.3_0397c47037feb279972567a050c551559bc8a3b1/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.android.support/animated-vector-drawable/24.2.1/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="94bc1dfb84dcc8b6f6f8f7cc726d7b2dd39c1574">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-animated-vector-drawable-24.2.1_cac83fae1b474f76aef27cae943246c386ea34d1/classes.dex" />
     </item>
     <item
         is-multidex="false"
@@ -191,15 +119,6 @@
         <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/pre-dexed/debug/com.android.support-support-core-ui-24.2.1_d6efbcc3653874d56f0a518dc0f8e471866ef9a1.jar" />
     </item>
     <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.afollestad.material-dialogs/core/0.9.0.2/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="d3f8ab57967a9149262ad36a46477fc2515f6ac8">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.afollestad.material-dialogs-core-0.9.0.2_af5578d77c558edbf70a2b7e800752a454c8ef87/classes.dex" />
-    </item>
-    <item
         is-multidex="false"
         jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.astuetz/pagerslidingtabstrip/1.0.1/jars/classes.jar"
         jumboMode="false"
@@ -209,15 +128,6 @@
         <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/pre-dexed/debug/com.astuetz-pagerslidingtabstrip-1.0.1_3c3580babd4cdabd61075d3c7c94d397a7797ad1.jar" />
     </item>
     <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.android.support/support-fragment/24.2.1/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="b9a1ac78ad7ef3abedc4a4b30cd92bcacb939d1f">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-fragment-24.2.1_5d8bb8ade9fdcc959e5e7a6cab3f4a902f4609db/classes.dex" />
-    </item>
-    <item
         is-multidex="false"
         jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.android.support/support-media-compat/24.2.1/jars/libs/internal_impl-24.2.1.jar"
         jumboMode="false"
@@ -225,15 +135,6 @@
         revision="24.0.3"
         sha1="fbf8da429efd5ad21e02e3e5ecaa1efc4167878d">
         <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/pre-dexed/debug/internal_impl-24.2.1_7b7599beab045e310d38e75fa299085da5dbcad7.jar" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/.gradle/caches/modules-2/files-2.1/com.nineoldandroids/library/2.4.0/e9b63380f3a242dbdbf103a2355ad7e43bad17cb/library-2.4.0.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="e9b63380f3a242dbdbf103a2355ad7e43bad17cb">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/library-2.4.0_2995709b5711bbc261cdf0618a309e25e143ab7f/classes.dex" />
     </item>
     <item
         is-multidex="false"
@@ -254,24 +155,6 @@
         <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/pre-dexed/debug/httpclient-4.5.1_7aae2d82744568ad336e0a87a7cf4dfea7c6e932.jar" />
     </item>
     <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-tasks/9.6.1/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="4a36600281a648769411ef642c331851732bf29e">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.google.android.gms-play-services-tasks-9.6.1_f955de6e84e5c204ccbb06c2b7309444f74fbd7f/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.xgc1986.android/parallaxpagertransformer/1.0.3/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="c7a86f0c60ea0a89b8b48bf6ff55cdc64f2bfabc">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.xgc1986.android-parallaxpagertransformer-1.0.3_269efad0618d0404737afc24e82df1ae192173f4/classes.dex" />
-    </item>
-    <item
         is-multidex="false"
         jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/9.6.1/jars/classes.jar"
         jumboMode="false"
@@ -288,15 +171,6 @@
         revision="24.0.3"
         sha1="386a4339ffe52d5d63e80f9bed8d2b1d1a418249">
         <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/pre-dexed/debug/android-async-http-1.4.9_067147f15c13df470104e46b1b72a40c6ecacffe.jar" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.android.support.constraint/constraint-layout/1.0.0-alpha9/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="f2b64f6a762f61a2379d6a79af03e2ee56eefe0b">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support.constraint-constraint-layout-1.0.0-alpha9_b27a1e5d731b967c44b2c2c47029c4ca3dcf92de/classes.dex" />
     </item>
     <item
         is-multidex="false"
@@ -344,24 +218,6 @@
         <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/pre-dexed/debug/glide-3.6.1_436d79067e519593b5394f5a9cbde93595303b6f.jar" />
     </item>
     <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-basement/9.6.1/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="eccaaa9ffa6bb4bfbd2e870f01aaf69655d353be">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.google.android.gms-play-services-basement-9.6.1_cef59affea263087b8878f9eae266f7eb921c4ca/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/libs/ParseFacebookUtilsV4-1.10.3.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="30f5f2c4ac77cfa3b5584766e3e40503bd927ae9">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/2/ParseFacebookUtilsV4-1.10.3_773c24cf344469888ae0c5dab2a424910343efee/classes.dex" />
-    </item>
-    <item
         is-multidex="false"
         jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/de.hdodenhof/circleimageview/1.3.0/jars/classes.jar"
         jumboMode="false"
@@ -380,51 +236,6 @@
         <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/pre-dexed/debug/com.android.support-percent-24.2.1_d777edc67acd7c945e96064d1035a302994ba4c5.jar" />
     </item>
     <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/24.2.1/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="7521486d9bfd2cd9e756e0cf75ed7d97f2ce2d3b">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-recyclerview-v7-24.2.1_5b38273d1006532efcab526b6772b611e965a6c5/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.code-troopers.betterpickers/library/2.2.1/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="0ac52a832939616e53a97e43b2c527f933e206bd">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.code-troopers.betterpickers-library-2.2.1_de9c38f4131e6bf6af51cc63c1e2065d58623d88/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.getbase/floatingactionbutton/1.10.1/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="f40cf334cdc8b098b74312e21c7741c6eefbeb0e">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.getbase-floatingactionbutton-1.10.1_158abb8add6baf46553039ee4852edcde09c217c/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.facebook.android/facebook-android-sdk/4.6.0/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="1c1afa0ab2a8197a5da1b36c4167a9e479cb74d9">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.facebook.android-facebook-android-sdk-4.6.0_302cec611be34ddc8f31ee37a45571ca863bb788/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.2.1/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="43b2dba6b5a0b14527961b75329d0b90025f15ea">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-appcompat-v7-24.2.1_b8dd58914aa0eff14adfcf5091cf642c27499e0b/classes.dex" />
-    </item>
-    <item
         is-multidex="false"
         jar="/Users/cvar/Library/Android/sdk/extras/m2repository/com/android/support/constraint/constraint-layout-solver/1.0.0-alpha9/constraint-layout-solver-1.0.0-alpha9.jar"
         jumboMode="false"
@@ -432,24 +243,6 @@
         revision="24.0.3"
         sha1="6a908fd0803cc5f65b007101002aec06dc7544da">
         <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/pre-dexed/debug/constraint-layout-solver-1.0.0-alpha9_0d04c5c7b63884e67242ccf223058bb2457ae904.jar" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.android.support/support-compat/24.2.1/jars/libs/internal_impl-24.2.1.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="7e4389bd133359a2ff88623ff1e4ff93d6e6f780">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/internal_impl-24.2.1_2f030b994db12feaa412061966932f18bdb60384/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.android.support/support-vector-drawable/24.2.1/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="d5c731fc64c03dfe04d51134955b483551c35849">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-vector-drawable-24.2.1_394086beb253c8d49f97faa84dcc3815e6b0c98e/classes.dex" />
     </item>
     <item
         is-multidex="false"
@@ -461,42 +254,6 @@
         <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/pre-dexed/debug/com.xgc1986.android-parallaxpagertransformer-1.0.3_269efad0618d0404737afc24e82df1ae192173f4.jar" />
     </item>
     <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="41c2c8df463926c55e8636c873540e0c449e84ef">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run-bootstrap_a4a1b6227dd9dd51a169fcff9e23bce146d577d4/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/9.6.1/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="af7582c6b327449c6d32518e6a10307860b7b5d6">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.google.android.gms-play-services-base-9.6.1_9b1826af4e2bb3ee2de4923d5312fd0144d8dc75/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/libs/foursquare-api-1.0.2.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="8f8b2bf3004096b8bedbc1d417830a6c828627ea">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/2/foursquare-api-1.0.2_4d71920996e13117048f4a7a34142b908eff2ce7/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.android.support/support-core-utils/24.2.1/jars/libs/internal_impl-24.2.1.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="935a969265b2a166b2d20415423f5f6e90fe16e0">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/internal_impl-24.2.1_99ffebbbac422d2eb98898c6d48ac2522917491c/classes.dex" />
-    </item>
-    <item
         is-multidex="false"
         jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-tasks/9.6.1/jars/classes.jar"
         jumboMode="false"
@@ -504,51 +261,6 @@
         revision="24.0.3"
         sha1="4a36600281a648769411ef642c331851732bf29e">
         <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/pre-dexed/debug/com.google.android.gms-play-services-tasks-9.6.1_f955de6e84e5c204ccbb06c2b7309444f74fbd7f.jar" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/libs/httpclient-4.5.1.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="7e3cecc566df91338c6c67883b89ddd05a17db43">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/2/httpclient-4.5.1_7aae2d82744568ad336e0a87a7cf4dfea7c6e932/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/.gradle/caches/modules-2/files-2.1/com.loopj.android/android-async-http/1.4.9/386a4339ffe52d5d63e80f9bed8d2b1d1a418249/android-async-http-1.4.9.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="386a4339ffe52d5d63e80f9bed8d2b1d1a418249">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/android-async-http-1.4.9_067147f15c13df470104e46b1b72a40c6ecacffe/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/Library/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/24.2.1/support-annotations-24.2.1.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="8de3aafecbdf98a61db6427f008f2d515bcd2544">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/support-annotations-24.2.1_35ba2f0343786dfa4b080c32f59ff3a31a7b2c5f/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/me.zhanghai.android.materialprogressbar/library/1.1.7/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="1478a113f04bf0b679037b4f6bd88bd1837b96a3">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/me.zhanghai.android.materialprogressbar-library-1.1.7_ce28fb60d377354d031ab8f5e44066bb7a7f9e81/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.android.support/support-compat/24.2.1/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="0ecb4b595fa0f0f8018a149ace3ea6525624f94e">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-compat-24.2.1_4a2e8167db7b94369d536c88b52526b90df4bb0f/classes.dex" />
     </item>
     <item
         is-multidex="false"
@@ -567,15 +279,6 @@
         revision="24.0.3"
         sha1="526a9f794eab830eae4f23a62c572878b3f491ab">
         <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/pre-dexed/debug/httpclient-4.3.6_dba7a150d3c34690492aff970130939b53181a27.jar" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.android.support/design/24.2.1/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="e03f47f3d1017a093bb3239d4ec47c3447f40744">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-design-24.2.1_d3284adfa4a9a8be8b60b92df8ad92ed53007f0e/classes.dex" />
     </item>
     <item
         is-multidex="false"
@@ -605,33 +308,6 @@
         <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/pre-dexed/debug/ParseFacebookUtilsV4-1.10.3_773c24cf344469888ae0c5dab2a424910343efee.jar" />
     </item>
     <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-maps/9.6.1/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="62ff84124b89177abc0c27f3e38c9732f2d41617">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.google.android.gms-play-services-maps-9.6.1_82701ee0d47c207c57c49e32c6eea735d5692252/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/.gradle/caches/modules-2/files-2.1/com.github.bumptech.glide/glide/3.6.1/86b122e640af09b0723e1fa44083c354ba6d9089/glide-3.6.1.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="86b122e640af09b0723e1fa44083c354ba6d9089">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/glide-3.6.1_436d79067e519593b5394f5a9cbde93595303b6f/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.makeramen/roundedimageview/2.2.1/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="814fc0c3ec69a944add398217d90077301501a74">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.makeramen-roundedimageview-2.2.1_b01c9a156396b1753af4409a72ae149d3ab5d652/classes.dex" />
-    </item>
-    <item
         is-multidex="false"
         jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/uk.co.chrisjenx/calligraphy/2.1.0/jars/classes.jar"
         jumboMode="false"
@@ -639,15 +315,6 @@
         revision="24.0.3"
         sha1="e653e15e62e8a59ddd76cc7f827bf8bce38ae7bb">
         <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/pre-dexed/debug/uk.co.chrisjenx-calligraphy-2.1.0_44c24484ef9e944bf57e8077b05d31bc3c2c6778.jar" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.android.support/percent/24.2.1/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="c394e9a7e1552a4499c7d7d25e7eccd6a533b6df">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-percent-24.2.1_d777edc67acd7c945e96064d1035a302994ba4c5/classes.dex" />
     </item>
     <item
         is-multidex="false"
@@ -675,42 +342,6 @@
         revision="24.0.3"
         sha1="1c1afa0ab2a8197a5da1b36c4167a9e479cb74d9">
         <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/pre-dexed/debug/com.facebook.android-facebook-android-sdk-4.6.0_302cec611be34ddc8f31ee37a45571ca863bb788.jar" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/Library/Android/sdk/extras/m2repository/com/android/support/constraint/constraint-layout-solver/1.0.0-alpha9/constraint-layout-solver-1.0.0-alpha9.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="6a908fd0803cc5f65b007101002aec06dc7544da">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/constraint-layout-solver-1.0.0-alpha9_0d04c5c7b63884e67242ccf223058bb2457ae904/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/.gradle/caches/modules-2/files-2.1/cz.msebera.android/httpclient/4.3.6/526a9f794eab830eae4f23a62c572878b3f491ab/httpclient-4.3.6.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="526a9f794eab830eae4f23a62c572878b3f491ab">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/httpclient-4.3.6_dba7a150d3c34690492aff970130939b53181a27/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/.gradle/caches/modules-2/files-2.1/com.parse.bolts/bolts-android/1.2.1/44780c2cf98f6a3cf4e77f1234d644758b329201/bolts-android-1.2.1.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="44780c2cf98f6a3cf4e77f1234d644758b329201">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/bolts-android-1.2.1_e311b868619b2ee787a1e00e84291b02799ee360/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.android.support/cardview-v7/24.2.1/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="c5e6490573cd2cc8018417f60ddd251138b6ed61">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-cardview-v7-24.2.1_96407520dfa8a90f4ee05facb5a6348a894d0e6f/classes.dex" />
     </item>
     <item
         is-multidex="false"
@@ -758,33 +389,6 @@
         <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/pre-dexed/debug/com.android.support-support-compat-24.2.1_4a2e8167db7b94369d536c88b52526b90df4bb0f.jar" />
     </item>
     <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/libs/gson-2.2.1.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="42a24d508f5e05bd22cc42bd2e2babd7b5466ec9">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/2/gson-2.2.1_ad45068b1a57bbc0d7fb864cdd89ed1eb562d806/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/libs/YouTubeAndroidPlayerApi.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="3c4f96ff493456651cc7bdb0b47e10eb25545a16">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/2/YouTubeAndroidPlayerApi_8ff7318f0e7fa258e91c39da45932dff3a58f42e/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/uk.co.chrisjenx/calligraphy/2.1.0/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="e653e15e62e8a59ddd76cc7f827bf8bce38ae7bb">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/uk.co.chrisjenx-calligraphy-2.1.0_44c24484ef9e944bf57e8077b05d31bc3c2c6778/classes.dex" />
-    </item>
-    <item
         is-multidex="false"
         jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/Kurtin0928/wikitude-native-sdk/unspecified/jars/classes.jar"
         jumboMode="false"
@@ -794,24 +398,6 @@
         <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/pre-dexed/debug/Kurtin0928-wikitude-native-sdk-unspecified_8d3c5d73bd6c4d558d7071f256f043d5b6307a11.jar" />
     </item>
     <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.google.maps.android/android-maps-utils/0.3.4/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="cf251baf39f5c5138224b67b4106eb6331abbd13">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.google.maps.android-android-maps-utils-0.3.4_fbd1f2263ab93a944a5c1a8d77854c9ad4e5d96f/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.android.support/support-media-compat/24.2.1/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="09b462bbcb77650284bd6614f1a32f360ef369f8">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-media-compat-24.2.1_3f7ea92efe3bc33f9af59172e81ab130bbde9ac5/classes.dex" />
-    </item>
-    <item
         is-multidex="false"
         jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.android.support/support-fragment/24.2.1/jars/libs/internal_impl-24.2.1.jar"
         jumboMode="false"
@@ -819,15 +405,6 @@
         revision="24.0.3"
         sha1="5f64d657e838e8375135c0f6057a7ff8fab6a50e">
         <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/pre-dexed/debug/internal_impl-24.2.1_1407bb2cb5bbe1adcf3601643f69fae49cf4a4b7.jar" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/libs/httpcore-4.4.3.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="e876a79d561e5c6207b78d347e198c8c4531a5e5">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/2/httpcore-4.4.3_681cf3a35d8a244f12369fe57cf0f6806f528e81/classes.dex" />
     </item>
     <item
         is-multidex="false"
@@ -866,42 +443,6 @@
         <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/pre-dexed/debug/com.makeramen-roundedimageview-2.2.1_b01c9a156396b1753af4409a72ae149d3ab5d652.jar" />
     </item>
     <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-location/9.6.1/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="79f521967ad7f49b34748db89df02852c2b2f87b">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.google.android.gms-play-services-location-9.6.1_98f8d74d43c400c9c2fe531d54ccf5978d660f8e/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.android.support/support-core-ui/24.2.1/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="e7f3132168957eefc46229fc32c3bd464642b71e">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-core-ui-24.2.1_d6efbcc3653874d56f0a518dc0f8e471866ef9a1/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.android.support/support-core-ui/24.2.1/jars/libs/internal_impl-24.2.1.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="867dad63c33388ff8c7644b236579355036d075f">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/internal_impl-24.2.1_0592ccfd7d69da2134c6b99fb337982fb731345b/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.android.support/support-v4/24.2.1/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-v4-24.2.1_2f4f4d719234d5920b496600ee3cc64b6fe66fe2/classes.dex" />
-    </item>
-    <item
         is-multidex="false"
         jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.afollestad.material-dialogs/core/0.9.0.2/jars/classes.jar"
         jumboMode="false"
@@ -909,15 +450,6 @@
         revision="24.0.3"
         sha1="d3f8ab57967a9149262ad36a46477fc2515f6ac8">
         <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/pre-dexed/debug/com.afollestad.material-dialogs-core-0.9.0.2_af5578d77c558edbf70a2b7e800752a454c8ef87.jar" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/exploded-aar/com.android.support/support-core-utils/24.2.1/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="9c4c3bc902450c39ed54de170db4fb12aea20a35">
-        <dex dex="/Users/cvar/NativeDev/Android/KurtinGit/Kurtin0928/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-core-utils-24.2.1_572c0fc4177c891ace1aeebc9dfe0ff45471ed46/classes.dex" />
     </item>
     <item
         is-multidex="false"

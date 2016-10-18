@@ -219,6 +219,7 @@ public class TripPlanListFragment extends TripBaseFragment {
         Log.v("Load","TripPlansFromRemote");
         ParseQuery<TripPlan> query = getQuery();
         query.setSkip(totalItemsCount);
+        query.orderByAscending(AppCodesKeys.PARSE_TRIP_PLAN_ORDER_KEY);
         query.findInBackground(new FindCallback<TripPlan>() {
             @Override
             public void done(List<TripPlan> tripPlans, ParseException e) {
