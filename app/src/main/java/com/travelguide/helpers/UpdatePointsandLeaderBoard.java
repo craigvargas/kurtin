@@ -78,10 +78,14 @@ public class UpdatePointsandLeaderBoard extends AsyncTask<String, Void,Void> {
                                 @Override
                                 public void done(List<LeaderBoard> list, ParseException e) {
                                     Integer totalLevelPoints = 0;
+                                    //CVar: Loop below calculates total level points across ALL users.  Is that intended???
                                     for(int i=0;i<list.size();i++){
                                         totalLevelPoints = totalLevelPoints + list.get(i).getPoints();
                                     }
                                     //save level points to that level items
+                                    //Cvar:  Loop below saves the total level points for every entry of that hunt&level across all users.
+                                    //Cvar:  This effectively sums up every user's points for the specified hunt&level combination
+                                    //Cvar:  Is that intended???
                                     for(int i=0;i<list.size();i++){
                                         LeaderBoard updateleaderBoard = list.get(i);
                                         updateleaderBoard.putTotalLevelPoints(totalLevelPoints);
@@ -95,12 +99,14 @@ public class UpdatePointsandLeaderBoard extends AsyncTask<String, Void,Void> {
                                                 query1.findInBackground(new FindCallback<LeaderBoard>() {
                                                     @Override
                                                     public void done(List<LeaderBoard> list, ParseException e) {
+                                                        //CVar: The query above pulls all completed levels for a given huntID across ALL users
 
                                                         //Adding
                                                         HashSet<String> levelIdsSet = new HashSet<String>();
                                                         for(int l=0;l<list.size();l++){
                                                             levelIdsSet.add(list.get(l).getLevelID().toString());
                                                         }
+                                                        //CVar: Create a list of all completed level ID's across ALL users
                                                         List<String> completedLevelIDs = new ArrayList<String>(levelIdsSet);
                                                         List<String> levelIdObjectId = new ArrayList<String>();
 
