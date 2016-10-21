@@ -7,7 +7,11 @@ import com.parse.Parse;
 import com.parse.ParseACL;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
+import com.travelguide.models.Checkpoint;
 import com.travelguide.models.Day;
+import com.travelguide.models.Hunt;
+import com.travelguide.models.HuntJoin;
+import com.travelguide.models.KurtinInteraction;
 import com.travelguide.models.LeaderBoard;
 import com.travelguide.models.MasterLeaderBoard;
 import com.travelguide.models.Place;
@@ -37,6 +41,10 @@ public class TravelGuideApplication extends Application {
         ParseObject.registerSubclass(Questions.class);
         ParseObject.registerSubclass(LeaderBoard.class);
         ParseObject.registerSubclass(MasterLeaderBoard.class);
+        ParseObject.registerSubclass(Hunt.class);
+        ParseObject.registerSubclass(Checkpoint.class);
+        ParseObject.registerSubclass(KurtinInteraction.class);
+        ParseObject.registerSubclass(HuntJoin.class);
         // Enable Local Datastore.
         Parse.enableLocalDatastore(this);
         // Initialization code here

@@ -26,6 +26,7 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="@string/no_data_available"
+            android:textColor="@color/white"
             android:visibility="gone" />
 
 

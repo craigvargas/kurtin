@@ -22,6 +22,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.travelguide.R;
+import com.travelguide.adapters.HuntListAdapter;
 import com.travelguide.adapters.TripPlanAdapter;
 import com.travelguide.decorations.VerticalSpaceItemDecoration;
 import com.travelguide.helpers.AppCodesKeys;
@@ -30,6 +31,8 @@ import com.travelguide.helpers.ItemClickSupport;
 import com.travelguide.helpers.NetworkAvailabilityCheck;
 import com.travelguide.helpers.Preferences;
 import com.travelguide.listener.OnTripPlanListener;
+import com.travelguide.models.Hunt;
+import com.travelguide.models.HuntJoin;
 import com.travelguide.models.MasterLeaderBoard;
 import com.travelguide.models.TripPlan;
 
@@ -51,8 +54,8 @@ public class TripPlanListFragment extends TripBaseFragment {
     private FloatingActionButton fabNewTripPlan;
 
     private OnTripPlanListener mTripPlanListener;
-    private TripPlanAdapter mTripPlanAdapter;
-    private List<TripPlan> mTripPlans;
+    private HuntListAdapter mHuntListAdapter;
+    private List<Hunt> mHuntList;
     private HashMap<String, Boolean> mUserHuntDataMap;
 
     private MaterialDialog progressDialog;
@@ -94,14 +97,14 @@ public class TripPlanListFragment extends TripBaseFragment {
 
         mUserHuntDataMap = new HashMap<>();
 
-        mTripPlans = new ArrayList<>();
+        mHuntList = new ArrayList<>();
 //        mTripPlanAdapter = new TripPlanAdapter(mTripPlans, getContext());
-        mTripPlanAdapter = new TripPlanAdapter(mTripPlans, mUserHuntDataMap,getContext());
-        mTripPlanAdapter.setHasStableIds(true);
+        mHuntListAdapter = new HuntListAdapter(mHuntList, mUserHuntDataMap,getContext());
+        mHuntListAdapter.setHasStableIds(true);
 
         rvTripPlans = (RecyclerView) view.findViewById(R.id.rvTripPlans);
         rvTripPlans.setItemAnimator(new DefaultItemAnimator());
-        rvTripPlans.setAdapter(mTripPlanAdapter);
+        rvTripPlans.setAdapter(mHuntListAdapter);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         rvTripPlans.setLayoutManager(layoutManager);
@@ -115,10 +118,10 @@ public class TripPlanListFragment extends TripBaseFragment {
         ItemClickSupport.addTo(rvTripPlans).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-                String tripPlanObjectId = mTripPlanAdapter.get(position).getObjectId();
+                String huntId = mHuntListAdapter.get(position).getObjectId();
 
                 if (mTripPlanListener != null) {
-                    mTripPlanListener.onTripPlanItemSelected(tripPlanObjectId);
+                    mTripPlanListener.onTripPlanItemSelected(huntId);
                 }
             }
         });
@@ -154,8 +157,8 @@ public class TripPlanListFragment extends TripBaseFragment {
             public void onRefresh() {
                 // Make sure to call swipeContainer.setRefreshing(false)
                 // once the network request has completed successfully.
-                mTripPlans.clear();
-                mTripPlanAdapter.notifyDataSetChanged();
+                mHuntList.clear();
+//                mHuntListAdapter.notifyDataSetChanged();
                 loadHunts();
 //                loadPlans(0);
             }
@@ -189,8 +192,8 @@ public class TripPlanListFragment extends TripBaseFragment {
         super.onAttach(context);
         try {
             mTripPlanListener = (OnTripPlanListener) context;
-            if (mTripPlans != null)
-                mTripPlans.clear();
+            if (mHuntList != null)
+                mHuntList.clear();
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
                     + " must implement OnTripPlanListener");
@@ -203,43 +206,43 @@ public class TripPlanListFragment extends TripBaseFragment {
         mTripPlanListener = null;
     }
 
-    private void populateTripPlanList(List<TripPlan> tripPlans) {
-        mTripPlans.addAll(tripPlans);
-        mTripPlanAdapter.notifyDataSetChanged();
+    private void populateTripPlanList(List<Hunt> huntList) {
+        mHuntList.addAll(huntList);
+        mHuntListAdapter.notifyDataSetChanged();
     }
 
     private void notifyAdapter(){
         if(mHuntsAreLoaded && mUserHuntDataIsLoaded){
             Log.v("Public Hunts", "Data Changed");
-            mTripPlanAdapter.notifyDataSetChanged();
+            mHuntListAdapter.notifyDataSetChanged();
         }
     }
 
     private boolean loadTripPlansFromRemote(int totalItemsCount) {
         Log.v("Load","TripPlansFromRemote");
-        ParseQuery<TripPlan> query = getQuery();
+        ParseQuery<Hunt> query = ParseQuery.getQuery(Hunt.class);
         query.setSkip(totalItemsCount);
         query.orderByAscending(AppCodesKeys.PARSE_TRIP_PLAN_ORDER_KEY);
-        query.findInBackground(new FindCallback<TripPlan>() {
+        query.findInBackground(new FindCallback<Hunt>() {
             @Override
-            public void done(List<TripPlan> tripPlans, ParseException e) {
+            public void done(List<Hunt> hunts, ParseException e) {
                 progressDialog.dismiss();
                 if (e == null) {
-                    if (tripPlans.isEmpty()) {
+                    if (hunts.isEmpty()) {
                         status = false;
                     } else {
                         status = true;
                         hideEmptyView();
 
 //                        populateTripPlanList(tripPlans);
-                        mTripPlans.addAll(tripPlans);
-                        savingOnDatabase(tripPlans);
+                        mHuntList.addAll(hunts);
+                        savingOnDatabase(hunts);
                     }
                 } else {
                     status = false;
                     Log.e(TAG, "Error fetching remote data: " + e.getMessage());
                 }
-                if (mTripPlans.size() == 0) {
+                if (mHuntList.size() == 0) {
                     showEmptyView();
                 }
                 mHuntsAreLoaded = true;
@@ -252,27 +255,27 @@ public class TripPlanListFragment extends TripBaseFragment {
 
     private boolean loadTripPlansFromDatabase(int totalItemsCount) {
         Log.v("Load","TripPlansFromDatabase");
-        ParseQuery<TripPlan> query = getQuery();
+        ParseQuery<Hunt> query = ParseQuery.getQuery(Hunt.class);
         query.setSkip(totalItemsCount);
         query.fromLocalDatastore();
-        query.findInBackground(new FindCallback<TripPlan>() {
+        query.findInBackground(new FindCallback<Hunt>() {
             @Override
-            public void done(List<TripPlan> tripPlans, ParseException e) {
+            public void done(List<Hunt> huntList, ParseException e) {
                 progressDialog.dismiss();
                 if (e == null) {
-                    if (tripPlans.isEmpty()) {
+                    if (huntList.isEmpty()) {
                         status = false;
                     } else {
                         status = true;
                         hideEmptyView();
-                        mTripPlans.addAll(tripPlans);
+                        mHuntList.addAll(huntList);
 //                        populateTripPlanList(tripPlans);
                     }
                 } else {
                     status = false;
                     Log.e(TAG, "Error fetching local data: " + e.getMessage());
                 }
-                if (mTripPlans.size() == 0) {
+                if (mHuntList.size() == 0) {
                     showEmptyView();
                 }
                 mHuntsAreLoaded = true;
@@ -288,8 +291,8 @@ public class TripPlanListFragment extends TripBaseFragment {
         ParseUser parseUser = ParseUser.getCurrentUser();
         if (parseUser != null){
 
-        ParseQuery<MasterLeaderBoard> queryLeaderBoard =
-                ParseQuery.getQuery(MasterLeaderBoard.class);
+        ParseQuery<HuntJoin> queryLeaderBoard =
+                ParseQuery.getQuery(HuntJoin.class);
 
         queryLeaderBoard.whereEqualTo(
                 AppCodesKeys.PARSE_LEADER_BOARD_USER_POINTER_KEY,
@@ -297,19 +300,19 @@ public class TripPlanListFragment extends TripBaseFragment {
 
         queryLeaderBoard.include(AppCodesKeys.PARSE_LEADER_BOARD_HUNT_POINTER_KEY);
 
-        queryLeaderBoard.findInBackground(new FindCallback<MasterLeaderBoard>() {
+        queryLeaderBoard.findInBackground(new FindCallback<HuntJoin>() {
             @Override
-            public void done(List<MasterLeaderBoard> mlbList, ParseException e) {
+            public void done(List<HuntJoin> huntJoinList, ParseException e) {
                 if (e == null) {
                     String huntID;
                     Boolean huntIsCompleted;
-                    TripPlan hunt;
+//                    TripPlan hunt;
                     mUserHuntDataMap.clear();
-                    for(MasterLeaderBoard mlb: mlbList){
-                        huntID = mlb
+                    for(HuntJoin huntJoin: huntJoinList){
+                        huntID = huntJoin
                                 .getParseObject(AppCodesKeys.PARSE_LEADER_BOARD_HUNT_POINTER_KEY)
                                 .getObjectId();
-                        huntIsCompleted = mlb.getCompletionStatus();
+                        huntIsCompleted = huntJoin.getCompletionStatus();
                         mUserHuntDataMap.put(huntID, huntIsCompleted);
 
                     }
@@ -324,8 +327,8 @@ public class TripPlanListFragment extends TripBaseFragment {
         }
     }
 
-    private void savingOnDatabase(List<TripPlan> tripPlans) {
-        ParseObject.pinAllInBackground(tripPlans);
+    private void savingOnDatabase(List<Hunt> huntList) {
+        ParseObject.pinAllInBackground(huntList);
     }
 
     private void showEmptyView() {

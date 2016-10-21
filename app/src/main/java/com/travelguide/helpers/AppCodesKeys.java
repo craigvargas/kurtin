@@ -23,8 +23,13 @@ public class AppCodesKeys {
     public static final String PARSE_LEADER_BOARD_USER_POINTER_PROFILE_PIC_KEY =
             PARSE_LEADER_BOARD_USER_POINTER_KEY + "." + PARSE_USER_PROFILE_PIC_KEY;
 
+    //Pars Hunt Join Keys
+    public static final String PARSE_HUNT_JOIN_USER_POINTER_KEY = "userObject";
+    public static final String PARSE_HUNT_JOIN_HUNT_POINTER_KEY = "huntObject";
+
+
     //Parse Hunt (Trip Plan) keys
-    public static final String PARSE_TRIP_PLAN_ORDER_KEY = "startsWhen";
+    public static final String PARSE_TRIP_PLAN_ORDER_KEY = "listOrder";
 
     //General app constants
     public static final String PROFILE_PIC_FILE_NAME = "profile.jpg";
