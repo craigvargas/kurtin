@@ -308,6 +308,7 @@ public class OnClickCloudTrackingActivity extends Fragment implements CloudTrack
                     Override
             public void run() {
                 try {
+                    Log.v("Recognition Failed", "Failed");
                     EditText targetInformationTextField = (EditText) controls.findViewById(on_click_cloud_tracking_info_field);
                     targetInformationTextField.setText("Recognition failed - Error code: " + errorCode_ + " Message: " + errorMessage_);
                     targetInformationTextField.setVisibility(View.VISIBLE);
@@ -1034,6 +1035,8 @@ public class OnClickCloudTrackingActivity extends Fragment implements CloudTrack
         recy.setLayoutParams(linearlayout);
         return recy;
     }
+    //Check leaderboard to see if user completed checkpoint already
+    //If user did not complete it then get questions from database and load questions into adapter
     private void loadTripPlacesFromRemote(String s, int quadno, Button submitbtn, TextView completedTV) {
         //Pre-Check if user has already completed this  -If Yes then stop this call
         LeaderBoard tempLeaderBoard = null;
@@ -1121,6 +1124,7 @@ public class OnClickCloudTrackingActivity extends Fragment implements CloudTrack
 
     }
 
+    //load data into adapter
     private void populateTripPlanPlaces(List < Questions > questionses) {
         mQuestionsList.clear();
         mQuestionsList.addAll(questionses);

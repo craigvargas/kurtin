@@ -48,7 +48,7 @@ public class LevelAdapter extends RecyclerView.Adapter<LevelAdapter.ViewHolder> 
         TextView tvLevel;
         public ViewHolder(View itemView) {
             super(itemView);
-            tvLevel = (TextView) itemView.findViewById(R.id.tvLevel);
+            tvLevel = (TextView) itemView.findViewById(R.id.tvCheckpointNumber);
         }
     }
 }

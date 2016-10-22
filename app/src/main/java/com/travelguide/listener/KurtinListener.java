@@ -1,0 +1,36 @@
+package com.travelguide.listener;
+
+import com.travelguide.models.Checkpoint;
+import com.travelguide.models.Hunt;
+import com.travelguide.models.KurtinInteraction;
+import com.travelguide.models.Questions;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public interface KurtinListener {
+
+    void onHuntSelected(String tripPlanObjectId);
+
+    void onHuntSelected(Hunt hunt);
+
+    void onTripPlanCreated(String tripPlanObjectId, String imageUrl);
+
+    void onTripPlanNew();
+
+    void  onDisplayLeaderBoardFromHuntDetails(String currentHuntID);
+
+    void onShowImageSlideShow(ArrayList<String> imageUrlSet);
+
+    Hunt getCurrentHunt();
+
+    void setCurrentHunt(Hunt hunt);
+
+    List<Checkpoint> getCurrentCheckpoints();
+
+    void setCurrentCheckpoints(List<Checkpoint> checkpoints);
+
+    List<KurtinInteraction> getCurrentInteractions();
+
+    void setCurrentInteractions(List<KurtinInteraction> interactions);
+}

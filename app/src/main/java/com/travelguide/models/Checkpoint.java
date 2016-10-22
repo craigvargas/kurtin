@@ -12,6 +12,8 @@ import com.parse.ParseRelation;
 @ParseClassName("Checkpoint")
 public class Checkpoint extends ParseObject {
 
+    private boolean mIsSelected;
+
     //Constructor
     public Checkpoint(){ super(); }
 
@@ -24,5 +26,12 @@ public class Checkpoint extends ParseObject {
     public ParseGeoPoint getGeoPoint(){ return getParseGeoPoint("geoPoint");}
     public ParseRelation getInteractions(){ return getRelation("kurtinInteractions"); }
     public ParseObject getInteraction(Integer questionNumber){ return getParseObject("kurtinInteraction" + questionNumber.toString());}
+
+    public boolean isSelected() {
+        return mIsSelected;
+    }
+    public void setSelected(boolean isSelected) {
+        this.mIsSelected = isSelected;
+    }
 
 }

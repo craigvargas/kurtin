@@ -22,7 +22,7 @@ import com.travelguide.adapters.TripPlanAdapter;
 import com.travelguide.decorations.VerticalSpaceItemDecoration;
 import com.travelguide.helpers.ItemClickSupport;
 import com.travelguide.helpers.NetworkAvailabilityCheck;
-import com.travelguide.listener.OnTripPlanListener;
+import com.travelguide.listener.KurtinListener;
 import com.travelguide.models.TripPlan;
 
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class SearchListFragment extends TripBaseFragment {
 
     private static final String TAG = SearchListFragment.class.getSimpleName();
 
-    private OnTripPlanListener mTripPlanListener;
+    private KurtinListener mTripPlanListener;
     private TripPlanAdapter mTripPlanAdapter;
     private List<TripPlan> mTripPlans;
 
@@ -98,7 +98,7 @@ public class SearchListFragment extends TripBaseFragment {
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
                 String tripPlanObjectId = mTripPlanAdapter.get(position).getObjectId();
                 if (mTripPlanListener != null) {
-                    mTripPlanListener.onTripPlanItemSelected(tripPlanObjectId);
+                    mTripPlanListener.onHuntSelected(tripPlanObjectId);
                 }
             }
         });
@@ -131,10 +131,10 @@ public class SearchListFragment extends TripBaseFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         try {
-            mTripPlanListener = (OnTripPlanListener) context;
+            mTripPlanListener = (KurtinListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
-                    + " must implement OnTripPlanListener");
+                    + " must implement KurtinListener");
         }
     }
 

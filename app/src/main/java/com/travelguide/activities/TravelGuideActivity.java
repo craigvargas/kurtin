@@ -55,6 +55,8 @@ import com.squareup.picasso.Picasso;
 import com.travelguide.R;
 import com.travelguide.foursquare.constants.FoursquareConstants;
 import com.travelguide.fragments.FullscreenFragment;
+import com.travelguide.fragments.HuntDetailFragment;
+import com.travelguide.fragments.HuntListFragment;
 import com.travelguide.fragments.KurtinLoginFragment;
 import com.travelguide.fragments.KurtinProfileFragment;
 import com.travelguide.fragments.KurtinSignUpFragment;
@@ -62,14 +64,15 @@ import com.travelguide.fragments.LeaderBoardFragment;
 import com.travelguide.fragments.LoginFragment;
 import com.travelguide.fragments.ProfileFragment;
 import com.travelguide.fragments.SearchListFragment;
-import com.travelguide.fragments.TripPlanDetailsFragment;
-import com.travelguide.fragments.TripPlanListFragment;
 import com.travelguide.helpers.AppCodesKeys;
 import com.travelguide.helpers.DeviceDimensionsHelper;
 import com.travelguide.helpers.NetworkAvailabilityCheck;
 import com.travelguide.helpers.Preferences;
 import com.travelguide.layouts.CustomCoordinatorLayout;
-import com.travelguide.listener.OnTripPlanListener;
+import com.travelguide.listener.KurtinListener;
+import com.travelguide.models.Checkpoint;
+import com.travelguide.models.Hunt;
+import com.travelguide.models.KurtinInteraction;
 import com.travelguide.scanner.OnClickCloudTrackingActivity;
 
 import java.util.ArrayList;
@@ -79,11 +82,8 @@ import java.util.StringTokenizer;
 import de.hdodenhof.circleimageview.CircleImageView;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-import static com.travelguide.R.id.btnFinish;
-import static java.security.AccessController.getContext;
-
 public class TravelGuideActivity extends AppCompatActivity implements
-        OnTripPlanListener,
+        KurtinListener,
         FragmentManager.OnBackStackChangedListener,
         ProfileFragment.OnFragmentInteractionListener,
         LoginFragment.OnLoginLogoutListener,
@@ -128,6 +128,11 @@ public class TravelGuideActivity extends AppCompatActivity implements
     private String mScannerParentTitle = "";
 
     private boolean mLoginStatus = false;
+
+    //Hold information about the hunt the user is currently engaging in
+    private Hunt mCurrentHunt;
+    private List<Checkpoint> mCurrrentCheckpoints;
+    private List<KurtinInteraction> mCurrentInteractions;
 
     private String referenceFragmentNameTag;
 
@@ -200,10 +205,10 @@ public class TravelGuideActivity extends AppCompatActivity implements
 
         prepareNavMenu();
 
-//        setContentFragment(R.id.fragment_frame, new TripPlanListFragment());
+//        setContentFragment(R.id.fragment_frame, new HuntListFragment());
         setContentFragment(
                 R.id.fragment_frame,
-                new TripPlanListFragment(),
+                new HuntListFragment(),
                 AppCodesKeys.TRIP_PLAN_LIST_FRAGMENT_ID);
     }
 
@@ -273,10 +278,10 @@ public class TravelGuideActivity extends AppCompatActivity implements
                         AppCodesKeys.KURTIN_LOGIN_FRAGMENT_ID);
                 break;
             case R.id.home_fragment:
-//                setContentFragment(R.id.fragment_frame, new TripPlanListFragment());
+//                setContentFragment(R.id.fragment_frame, new HuntListFragment());
                 setContentFragment(
                         R.id.fragment_frame,
-                        new TripPlanListFragment(),
+                        new HuntListFragment(),
                         AppCodesKeys.TRIP_PLAN_LIST_FRAGMENT_ID);
                 break;
             case R.id.my_hunts_fragment:
@@ -532,13 +537,81 @@ public class TravelGuideActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onTripPlanItemSelected(String tripPlanObjectId) {
-        TripPlanDetailsFragment fragment = TripPlanDetailsFragment.newInstance(tripPlanObjectId);
+    public void onTripPlanItemSelected(String objectId){
+        Log.v("From Activity", "onTripPlanItemSelected is an empty function");
+    }
+
+    @Override
+    public void onHuntSelected(String tripPlanObjectId) {
+        HuntDetailFragment fragment = HuntDetailFragment.newInstance(tripPlanObjectId);
 //        setContentFragment(R.id.fragment_frame, fragment);
         setContentFragment(
                 R.id.fragment_frame,
                 fragment,
                 AppCodesKeys.TRIP_PLAN_DETAILS_FRAGMENT_ID);
+    }
+
+    @Override
+    public void onHuntSelected(Hunt hunt) {
+        mCurrentHunt = hunt;
+        Log.v("onHuntSelected", "mCurrentHunt: " + mCurrentHunt.getHuntName());
+        setContentFragment(
+                R.id.fragment_frame,
+                new HuntDetailFragment(),
+                AppCodesKeys.TRIP_PLAN_DETAILS_FRAGMENT_ID);
+
+//        //Build argument bundle
+//        Bundle huntDetailArgs = new Bundle();
+//        //Pack hunt fields
+//        huntDetailArgs.putString(HuntDetailFragment.HUNT_NAME_KEY, hunt.getHuntName());
+//        huntDetailArgs.putString(HuntDetailFragment.HUNT_DESC_KEY, hunt.getHuntDescription());
+//        huntDetailArgs.putString(HuntDetailFragment.HUNT_ADDRESS_KEY, hunt.getHuntAddress());
+//        huntDetailArgs.putString(HuntDetailFragment.HUNT_TIME_STRING_KEY, hunt.getHuntTimeString());
+//        huntDetailArgs.putString(HuntDetailFragment.HUNT_PRIZE_KEY, hunt.getHuntPrize());
+//        huntDetailArgs.putString(HuntDetailFragment.HUNT_POSTER_URL_KEY, hunt.getHuntPosterUrl());
+//        huntDetailArgs.putString(HuntDetailFragment.HUNT_ID_KEY, hunt.getObjectId());
+//        //Pack Wikitude fields
+//        huntDetailArgs.putString(HuntDetailFragment.WIKITUDE_FOLDER_TOKEN_KEY, hunt.getWikitudeTargetCollectionId());
+//        huntDetailArgs.putString(HuntDetailFragment.WIKITUDE_CLIENT_TOKEN_KEY, hunt.getWikitudeClientID());
+//        //Create new instance and pass the argument bundle
+//        HuntDetailFragment fragment = HuntDetailFragment.newInstance(huntDetailArgs);
+
+//        setContentFragment(R.id.fragment_frame, fragment);
+//        setContentFragment(
+//                R.id.fragment_frame,
+//                fragment,
+//                AppCodesKeys.TRIP_PLAN_DETAILS_FRAGMENT_ID);
+    }
+
+    @Override
+    public Hunt getCurrentHunt(){
+        return mCurrentHunt;
+    }
+
+    @Override
+    public void setCurrentHunt(Hunt hunt){
+        mCurrentHunt = hunt;
+    }
+
+    @Override
+    public List<Checkpoint> getCurrentCheckpoints(){
+        return mCurrrentCheckpoints;
+    }
+
+    public void setCurrentCheckpoints(List<Checkpoint> checkpoints){
+        mCurrrentCheckpoints = checkpoints;
+//        mCurrrentCheckpoints.clear();
+//        mCurrrentCheckpoints.addAll(checkpoints);
+    }
+    @Override
+    public List<KurtinInteraction> getCurrentInteractions(){
+        return mCurrentInteractions;
+    }
+
+    @Override
+    public void setCurrentInteractions(List<KurtinInteraction> interactions){
+        mCurrentInteractions.clear();
+        mCurrentInteractions.addAll(interactions);
     }
 
     /* Comented on 09/23 by hemanth fto bring use overallleaderboard in place of ..
@@ -572,7 +645,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
     @Override
     public void onTripPlanCreated(String tripPlanObjectId, String imageUrl) {
         //Opening details passing ID of new item
-        TripPlanDetailsFragment fragment = TripPlanDetailsFragment.newInstance(tripPlanObjectId, imageUrl);
+        HuntDetailFragment fragment = HuntDetailFragment.newInstance(tripPlanObjectId, imageUrl);
 //        setContentFragment(R.id.fragment_frame, fragment);
         setContentFragment(
                 R.id.fragment_frame,
@@ -596,10 +669,10 @@ public class TravelGuideActivity extends AppCompatActivity implements
         fragmentTransaction.replace(fragmentFrame, fragment);
 
         //Decide whether or not to put a tag on the backstack
-        if(fragment instanceof TripPlanListFragment){
+        if(fragment instanceof HuntListFragment){
             referenceFragmentNameTag = HOME_FRAGMENT_TAG;
             fragmentTransaction.addToBackStack(referenceFragmentNameTag);
-        }else if(fragment instanceof TripPlanDetailsFragment) {
+        }else if(fragment instanceof HuntDetailFragment) {
             referenceFragmentNameTag = HUNT_DETAIL_FRAGMENT_TAG;
             fragmentTransaction.addToBackStack(referenceFragmentNameTag);
         }else{
@@ -635,10 +708,10 @@ public class TravelGuideActivity extends AppCompatActivity implements
         fragmentTransaction.replace(fragmentFrame, fragment);
 
 //        //Decide whether or not to put a tag on the backstack
-//        if(fragment instanceof TripPlanListFragment){
+//        if(fragment instanceof HuntListFragment){
 //            referenceFragmentNameTag = HOME_FRAGMENT_TAG;
 //            fragmentTransaction.addToBackStack(referenceFragmentNameTag);
-//        }else if(fragment instanceof TripPlanDetailsFragment) {
+//        }else if(fragment instanceof HuntDetailFragment) {
 //            referenceFragmentNameTag = HUNT_DETAIL_FRAGMENT_TAG;
 //            fragmentTransaction.addToBackStack(referenceFragmentNameTag);
 //        }else{
@@ -667,7 +740,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
     }
 
     private void lockUnlockNavigationDrawer(Fragment fragment) {
-        if (fragment instanceof TripPlanListFragment) {
+        if (fragment instanceof HuntListFragment) {
             mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         } else {
             mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
@@ -799,10 +872,10 @@ public class TravelGuideActivity extends AppCompatActivity implements
 
     public void hideOrShowFAB() {
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_frame);
-        if (fragment instanceof TripPlanListFragment) {
-            ((TripPlanListFragment) fragment).hideOrShowFAB();
-        } else if (fragment instanceof TripPlanDetailsFragment) {
-            ((TripPlanDetailsFragment) fragment).hideOrShowFAB();
+        if (fragment instanceof HuntListFragment) {
+            ((HuntListFragment) fragment).hideOrShowFAB();
+        } else if (fragment instanceof HuntDetailFragment) {
+            ((HuntDetailFragment) fragment).hideOrShowFAB();
         }
     }
 
@@ -915,7 +988,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
     }
     public void showScanButton(){
 //        try {
-//            TripPlanDetailsFragment fragment = (TripPlanDetailsFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_frame);
+//            HuntDetailFragment fragment = (HuntDetailFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_frame);
 //            fragment.showScanButton();
 //        } catch (Exception e) {
 //            e.printStackTrace();

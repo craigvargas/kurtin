@@ -16,7 +16,7 @@ import android.widget.TextView;
 import com.makeramen.roundedimageview.RoundedDrawable;
 import com.squareup.picasso.Transformation;
 import com.travelguide.R;
-import com.travelguide.fragments.TripPlanDetailsFragment;
+import com.travelguide.fragments.HuntDetailFragment;
 import com.travelguide.models.Questions;
 import com.travelguide.scanner.OnClickCloudTrackingActivity;
 
@@ -102,7 +102,7 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
 //                    if(pos < answerlist.size())
 //                    answerlist.remove(position);
 
-                    TripPlanDetailsFragment.UpdateSelectedValue(holder.tvQuestionID.getText().toString(),holder.rbOptionOne.getText().toString());
+                    HuntDetailFragment.UpdateSelectedValue(holder.tvQuestionID.getText().toString(),holder.rbOptionOne.getText().toString());
 
                     if(position == 0){
                         if(answerlist.size() > position){

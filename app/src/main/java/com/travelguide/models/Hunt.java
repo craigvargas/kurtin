@@ -31,7 +31,7 @@ public class Hunt extends ParseObject {
     public String getHuntAddress(){ return getString("huntAddress"); }
     public String getHuntPrize(){ return getString("huntPrize"); }
     public String getHuntPosterUrl(){ return getString("huntPosterUrl"); }
-    public ParseRelation getCheckPointRelations() { return getRelation("huntCheckpoints"); }
+    public ParseRelation getCheckpointRelations() { return getRelation("checkpoints"); }
     public ParseObject getHuntCheckpoint(Integer checkpointNumber){ return getParseObject("huntCheckpoint" + checkpointNumber.toString()); }
 
 

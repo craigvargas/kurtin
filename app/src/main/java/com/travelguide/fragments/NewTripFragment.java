@@ -34,7 +34,7 @@ import com.travelguide.R;
 import com.travelguide.adapters.TextWatcherAdapter;
 import com.travelguide.helpers.GoogleImageSearch;
 import com.travelguide.helpers.Preferences;
-import com.travelguide.listener.OnTripPlanListener;
+import com.travelguide.listener.KurtinListener;
 import com.travelguide.models.Day;
 import com.travelguide.models.TripPlan;
 import com.travelguide.viewmodel.TripDateViewModel;
@@ -66,7 +66,7 @@ public class NewTripFragment extends TripBaseFragment {
     private TripDateViewModel startDateViewModel;
     private TripDateViewModel endDateViewModel;
 
-    private OnTripPlanListener mListener;
+    private KurtinListener mListener;
 
     private String travellerType;
     private String parseNewTripObjectId;
@@ -116,10 +116,10 @@ public class NewTripFragment extends TripBaseFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         try {
-            mListener = (OnTripPlanListener) context;
+            mListener = (KurtinListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
-                    + " must implement OnTripPlanListener");
+                    + " must implement KurtinListener");
         }
     }
 

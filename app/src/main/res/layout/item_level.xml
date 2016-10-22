@@ -23,7 +23,7 @@
         android:tint="@color/kurtin_text_primary"/>
 
     <TextView
-        android:id="@+id/tvLevel"
+        android:id="@+id/tvCheckpointNumber"
         android:layout_below="@id/ivLevelIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

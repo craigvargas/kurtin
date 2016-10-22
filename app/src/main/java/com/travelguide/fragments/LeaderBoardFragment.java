@@ -167,7 +167,7 @@ public class LeaderBoardFragment extends Fragment {
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
                 String tripPlanObjectId = mTripPlanAdapter.get(position).getObjectId();
                 if (mListener != null) {
-                    mListener.onTripPlanItemSelected(tripPlanObjectId);
+                    mListener.onHuntSelected(tripPlanObjectId);
                 }
             }
         });
