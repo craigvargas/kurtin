@@ -67,6 +67,7 @@ import java.util.List;
 
 import static android.widget.ImageView.ScaleType.FIT_XY;
 import static com.facebook.FacebookSdk.getApplicationContext;
+import static com.loopj.android.http.AsyncHttpClient.log;
 import static com.travelguide.R.id.on_click_cloud_tracking_info_field;
 import static com.travelguide.R.id.q1;
 import static com.travelguide.R.id.q2;
@@ -325,7 +326,9 @@ public class OnClickCloudTrackingActivity extends Fragment implements CloudTrack
             Override
     public void onRecognitionSuccessful(final CloudTracker cloudTracker_, boolean recognized_, final JSONObject jsonObject_) {
         try {
-            Log.e(TAG, "onRecognitionSuccessful:jsonObject_:  " + jsonObject_);
+            Log.e(TAG, "onRecognitionSuccessful:jsonObject_:  " + jsonObject_ );
+            Log.v(TAG, "Recognized: " + recognized_);
+            Log.v(TAG, "Cloud Tracker" + cloudTracker_.toString());
 
             if (recognized_) {
                 getActivity().runOnUiThread(new Runnable() {@
@@ -372,292 +375,306 @@ public class OnClickCloudTrackingActivity extends Fragment implements CloudTrack
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    if (levleID.equals(mSelectedDayObjectId.toString())) {
+                    try {
+                        if (levleID.equals(mSelectedDayObjectId.toString())) {
 
-                        ArrayList QTypes = new ArrayList();
-                        QTypes.add(0, q1Type);
-                        QTypes.add(1, q2Type);
-                        QTypes.add(2, q3Type);
-                        QTypes.add(3, q4Type);
+                            ArrayList QTypes = new ArrayList();
+                            QTypes.add(0, q1Type);
+                            QTypes.add(1, q2Type);
+                            QTypes.add(2, q3Type);
+                            QTypes.add(3, q4Type);
 
 
-                        q2 = (RelativeLayout) controls.findViewById(R.id.q2);
-                        q1 = (RelativeLayout) controls.findViewById(R.id.q1);
-                        q3 = (RelativeLayout) controls.findViewById(R.id.q3);
-                        q4 = (RelativeLayout) controls.findViewById(R.id.q4);
+                            q2 = (RelativeLayout) controls.findViewById(R.id.q2);
+                            q1 = (RelativeLayout) controls.findViewById(R.id.q1);
+                            q3 = (RelativeLayout) controls.findViewById(R.id.q3);
+                            q4 = (RelativeLayout) controls.findViewById(R.id.q4);
 
-                        submitbtn1 = new Button(getActivity());
-                        submitbtn2 = new Button(getActivity());
-                        submitbtn3 = new Button(getActivity());
-                        submitbtn4 = new Button(getActivity());
+                            submitbtn1 = new Button(getActivity());
+                            submitbtn2 = new Button(getActivity());
+                            submitbtn3 = new Button(getActivity());
+                            submitbtn4 = new Button(getActivity());
 
-                        completedTV = new TextView(getActivity());
+                            completedTV = new TextView(getActivity());
 
-                        on_click_cloud_tracking_info = (EditText) controls.findViewById(on_click_cloud_tracking_info_field);
+                            on_click_cloud_tracking_info = (EditText) controls.findViewById(on_click_cloud_tracking_info_field);
 
-                        final String QuadHeadname = nameToDisplay;
+                            final String QuadHeadname = nameToDisplay;
 
-                        setQ1Small(q1, q2, q3, q4, submitbtn1, on_click_cloud_tracking_info, QuadHeadname);
-                        setQ2Small(q1, q2, q3, q4, submitbtn2, on_click_cloud_tracking_info, QuadHeadname);
-                        setQ3Small(q1, q2, q3, q4, submitbtn3, on_click_cloud_tracking_info, QuadHeadname);
-                        setQ4Small(q1, q2, q3, q4, submitbtn4, on_click_cloud_tracking_info, QuadHeadname);
+                            setQ1Small(q1, q2, q3, q4, submitbtn1, on_click_cloud_tracking_info, QuadHeadname);
+                            setQ2Small(q1, q2, q3, q4, submitbtn2, on_click_cloud_tracking_info, QuadHeadname);
+                            setQ3Small(q1, q2, q3, q4, submitbtn3, on_click_cloud_tracking_info, QuadHeadname);
+                            setQ4Small(q1, q2, q3, q4, submitbtn4, on_click_cloud_tracking_info, QuadHeadname);
 
-                        setSubmitButton("0", submitbtn1);
-                        setSubmitButton("0", submitbtn2);
-                        setSubmitButton("0", submitbtn3);
-                        setSubmitButton("0", submitbtn4);
-                        setCompletedText("0", completedTV);
-                        //Log.e(TAG, "run: Display: " + height + "---" + width);
-                        //Log.e(TAG, "run: For loop starts");
+                            setSubmitButton("0", submitbtn1);
+                            setSubmitButton("0", submitbtn2);
+                            setSubmitButton("0", submitbtn3);
+                            setSubmitButton("0", submitbtn4);
+                            setCompletedText("0", completedTV);
+                            //Log.e(TAG, "run: Display: " + height + "---" + width);
+                            //Log.e(TAG, "run: For loop starts");
 
-                        for (int i = 0; i <= QTypes.size(); i++) {
-                            if (i == 0) {
-                                // LinearLayout q1 = (LinearLayout)controls. findViewById(R.id.q1); // get your WebView form your xml file
-                                q1.removeAllViews();
-                                q1YouTubeViewb1 = new ImageView(getActivity());
-                                q1YouTubeViewb2 = new ImageView(getActivity());
-                                //final ImageView ytCompleted = new ImageView(getActivity());
-                                wbCompleted1 = new ImageView(getActivity());
-                                wbCompleted1ID = wbCompleted1.generateViewId();
-                                wbCompleted1.setId(wbCompleted1ID);
-                                //check if full screen is needed....
-                                webViewYT = new WebView(getActivity());
-                                if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, 1)) {
-                                    webViewYT.setLayoutParams(new LinearLayout.LayoutParams(
-                                            LinearLayout.LayoutParams.MATCH_PARENT,
-                                            webviewHeight));
+                            for (int i = 0; i <= QTypes.size(); i++) {
+                                if (i == 0) {
+                                    // LinearLayout q1 = (LinearLayout)controls. findViewById(R.id.q1); // get your WebView form your xml file
+                                    q1.removeAllViews();
+                                    q1YouTubeViewb1 = new ImageView(getActivity());
+                                    q1YouTubeViewb2 = new ImageView(getActivity());
+                                    //final ImageView ytCompleted = new ImageView(getActivity());
+                                    wbCompleted1 = new ImageView(getActivity());
+                                    wbCompleted1ID = wbCompleted1.generateViewId();
+                                    wbCompleted1.setId(wbCompleted1ID);
+                                    //check if full screen is needed....
+                                    webViewYT = new WebView(getActivity());
+                                    if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, 1)) {
+                                        webViewYT.setLayoutParams(new LinearLayout.LayoutParams(
+                                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                                webviewHeight));
+                                    } else {
+                                        webViewYT.setLayoutParams(new LinearLayout.LayoutParams(
+                                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                                height));
+                                    }
+                                    //System.out.println("Choice3 selected");
+                                    webViewYT.setWebViewClient(new WebViewClient() {
+                                        @
+                                                Override
+                                        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                                            return false;
+                                        }
+                                    });
+                                    webViewYT.loadUrl(q1DataSource);
+                                    webViewYT.getSettings().setPluginState(WebSettings.PluginState.ON);
+                                    webViewYT.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+                                    webViewYT.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+                                    webViewYT.getSettings().setAppCacheEnabled(true);
+                                    webViewYT.getSettings().setJavaScriptEnabled(true);
+                                    webViewYT.getSettings().setDomStorageEnabled(true);
+                                    webViewYT.getSettings().setLoadWithOverviewMode(true);
+                                    webViewYT.setBackgroundColor(Color.BLACK);
+                                    webViewYT.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+                                    webViewYT.setVerticalScrollBarEnabled(false);
+                                    q1YouTubeViewID = webViewYT.generateViewId();
+                                    webViewYT.setId(q1YouTubeViewID);
+                                    webViewYT.setVisibility(View.VISIBLE);
+                                    q1.setVisibility(View.VISIBLE);
+                                    q1YouTubeViewb1.setOnClickListener(new View.OnClickListener() {
+                                        @
+                                                Override
+                                        public void onClick(View v) {
+                                            q1YouTubeViewb2.setVisibility(View.VISIBLE);
+                                            q1YouTubeViewb1.setVisibility(View.GONE);
+                                            setQ1Large(q1, q2, q3, q4, on_click_cloud_tracking_info, submitbtn1, completedTV);
+                                        }
+                                    });
+
+                                    q1YouTubeViewb2.setOnClickListener(new View.OnClickListener() {
+                                        @
+                                                Override
+                                        public void onClick(View v) {
+                                            q1YouTubeViewb2.setVisibility(View.GONE);
+                                            q1YouTubeViewb1.setVisibility(View.VISIBLE);
+                                            setQ1Small(q1, q2, q3, q4, submitbtn1, on_click_cloud_tracking_info, QuadHeadname);
+                                        }
+                                    });
+
+                                    RecyclerView recyclerView4 = new RecyclerView(getActivity());
+                                    setWebviewAddview(q1, webViewYT, recyclerView4, q1YouTubeViewb1, q1YouTubeViewb2, submitbtn1, wbCompleted1, mSelectedDayObjectId, 1);
+
+
+                                } else if (i == 1) {
+                                    //                            LinearLayout q2 = (LinearLayout) controls.findViewById(R.id.q2); // get your WebView form your xml file
+                                    q2.removeAllViews();
+                                    q2.removeAllViewsInLayout();
+                                    q2WebViewb1 = new ImageView(getActivity());
+                                    q2WebViewb2 = new ImageView(getActivity());
+                                    wbCompleted2 = new ImageView(getActivity());
+                                    wbCompleted2ID = q2WebViewb2.generateViewId();
+                                    wbCompleted2.setId(wbCompleted2ID);
+                                    //System.out.println("Choice2 selected");
+                                    WebView webView = new WebView(getActivity());
+                                    webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+
+                                    if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, 2)) {
+                                        webView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, webviewHeight));
+
+                                    } else {
+                                        webView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height));
+
+                                    }
+
+
+                                    webView.setWebViewClient(new WebViewClient()); // set the WebViewClient
+                                    webView.loadUrl(q2DataSource); // Load your desired url
+                                    webView.getSettings().setBuiltInZoomControls(true);
+                                    if (Build.VERSION.SDK_INT >= 11) {
+                                        webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+                                    }
+                                    webView.getSettings().setJavaScriptEnabled(true);
+                                    webView.getSettings().setLoadWithOverviewMode(true);
+                                    webView.getSettings().setUseWideViewPort(true);
+                                    webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+                                    webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+                                    q2WebViewID = webView.generateViewId();
+                                    webView.setId(q2WebViewID);
+                                    q2WebViewb1.setOnClickListener(new View.OnClickListener() {
+                                        @
+                                                Override
+                                        public void onClick(View v) {
+                                            q2WebViewb2.setVisibility(View.VISIBLE);
+                                            q2WebViewb1.setVisibility(View.GONE);
+                                            setQ2Large(q1, q2, q3, q4, on_click_cloud_tracking_info, submitbtn2);
+                                        }
+                                    });
+
+                                    q2WebViewb2.setOnClickListener(new View.OnClickListener() {
+                                        @
+                                                Override
+                                        public void onClick(View v) {
+                                            q2WebViewb2.setVisibility(View.GONE);
+                                            q2WebViewb1.setVisibility(View.VISIBLE);
+                                            setQ2Small(q1, q2, q3, q4, submitbtn2, on_click_cloud_tracking_info, QuadHeadname);
+                                        }
+                                    });
+                                    RecyclerView recyclerView2 = new RecyclerView(getActivity());
+                                    setWebviewAddview(q2, webView, recyclerView2, q2WebViewb1, q2WebViewb2, submitbtn2, wbCompleted2, mSelectedDayObjectId, 2);
+                                } else if (i == 2) {
+                                    //                            LinearLayout q3 = (LinearLayout) controls.findViewById(R.id.q3); // get your WebView form your xml file
+                                    q3.removeAllViews();
+                                    q3ImageViewb1 = new ImageView(getActivity());
+                                    q3ImageViewb2 = new ImageView(getActivity());
+                                    wbCompleted3 = new ImageView(getActivity());
+                                    wbCompleted3ID = wbCompleted3.generateViewId();
+                                    wbCompleted3.setId(wbCompleted3ID);
+                                    //System.out.println("Choice3 selected");
+
+                                    ImageView imageView = new ImageView(getActivity());
+                                    Picasso.with(getActivity()).load(q3DataSourceURI).into(imageView);
+                                    imageView.setScaleType(FIT_XY);
+                                    imageView.setAdjustViewBounds(true);
+                                    imageView.setBackgroundColor(Color.BLACK);
+
+                                    if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, 3)) {
+
+                                        imageView.setLayoutParams(new LinearLayout.LayoutParams(
+                                                LinearLayout.LayoutParams.FILL_PARENT,
+                                                webviewHeight, Gravity.CENTER));
+                                    } else {
+
+                                        imageView.setLayoutParams(new LinearLayout.LayoutParams(
+                                                LinearLayout.LayoutParams.FILL_PARENT,
+                                                height, Gravity.CENTER));
+                                    }
+
+                                    //q3.setBackgroundColor(Color.BLACK);
+                                    RecyclerView recyclerView3 = new RecyclerView(getActivity());
+                                    recyclerView3.setBackgroundColor(Color.BLACK);
+                                    q3ImageViewID = imageView.generateViewId();
+                                    imageView.setId(q3ImageViewID);
+                                    setImageAddview(q3, imageView, recyclerView3, q3ImageViewb1, q3ImageViewb2, submitbtn3, wbCompleted3, mSelectedDayObjectId, 3);
+                                    q3ImageViewb1.setOnClickListener(new View.OnClickListener() {
+                                        @
+                                                Override
+                                        public void onClick(View v) {
+                                            q3ImageViewb2.setVisibility(View.VISIBLE);
+                                            q3ImageViewb1.setVisibility(View.GONE);
+                                            setQ3Large(q1, q2, q3, q4, on_click_cloud_tracking_info, submitbtn3);
+                                        }
+                                    });
+
+                                    q3ImageViewb2.setOnClickListener(new View.OnClickListener() {
+                                        @
+                                                Override
+                                        public void onClick(View v) {
+                                            setQ3Small(q1, q2, q3, q4, submitbtn3, on_click_cloud_tracking_info, QuadHeadname);
+                                            q3ImageViewb2.setVisibility(View.GONE);
+                                            q3ImageViewb1.setVisibility(View.VISIBLE);
+                                        }
+                                    });
+                                } else if (i == 3) {
+                                    //                            LinearLayout q4 = (LinearLayout) controls.findViewById(R.id.q4); // get your WebView form your xml file
+                                    q4.removeAllViews();
+                                    q4WebViewb1 = new ImageView(getActivity());
+                                    q4WebViewb2 = new ImageView(getActivity());
+                                    wbCompleted4 = new ImageView(getActivity());
+                                    wbCompleted4ID = wbCompleted4.generateViewId();
+                                    wbCompleted4.setId(wbCompleted4ID);
+                                    //System.out.println("Choice2 selected");
+                                    WebView webView = new WebView(getActivity());
+                                    webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+
+                                    if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, 4)) {
+                                        webView.setLayoutParams(new LinearLayout.LayoutParams(
+                                                LinearLayout.LayoutParams.WRAP_CONTENT,
+                                                webviewHeight));
+
+                                    } else {
+                                        webView.setLayoutParams(new LinearLayout.LayoutParams(
+                                                LinearLayout.LayoutParams.WRAP_CONTENT,
+                                                height));
+                                    }
+
+                                    webView.setWebViewClient(new WebViewClient()); // set the WebViewClient
+                                    webView.loadUrl(q4DataSource); // Load your desired url
+                                    webView.getSettings().setBuiltInZoomControls(true);
+                                    if (Build.VERSION.SDK_INT >= 11) {
+                                        webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+                                    }
+                                    webView.getSettings().setJavaScriptEnabled(true);
+                                    webView.getSettings().setLoadWithOverviewMode(true);
+                                    webView.getSettings().setUseWideViewPort(true);
+                                    webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+
+                                    webView.getSettings().setPluginState(WebSettings.PluginState.ON);
+                                    webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+                                    webView.getSettings().setAppCacheEnabled(true);
+                                    webView.getSettings().setDomStorageEnabled(true);
+                                    q4WebViewID = webView.generateViewId();
+                                    webView.setId(q4WebViewID);
+                                    RecyclerView recyclerView2 = new RecyclerView(getActivity());
+                                    setWebviewAddview(q4, webView, recyclerView2, q4WebViewb1, q4WebViewb2, submitbtn4, wbCompleted4, mSelectedDayObjectId, 4);
+
+                                    q4WebViewb1.setOnClickListener(new View.OnClickListener() {
+                                        @
+                                                Override
+                                        public void onClick(View v) {
+                                            q4WebViewb2.setVisibility(View.VISIBLE);
+                                            q4WebViewb1.setVisibility(View.GONE);
+                                            setQ4Large(q1, q2, q3, q4, on_click_cloud_tracking_info, submitbtn4);
+                                        }
+                                    });
+
+                                    q4WebViewb2.setOnClickListener(new View.OnClickListener() {
+                                        @
+                                                Override
+                                        public void onClick(View v) {
+                                            q4WebViewb2.setVisibility(View.GONE);
+                                            q4WebViewb1.setVisibility(View.VISIBLE);
+                                            setQ4Small(q1, q2, q3, q4, submitbtn4, on_click_cloud_tracking_info, QuadHeadname);
+                                        }
+                                    });
+
                                 } else {
-                                    webViewYT.setLayoutParams(new LinearLayout.LayoutParams(
-                                            LinearLayout.LayoutParams.MATCH_PARENT,
-                                            height));
                                 }
-                                //System.out.println("Choice3 selected");
-                                webViewYT.setWebViewClient(new WebViewClient() {@
-                                        Override
-                                public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                                    return false;
-                                }
-                                });
-                                webViewYT.loadUrl(q1DataSource);
-                                webViewYT.getSettings().setPluginState(WebSettings.PluginState.ON);
-                                webViewYT.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
-                                webViewYT.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-                                webViewYT.getSettings().setAppCacheEnabled(true);
-                                webViewYT.getSettings().setJavaScriptEnabled(true);
-                                webViewYT.getSettings().setDomStorageEnabled(true);
-                                webViewYT.getSettings().setLoadWithOverviewMode(true);
-                                webViewYT.setBackgroundColor(Color.BLACK);
-                                webViewYT.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
-                                webViewYT.setVerticalScrollBarEnabled(false);
-                                q1YouTubeViewID = webViewYT.generateViewId();
-                                webViewYT.setId(q1YouTubeViewID);
-                                webViewYT.setVisibility(View.VISIBLE);
-                                q1.setVisibility(View.VISIBLE);
-                                q1YouTubeViewb1.setOnClickListener(new View.OnClickListener() {@
-                                        Override
-                                public void onClick(View v) {
-                                    q1YouTubeViewb2.setVisibility(View.VISIBLE);
-                                    q1YouTubeViewb1.setVisibility(View.GONE);
-                                    setQ1Large(q1, q2, q3, q4, on_click_cloud_tracking_info, submitbtn1, completedTV);
-                                }
-                                });
-
-                                q1YouTubeViewb2.setOnClickListener(new View.OnClickListener() {@
-                                        Override
-                                public void onClick(View v) {
-                                    q1YouTubeViewb2.setVisibility(View.GONE);
-                                    q1YouTubeViewb1.setVisibility(View.VISIBLE);
-                                    setQ1Small(q1, q2, q3, q4, submitbtn1, on_click_cloud_tracking_info, QuadHeadname);
-                                }
-                                });
-
-                                RecyclerView recyclerView4 = new RecyclerView(getActivity());
-                                setWebviewAddview(q1, webViewYT, recyclerView4, q1YouTubeViewb1, q1YouTubeViewb2, submitbtn1, wbCompleted1, mSelectedDayObjectId, 1);
+                            }
+                            try {
+                                EditText targetInformationTextField = (EditText) controls.findViewById(on_click_cloud_tracking_info_field);
+                                targetInformationTextField.setText(nameToDisplay);
+                                targetInformationTextField.setVisibility(View.VISIBLE);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
 
 
-                            } else if (i == 1) {
-                                //                            LinearLayout q2 = (LinearLayout) controls.findViewById(R.id.q2); // get your WebView form your xml file
-                                q2.removeAllViews();
-                                q2.removeAllViewsInLayout();
-                                q2WebViewb1 = new ImageView(getActivity());
-                                q2WebViewb2 = new ImageView(getActivity());
-                                wbCompleted2 = new ImageView(getActivity());
-                                wbCompleted2ID = q2WebViewb2.generateViewId();
-                                wbCompleted2.setId(wbCompleted2ID);
-                                //System.out.println("Choice2 selected");
-                                WebView webView = new WebView(getActivity());
-                                webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+                        } else {
 
-                                if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, 2)) {
-                                    webView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, webviewHeight));
-
-                                } else {
-                                    webView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height));
-
-                                }
-
-
-
-                                webView.setWebViewClient(new WebViewClient()); // set the WebViewClient
-                                webView.loadUrl(q2DataSource); // Load your desired url
-                                webView.getSettings().setBuiltInZoomControls(true);
-                                if (Build.VERSION.SDK_INT >= 11) {
-                                    webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-                                }
-                                webView.getSettings().setJavaScriptEnabled(true);
-                                webView.getSettings().setLoadWithOverviewMode(true);
-                                webView.getSettings().setUseWideViewPort(true);
-                                webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
-                                webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
-                                q2WebViewID = webView.generateViewId();
-                                webView.setId(q2WebViewID);
-                                q2WebViewb1.setOnClickListener(new View.OnClickListener() {@
-                                        Override
-                                public void onClick(View v) {
-                                    q2WebViewb2.setVisibility(View.VISIBLE);
-                                    q2WebViewb1.setVisibility(View.GONE);
-                                    setQ2Large(q1, q2, q3, q4, on_click_cloud_tracking_info, submitbtn2);
-                                }
-                                });
-
-                                q2WebViewb2.setOnClickListener(new View.OnClickListener() {@
-                                        Override
-                                public void onClick(View v) {
-                                    q2WebViewb2.setVisibility(View.GONE);
-                                    q2WebViewb1.setVisibility(View.VISIBLE);
-                                    setQ2Small(q1, q2, q3, q4, submitbtn2, on_click_cloud_tracking_info, QuadHeadname);
-                                }
-                                });
-                                RecyclerView recyclerView2 = new RecyclerView(getActivity());
-                                setWebviewAddview(q2, webView, recyclerView2, q2WebViewb1, q2WebViewb2, submitbtn2, wbCompleted2, mSelectedDayObjectId, 2);
-                            } else if (i == 2) {
-                                //                            LinearLayout q3 = (LinearLayout) controls.findViewById(R.id.q3); // get your WebView form your xml file
-                                q3.removeAllViews();
-                                q3ImageViewb1 = new ImageView(getActivity());
-                                q3ImageViewb2= new ImageView(getActivity());
-                                wbCompleted3 = new ImageView(getActivity());
-                                wbCompleted3ID = wbCompleted3.generateViewId();
-                                wbCompleted3.setId(wbCompleted3ID);
-                                //System.out.println("Choice3 selected");
-
-                                ImageView imageView = new ImageView(getActivity());
-                                Picasso.with(getActivity()).load(q3DataSourceURI).into(imageView);
-                                imageView.setScaleType(FIT_XY);
-                                imageView.setAdjustViewBounds(true);
-                                imageView.setBackgroundColor(Color.BLACK);
-
-                                if(checkIfCompletedIconIsNeeded(mSelectedDayObjectId, 3)){
-
-                                    imageView.setLayoutParams(new LinearLayout.LayoutParams(
-                                            LinearLayout.LayoutParams.FILL_PARENT,
-                                            webviewHeight, Gravity.CENTER));                                            }else{
-
-                                    imageView.setLayoutParams(new LinearLayout.LayoutParams(
-                                            LinearLayout.LayoutParams.FILL_PARENT,
-                                            height, Gravity.CENTER));                                            }
-
-                                //q3.setBackgroundColor(Color.BLACK);
-                                RecyclerView recyclerView3 = new RecyclerView(getActivity());
-                                recyclerView3.setBackgroundColor(Color.BLACK);
-                                q3ImageViewID = imageView.generateViewId();
-                                imageView.setId(q3ImageViewID);
-                                setImageAddview(q3, imageView, recyclerView3, q3ImageViewb1, q3ImageViewb2, submitbtn3, wbCompleted3, mSelectedDayObjectId, 3);
-                                q3ImageViewb1.setOnClickListener(new View.OnClickListener() {@
-                                        Override
-                                public void onClick(View v) {
-                                    q3ImageViewb2.setVisibility(View.VISIBLE);
-                                    q3ImageViewb1.setVisibility(View.GONE);
-                                    setQ3Large(q1, q2, q3, q4, on_click_cloud_tracking_info, submitbtn3);
-                                }
-                                });
-
-                                q3ImageViewb2.setOnClickListener(new View.OnClickListener() {@
-                                        Override
-                                public void onClick(View v) {
-                                    setQ3Small(q1, q2, q3, q4, submitbtn3, on_click_cloud_tracking_info, QuadHeadname);
-                                    q3ImageViewb2.setVisibility(View.GONE);
-                                    q3ImageViewb1.setVisibility(View.VISIBLE);
-                                }
-                                });
-                            } else if (i == 3) {
-                                //                            LinearLayout q4 = (LinearLayout) controls.findViewById(R.id.q4); // get your WebView form your xml file
-                                q4.removeAllViews();
-                                q4WebViewb1 = new ImageView(getActivity());
-                                q4WebViewb2 = new ImageView(getActivity());
-                                wbCompleted4 = new ImageView(getActivity());
-                                wbCompleted4ID = wbCompleted4.generateViewId();
-                                wbCompleted4.setId(wbCompleted4ID);
-                                //System.out.println("Choice2 selected");
-                                WebView webView = new WebView(getActivity());
-                                webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
-
-                                if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, 4)) {
-                                    webView.setLayoutParams(new LinearLayout.LayoutParams(
-                                            LinearLayout.LayoutParams.WRAP_CONTENT,
-                                            webviewHeight));
-
-                                } else {
-                                    webView.setLayoutParams(new LinearLayout.LayoutParams(
-                                            LinearLayout.LayoutParams.WRAP_CONTENT,
-                                            height));
-                                }
-
-                                webView.setWebViewClient(new WebViewClient()); // set the WebViewClient
-                                webView.loadUrl(q4DataSource); // Load your desired url
-                                webView.getSettings().setBuiltInZoomControls(true);
-                                if (Build.VERSION.SDK_INT >= 11) {
-                                    webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-                                }
-                                webView.getSettings().setJavaScriptEnabled(true);
-                                webView.getSettings().setLoadWithOverviewMode(true);
-                                webView.getSettings().setUseWideViewPort(true);
-                                webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
-
-                                webView.getSettings().setPluginState(WebSettings.PluginState.ON);
-                                webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-                                webView.getSettings().setAppCacheEnabled(true);
-                                webView.getSettings().setDomStorageEnabled(true);
-                                q4WebViewID = webView.generateViewId();
-                                webView.setId(q4WebViewID);
-                                RecyclerView recyclerView2 = new RecyclerView(getActivity());
-                                setWebviewAddview(q4, webView, recyclerView2, q4WebViewb1, q4WebViewb2, submitbtn4, wbCompleted4, mSelectedDayObjectId, 4);
-
-                                q4WebViewb1.setOnClickListener(new View.OnClickListener() {@
-                                        Override
-                                public void onClick(View v) {
-                                    q4WebViewb2.setVisibility(View.VISIBLE);
-                                    q4WebViewb1.setVisibility(View.GONE);
-                                    setQ4Large(q1, q2, q3, q4, on_click_cloud_tracking_info, submitbtn4);
-                                }
-                                });
-
-                                q4WebViewb2.setOnClickListener(new View.OnClickListener() {@
-                                        Override
-                                public void onClick(View v) {
-                                    q4WebViewb2.setVisibility(View.GONE);
-                                    q4WebViewb1.setVisibility(View.VISIBLE);
-                                    setQ4Small(q1, q2, q3, q4, submitbtn4, on_click_cloud_tracking_info, QuadHeadname);
-                                }
-                                });
-
-                            } else {}
-                        }
-                        try {
                             EditText targetInformationTextField = (EditText) controls.findViewById(on_click_cloud_tracking_info_field);
-                            targetInformationTextField.setText(nameToDisplay);
+                            targetInformationTextField.setText("Incorrect Image recognized - Please try again", TextView.BufferType.NORMAL);
                             targetInformationTextField.setVisibility(View.VISIBLE);
-                        } catch (Exception e) {
-                            e.printStackTrace();
                         }
-
-
-                    } else {
-
-                        EditText targetInformationTextField = (EditText) controls.findViewById(on_click_cloud_tracking_info_field);
-                        targetInformationTextField.setText("Incorrect Image recognized - Please try again", TextView.BufferType.NORMAL);
-                        targetInformationTextField.setVisibility(View.VISIBLE);
+                    }catch(Exception e){
+                        e.printStackTrace();
                     }
-
                 }
                 });
             } else {
@@ -668,6 +685,7 @@ public class OnClickCloudTrackingActivity extends Fragment implements CloudTrack
                         EditText targetInformationTextField = (EditText) controls.findViewById(on_click_cloud_tracking_info_field);
                         targetInformationTextField.setText("Recognition failed - Please try again", TextView.BufferType.NORMAL);
                         targetInformationTextField.setVisibility(View.VISIBLE);
+                        Log.v(TAG, "Wikitude returned boolean value of false for recognized_");
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
