@@ -1,38 +1,3 @@
-//package com.travelguide.fragments;
-//
-//
-//import android.os.Bundle;
-//import android.support.v4.app.Fragment;
-//import android.view.LayoutInflater;
-//import android.view.View;
-//import android.view.ViewGroup;
-//import android.widget.TextView;
-//
-//import com.travelguide.R;
-//
-///**
-// * A simple {@link Fragment} subclass.
-// */
-//public class CloudScannerFragment extends Fragment {
-//
-//
-//    public CloudScannerFragment() {
-//        // Required empty public constructor
-//    }
-//
-//
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                             Bundle savedInstanceState) {
-//        TextView textView = new TextView(getActivity());
-//        textView.setText(R.string.hello_blank_fragment);
-//        return textView;
-//    }
-//
-//}
-
-
-
 package com.travelguide.fragments;
 
 /**
@@ -40,6 +5,7 @@ package com.travelguide.fragments;
  */
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -80,7 +46,10 @@ import com.travelguide.R;
 import com.travelguide.adapters.QuestionsAdapter;
 import com.travelguide.decorations.DividerItemDecoration;
 import com.travelguide.helpers.UpdatePointsandLeaderBoard;
+import com.travelguide.listener.KurtinListener;
+import com.travelguide.models.Checkpoint;
 import com.travelguide.models.Day;
+import com.travelguide.models.Hunt;
 import com.travelguide.models.LeaderBoard;
 import com.travelguide.models.Questions;
 import com.travelguide.scanner.CustomSurfaceView;
@@ -97,6 +66,7 @@ import com.wikitude.tracker.CloudTracker;
 import com.wikitude.tracker.CloudTrackerEventListener;
 import com.wikitude.tracker.Tracker;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -115,6 +85,7 @@ import static com.travelguide.R.id.q4;
 public class CloudScannerFragment extends Fragment implements CloudTrackerEventListener, ExternalRendering {
 
     private static final String TAG = "OnClickCloudTracking";
+    private static final String WIKITUDE_METADATA_KEY = "metadata";
 
     private WikitudeSDK _wikitudeSDK;
     private CustomSurfaceView _customSurfaceView;
@@ -200,7 +171,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
     private Integer q3ImageViewID;
     private Integer q4WebViewID;
 
-
+    private KurtinListener mKurtinListener;
 
     @
             Override
@@ -220,11 +191,11 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         //First get fodler id
         try {
             Bundle bundle = this.getArguments();
-            String id = bundle.getString("dayid");
+            String id = bundle.getString(Checkpoint.CHECKPOINT_ID);
             mSelectedDayObjectId = id;
 
-            wikitudeTargetCollectionId = bundle.getString("wikitudeTargetCollectionId");
-            wikitudeClientId = bundle.getString("wikitudeClientId");
+            wikitudeTargetCollectionId = bundle.getString(Hunt.WIKITUDE_TARGET_COLLECTION_ID);
+            wikitudeClientId = bundle.getString(Hunt.WIKITUDE_CLIENT_ID);
             Log.e("TCD", wikitudeTargetCollectionId);
             Log.e("CID", wikitudeClientId);
 
@@ -250,6 +221,24 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         mQuestionsList = new ArrayList < Questions > ();
         mQuestionsAdapter = new QuestionsAdapter(mQuestionsList, getContext());
     }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            mKurtinListener = (KurtinListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement KurtinListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mKurtinListener = null;
+    }
+
 
     @
             Override
@@ -369,7 +358,16 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
             Log.v(TAG, "Recognized: " + recognized_);
             Log.v(TAG, "Cloud Tracker" + cloudTracker_.toString());
 
-            if (recognized_) {
+            //Check if wikitude recognized the image
+            if(recognized_){
+//                Toast.makeText(getContext(), "Success. Kurtin is hunting for your content", Toast.LENGTH_SHORT);
+                //Immediately send jsonObject with data to another fragment
+                if(mKurtinListener != null){
+                    JSONObject parentContentObject = jsonObject_.getJSONObject(WIKITUDE_METADATA_KEY);
+                    JSONArray contentArray = parentContentObject.getJSONArray("content");
+                    mKurtinListener.onSuccessfulCloudScanRecognition(contentArray);
+                }
+            }else if (false){ //recognized_) {
                 getActivity().runOnUiThread(new Runnable() {@
                         Override
                 public void run() {

@@ -732,6 +732,7 @@ public class KurtinLoginFragment extends Fragment {
         Preferences.writeBoolean(context, Preferences.User.LOG_IN_STATUS, true);
         Preferences.writeString(context, Preferences.User.NAME, name);
         Preferences.writeString(context, Preferences.User.EMAIL, email);
+
         completeLogin();
     }
 

@@ -12,6 +12,19 @@ import com.parse.ParseRelation;
 @ParseClassName("Hunt")
 public class Hunt extends ParseObject {
 
+    public static String WIKITUDE_TARGET_COLLECTION_ID = "wikitudeTargetCollectionId";
+    public static String WIKITUDE_CLIENT_ID = "wikitudeClientID";
+
+    public static String HUNT_NAME = "huntName";
+    public static String HUNT_LOCATION = "huntLocation";
+    public static String HUNT_DESCRIPTION = "huntDescription";
+    public static String HUNT_TIME_STRING = "huntTimeString";
+    public static String HUNT_ADDRESS = "huntAddress";
+    public static String HUNT_PRIZE = "huntPrize";
+    public static String HUNT_POSTER_URL = "huntPosterUrl";
+    public static String HUNT_CHECKPOINT_RELATIONS = "checkpoints";
+    public static String HUNT_CHECKPOINT_POINTER_PREFIX = "huntCheckpoint";
+
     //Constructor
     public Hunt(){ super(); }
 
@@ -20,19 +33,21 @@ public class Hunt extends ParseObject {
     //*
 
     //Wikitude Data from parse
-    public String getWikitudeTargetCollectionId(){ return getString("wikitudeTargetCollectionId"); }
-    public String getWikitudeClientID(){ return getString("wikitudeClientID"); }
+    public String getWikitudeTargetCollectionId(){ return getString(WIKITUDE_TARGET_COLLECTION_ID); }
+    public String getWikitudeClientID(){ return getString(WIKITUDE_CLIENT_ID); }
 
     //Hunt data from parse
-    public String getHuntName(){ return getString("huntName"); }
-    public String getHuntLocation(){ return getString("huntLocation"); }
-    public String getHuntDescription(){ return getString("huntDescription"); }
-    public String getHuntTimeString(){ return getString("huntTimeString"); }
-    public String getHuntAddress(){ return getString("huntAddress"); }
-    public String getHuntPrize(){ return getString("huntPrize"); }
-    public String getHuntPosterUrl(){ return getString("huntPosterUrl"); }
-    public ParseRelation getCheckpointRelations() { return getRelation("checkpoints"); }
-    public ParseObject getHuntCheckpoint(Integer checkpointNumber){ return getParseObject("huntCheckpoint" + checkpointNumber.toString()); }
+    public String getHuntName(){ return getString(HUNT_NAME); }
+    public String getHuntLocation(){ return getString(HUNT_LOCATION); }
+    public String getHuntDescription(){ return getString(HUNT_DESCRIPTION); }
+    public String getHuntTimeString(){ return getString(HUNT_TIME_STRING); }
+    public String getHuntAddress(){ return getString(HUNT_ADDRESS); }
+    public String getHuntPrize(){ return getString(HUNT_PRIZE); }
+    public String getHuntPosterUrl(){ return getString(HUNT_POSTER_URL); }
+    public ParseRelation getCheckpointRelations() { return getRelation(HUNT_CHECKPOINT_RELATIONS); }
+    public ParseObject getHuntCheckpoint(Integer checkpointNumber){
+        return getParseObject(HUNT_CHECKPOINT_POINTER_PREFIX + checkpointNumber.toString());
+    }
 
 
     //*

@@ -71,7 +71,7 @@ public class HuntDetailFragment extends TripBaseFragment
 
     private static final String ARG_TRIP_PLAN_OBJECT_ID = "tripPlanObjectId";
     private static final String ARG_TRIP_PLAN_IMAGE_URL = "tripPlanImageUrl";
-    private static final String ARG_HUNT_OBJECT = "huntObject";
+//    private static final String ARG_HUNT_OBJECT = "huntObject";
 
     private RecyclerView rvCheckpoints;
     private RecyclerView rvPlaceDetails;
@@ -86,13 +86,14 @@ public class HuntDetailFragment extends TripBaseFragment
     //Hunt Data
     Hunt mCurrentHunt;
     List<Checkpoint> mCurrentCheckpoints;
-    String mHuntName;
-    String mHuntDescription;
-    String mHuntAddress;
-    String mHuntTimeString;
-    String mHuntPrize;
-    String mHuntPosterUrl;
-    String mHuntId;
+    Checkpoint mSelectedCheckpoint;
+//    String mHuntName;
+//    String mHuntDescription;
+//    String mHuntAddress;
+//    String mHuntTimeString;
+//    String mHuntPrize;
+//    String mHuntPosterUrl;
+//    String mHuntId;
 
     private String mTripPLanObjectId;
     private String mTripPlanImageUrl;
@@ -263,6 +264,7 @@ public class HuntDetailFragment extends TripBaseFragment
                     mLoginListener.onLoginRequested();
                 }else {
                     Log.v("ScanBtn Clicked", "Need to implement join table update");
+                    //TODO: Update the leaderboard join table
 //                    updateHuntLeaderboard();
                     scanImage();
                 }
@@ -487,6 +489,8 @@ public class HuntDetailFragment extends TripBaseFragment
         for (Checkpoint cp: mCurrentCheckpoints){
             cp.setSelected(false);
         }
+
+        mSelectedCheckpoint = checkpoint;
         checkpoint.setSelected(true);
 
         Picasso.with(getContext())
@@ -590,17 +594,28 @@ public class HuntDetailFragment extends TripBaseFragment
 
     //Main Code-Which calls Scanner-India Team Code
     public void scanImage(){
+
+        //Cvar My new code
+        if(mKurtinListener != null){
+           mKurtinListener.onCheckpointScanSelected(mSelectedCheckpoint);
+        }else{
+            Log.e("scanImage()", "Need to implement KurtinListener");
+        }
+
 //        fragment_frame_scanner.setVisibility(View.VISIBLE);
 //        ((TravelGuideActivity)getActivity()).showScanner(
 //                mSelectedCheckpointObjectId,
 //                wikitudeFolderToken,
 //                wikitudeClientToken);
-        fragment_frame_scanner.setVisibility(View.VISIBLE);
-        ((TravelGuideActivity)getActivity()).showScanner(
-                mSelectedCheckpointObjectId,
-                mCurrentHunt.getWikitudeTargetCollectionId(),
-                mCurrentHunt.getWikitudeClientID());
-        hideScanButton();
+
+//        //Working code
+//        fragment_frame_scanner.setVisibility(View.VISIBLE);
+//        ((TravelGuideActivity)getActivity()).showScanner(
+//                mSelectedCheckpointObjectId,
+//                mCurrentHunt.getWikitudeTargetCollectionId(),
+//                mCurrentHunt.getWikitudeClientID());
+//        hideScanButton();
+//        //End of working code
 
 //        OnClickCloudTrackingActivity fragment = new OnClickCloudTrackingActivity();
 //        Bundle bundle = new Bundle();

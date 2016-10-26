@@ -243,6 +243,7 @@ public class HuntListFragment extends TripBaseFragment {
                     showEmptyView();
                 }
                 mHuntsAreLoaded = true;
+                Log.v("Hunts load remote", "numHunts: " + mHuntList.size());
                 notifyAdapter();
                 swipeContainer.setRefreshing(false);
             }
@@ -321,6 +322,7 @@ public class HuntListFragment extends TripBaseFragment {
             }
         });
         }else{
+            mUserHuntDataIsLoaded = true;
         }
     }
 

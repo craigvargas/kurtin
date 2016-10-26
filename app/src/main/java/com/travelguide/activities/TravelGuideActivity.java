@@ -54,6 +54,7 @@ import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 import com.travelguide.R;
 import com.travelguide.foursquare.constants.FoursquareConstants;
+import com.travelguide.fragments.CloudScannerFragment;
 import com.travelguide.fragments.FullscreenFragment;
 import com.travelguide.fragments.HuntDetailFragment;
 import com.travelguide.fragments.HuntListFragment;
@@ -74,6 +75,9 @@ import com.travelguide.models.Checkpoint;
 import com.travelguide.models.Hunt;
 import com.travelguide.models.KurtinInteraction;
 import com.travelguide.scanner.OnClickCloudTrackingActivity;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -131,6 +135,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
 
     //Hold information about the hunt the user is currently engaging in
     private Hunt mCurrentHunt;
+    private Checkpoint mSelectedCheckpoint;
     private List<Checkpoint> mCurrrentCheckpoints;
     private List<KurtinInteraction> mCurrentInteractions;
 
@@ -536,6 +541,13 @@ public class TravelGuideActivity extends AppCompatActivity implements
         }
     }
 
+    //*
+    //**
+    //***
+    //KurtinListener implementations
+    //***
+    //**
+    //*
     @Override
     public void onTripPlanItemSelected(String objectId){
         Log.v("From Activity", "onTripPlanItemSelected is an empty function");
@@ -559,28 +571,26 @@ public class TravelGuideActivity extends AppCompatActivity implements
                 R.id.fragment_frame,
                 new HuntDetailFragment(),
                 AppCodesKeys.TRIP_PLAN_DETAILS_FRAGMENT_ID);
+    }
 
-//        //Build argument bundle
-//        Bundle huntDetailArgs = new Bundle();
-//        //Pack hunt fields
-//        huntDetailArgs.putString(HuntDetailFragment.HUNT_NAME_KEY, hunt.getHuntName());
-//        huntDetailArgs.putString(HuntDetailFragment.HUNT_DESC_KEY, hunt.getHuntDescription());
-//        huntDetailArgs.putString(HuntDetailFragment.HUNT_ADDRESS_KEY, hunt.getHuntAddress());
-//        huntDetailArgs.putString(HuntDetailFragment.HUNT_TIME_STRING_KEY, hunt.getHuntTimeString());
-//        huntDetailArgs.putString(HuntDetailFragment.HUNT_PRIZE_KEY, hunt.getHuntPrize());
-//        huntDetailArgs.putString(HuntDetailFragment.HUNT_POSTER_URL_KEY, hunt.getHuntPosterUrl());
-//        huntDetailArgs.putString(HuntDetailFragment.HUNT_ID_KEY, hunt.getObjectId());
-//        //Pack Wikitude fields
-//        huntDetailArgs.putString(HuntDetailFragment.WIKITUDE_FOLDER_TOKEN_KEY, hunt.getWikitudeTargetCollectionId());
-//        huntDetailArgs.putString(HuntDetailFragment.WIKITUDE_CLIENT_TOKEN_KEY, hunt.getWikitudeClientID());
-//        //Create new instance and pass the argument bundle
-//        HuntDetailFragment fragment = HuntDetailFragment.newInstance(huntDetailArgs);
+    @Override
+    public void onCheckpointScanSelected(Checkpoint checkpoint){
+        mSelectedCheckpoint = checkpoint;
 
-//        setContentFragment(R.id.fragment_frame, fragment);
-//        setContentFragment(
-//                R.id.fragment_frame,
-//                fragment,
-//                AppCodesKeys.TRIP_PLAN_DETAILS_FRAGMENT_ID);
+        Bundle bundle = new Bundle();
+        bundle.putString(Checkpoint.CHECKPOINT_ID, mSelectedCheckpoint.getObjectId());
+        bundle.putString(Hunt.WIKITUDE_TARGET_COLLECTION_ID, mCurrentHunt.getWikitudeTargetCollectionId());
+        bundle.putString(Hunt.WIKITUDE_CLIENT_ID, mCurrentHunt.getWikitudeClientID());
+
+        Log.v("About to launchScanner", "clientId: " + mCurrentHunt.getWikitudeClientID());
+
+//        OnClickCloudTrackingActivity scannerFragment = new OnClickCloudTrackingActivity();
+        CloudScannerFragment scannerFragment = new CloudScannerFragment();
+        scannerFragment.setArguments(bundle);
+        setContentFragment(
+                R.id.fragment_frame,
+                scannerFragment,
+                AppCodesKeys.SCANNER_FRAGMENT_ID);
     }
 
     @Override
@@ -613,6 +623,22 @@ public class TravelGuideActivity extends AppCompatActivity implements
         mCurrentInteractions.clear();
         mCurrentInteractions.addAll(interactions);
     }
+
+    @Override
+    public void onSuccessfulCloudScanRecognition(JSONArray contentToDisplay){
+        for(JSONObject jsonObject: contentToDisplay) {
+            Log.v("Activity", "Content Array: " + contentToDisplay);
+        }
+    }
+    //*
+    //**
+    //***
+    //End of KurtinListener implementations
+    //***
+    //**
+    //*
+
+
 
     /* Comented on 09/23 by hemanth fto bring use overallleaderboard in place of ..
     @Override

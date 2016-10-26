@@ -1,0 +1,34 @@
+{
+    "q1Type": "YouTubeVideo",
+    "q1DataSource": "https://www.youtube.com/watch?v=wNjQishYOy0",
+    "q2Type": "WebPage",
+    "q2DataSource": "https://www.gatorade.com/sports-fuel",
+    "q3Type": "Image",
+    "q3DataSource": "https://static01.nyt.com/images/2016/09/01/business/00xp-gatorade_web1/00xp-gatorade-blog427.jpg",
+    "q3ClickSource": "http://www.gatorade.com/",
+    "q4Type": "WebPage",
+    "q4DataSource": "http://www.gatorade.com/products/g-series/thirst-quencher",
+    "unique_name": "Gatorade",
+    "identified_name": "Gatorade",
+    "identified_image_logo": "https://s3-us-west-2.amazonaws.com/web.blog/images/GATORADE.jpeg",
+    "level_id": "TE9fhDao8N",
+    "content": [
+        {
+            "type": "YouTubeVideo",
+            "source": "https://www.youtube.com/watch?v=wNjQishYOy0"
+        },
+        {
+            "type": "WebPage",
+            "source": "https://www.gatorade.com/sports-fuel"
+        },
+        {
+            "type": "Image",
+            "source": "https://static01.nyt.com/images/2016/09/01/business/00xp-gatorade_web1/00xp-gatorade-blog427.jpg",
+            "click_target": "http://www.gatorade.com/"
+        },
+        {
+            "type": "WebPage",
+            "source": "http://www.gatorade.com/products/g-series/thirst-quencher"
+        }
+    ]
+}

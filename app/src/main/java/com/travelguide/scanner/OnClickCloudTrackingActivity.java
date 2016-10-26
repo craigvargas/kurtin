@@ -45,7 +45,9 @@ import com.travelguide.R;
 import com.travelguide.adapters.QuestionsAdapter;
 import com.travelguide.decorations.DividerItemDecoration;
 import com.travelguide.helpers.UpdatePointsandLeaderBoard;
+import com.travelguide.models.Checkpoint;
 import com.travelguide.models.Day;
+import com.travelguide.models.Hunt;
 import com.travelguide.models.LeaderBoard;
 import com.travelguide.models.Questions;
 import com.wikitude.WikitudeSDK;
@@ -181,11 +183,13 @@ public class OnClickCloudTrackingActivity extends Fragment implements CloudTrack
         //First get fodler id
         try {
             Bundle bundle = this.getArguments();
-            String id = bundle.getString("dayid");
+//            String id = bundle.getString("dayid");
+            String id = bundle.getString(Checkpoint.CHECKPOINT_ID);
             mSelectedDayObjectId = id;
 
-            wikitudeTargetCollectionId = bundle.getString("wikitudeTargetCollectionId");
-            wikitudeClientId = bundle.getString("wikitudeClientId");
+            wikitudeTargetCollectionId = bundle.getString(Hunt.WIKITUDE_TARGET_COLLECTION_ID);
+            wikitudeClientId = bundle.getString(Hunt.WIKITUDE_CLIENT_ID);
+            Log.e("ChkID", mSelectedDayObjectId);
             Log.e("TCD", wikitudeTargetCollectionId);
             Log.e("CID", wikitudeClientId);
 
@@ -309,7 +313,7 @@ public class OnClickCloudTrackingActivity extends Fragment implements CloudTrack
                     Override
             public void run() {
                 try {
-                    Log.v("Recognition Failed", "Failed");
+                    Log.v("Recognition Failed", "Recognition failed - Error code: " + errorCode_ + " Message: " + errorMessage_);
                     EditText targetInformationTextField = (EditText) controls.findViewById(on_click_cloud_tracking_info_field);
                     targetInformationTextField.setText("Recognition failed - Error code: " + errorCode_ + " Message: " + errorMessage_);
                     targetInformationTextField.setVisibility(View.VISIBLE);
