@@ -73,6 +73,7 @@ import com.travelguide.layouts.CustomCoordinatorLayout;
 import com.travelguide.listener.KurtinListener;
 import com.travelguide.models.Checkpoint;
 import com.travelguide.models.Hunt;
+import com.travelguide.models.HuntJoin;
 import com.travelguide.models.KurtinInteraction;
 import com.travelguide.scanner.OnClickCloudTrackingActivity;
 
@@ -136,7 +137,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
     //Hold information about the hunt the user is currently engaging in
     private Hunt mCurrentHunt;
     private Checkpoint mSelectedCheckpoint;
-    private List<Checkpoint> mCurrrentCheckpoints;
+    private List<Checkpoint> mCurrentCheckpoints;
     private List<KurtinInteraction> mCurrentInteractions;
 
     private String referenceFragmentNameTag;
@@ -605,14 +606,21 @@ public class TravelGuideActivity extends AppCompatActivity implements
 
     @Override
     public List<Checkpoint> getCurrentCheckpoints(){
-        return mCurrrentCheckpoints;
+        return mCurrentCheckpoints;
     }
 
     public void setCurrentCheckpoints(List<Checkpoint> checkpoints){
-        mCurrrentCheckpoints = checkpoints;
-//        mCurrrentCheckpoints.clear();
-//        mCurrrentCheckpoints.addAll(checkpoints);
+        mCurrentCheckpoints = checkpoints;
+//        mCurrentCheckpoints.clear();
+//        mCurrentCheckpoints.addAll(checkpoints);
     }
+
+    @Override
+    public Checkpoint getSelectedCheckpoint(){ return mSelectedCheckpoint; }
+
+    @Override
+    public void setSelectedCheckpoint(Checkpoint checkpoint){ mSelectedCheckpoint = checkpoint;}
+
     @Override
     public List<KurtinInteraction> getCurrentInteractions(){
         return mCurrentInteractions;
@@ -626,9 +634,18 @@ public class TravelGuideActivity extends AppCompatActivity implements
 
     @Override
     public void onSuccessfulCloudScanRecognition(JSONArray contentToDisplay){
-        for(JSONObject jsonObject: contentToDisplay) {
-            Log.v("Activity", "Content Array: " + contentToDisplay);
+        try {
+            for (int index = 0; index < contentToDisplay.length(); index++) {
+                Log.v("Activity", "Content item " + index + " is: " + contentToDisplay.getJSONObject(index).toString());
+            }
+        }catch(Exception e){
+            e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onHuntCompleted(HuntJoin huntJoinRecord){
+        //Show hunt completion screen (trophy)
     }
     //*
     //**

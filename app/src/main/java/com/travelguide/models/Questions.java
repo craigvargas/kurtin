@@ -31,6 +31,11 @@ public class Questions extends ParseObject{
     public Integer getPoints() {return getInt("points");}
     public String getLinkedImage() {return getString("linkedImageID");}
 
+    //Setters
+    public void putQuestionDetails(String question){put("questionDetails", question);}
+    public void putOption1(String option){put("option1", option);}
+    public void putOption2(String option){put("option2", option);}
+    public void putOption3(String option){put("option3", option);}
 
     //Saving Data
     /**

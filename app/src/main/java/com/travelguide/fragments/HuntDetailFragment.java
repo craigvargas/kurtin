@@ -55,6 +55,7 @@ import com.travelguide.listener.KurtinListener;
 import com.travelguide.models.Checkpoint;
 import com.travelguide.models.Day;
 import com.travelguide.models.Hunt;
+import com.travelguide.models.HuntJoin;
 import com.travelguide.models.MasterLeaderBoard;
 import com.travelguide.models.Place;
 import com.travelguide.models.Questions;
@@ -266,6 +267,7 @@ public class HuntDetailFragment extends TripBaseFragment
                     Log.v("ScanBtn Clicked", "Need to implement join table update");
                     //TODO: Update the leaderboard join table
 //                    updateHuntLeaderboard();
+                    updateHuntJoinTable();
                     scanImage();
                 }
             }
@@ -633,19 +635,18 @@ public class HuntDetailFragment extends TripBaseFragment
 //        scanbtn.setVisibility(View.GONE);
     }
 
-    //TODO refactor function below for new DB schema
     //User has entered the hunt so make a record of it
-    private void updateHuntLeaderboard(){
-        ParseQuery huntLeaderBoardQuery = ParseQuery.getQuery(MasterLeaderBoard.class);
-        huntLeaderBoardQuery.whereEqualTo(AppCodesKeys.PARSE_LEADER_BOARD_USER_POINTER_KEY, mCurrentUser);
-        huntLeaderBoardQuery.whereEqualTo(AppCodesKeys.PARSE_LEADER_BOARD_HUNT_POINTER_KEY, mHuntTripPlan);
+    private void updateHuntJoinTable(){
+        ParseQuery huntJoinQuery = ParseQuery.getQuery(HuntJoin.class);
+        huntJoinQuery.whereEqualTo(HuntJoin.USER_POINTER_KEY, mCurrentUser);
+        huntJoinQuery.whereEqualTo(HuntJoin.HUNT_POINTER_KEY, mCurrentHunt);
 
-        huntLeaderBoardQuery.findInBackground(new FindCallback<MasterLeaderBoard>() {
+        huntJoinQuery.findInBackground(new FindCallback<HuntJoin>() {
             @Override
-            public void done(List<MasterLeaderBoard> huntLeaderBoardList, ParseException e) {
+            public void done(List<HuntJoin> huntJoinList, ParseException e) {
                 if(e==null){
-                    if(huntLeaderBoardList.size() == 0){
-                        createHuntLeaderBoardRecord();
+                    if(huntJoinList.size() == 0){
+                        createHuntJoinRecord();
                     }else{
                         Toast.makeText(getContext(), "Welcome back to the hunt", Toast.LENGTH_SHORT).show();
                     }
@@ -653,24 +654,12 @@ public class HuntDetailFragment extends TripBaseFragment
                     e.printStackTrace();
                 }
             }
-
-//            @Override
-//            public void done(Object o, Throwable throwable) {
-//                Log.v("Update Leader Board", "Inside unkown DONE function. object = " + o.toString());
-//
-//            }
         });
     }
 
-    //TODO refactor function below for new DB schema
-    private void createHuntLeaderBoardRecord(){
-        MasterLeaderBoard huntLeaderBoardRecord = new MasterLeaderBoard();
-        huntLeaderBoardRecord.putUser(mCurrentUser);
-        huntLeaderBoardRecord.putHunt(mHuntTripPlan);
-        huntLeaderBoardRecord.putCompletionStatus(false);
-        huntLeaderBoardRecord.putPoints(0);
-        huntLeaderBoardRecord.putHuntID(mHuntTripPlan.getObjectId());
-        huntLeaderBoardRecord.saveInBackground(new SaveCallback() {
+    private void createHuntJoinRecord(){
+        HuntJoin huntJoin = HuntJoin.createHuntJoinRecord(mCurrentUser, mCurrentHunt, mSelectedCheckpoint.getObjectId());
+        huntJoin.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if(e==null){

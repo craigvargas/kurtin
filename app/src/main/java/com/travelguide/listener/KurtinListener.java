@@ -2,6 +2,7 @@ package com.travelguide.listener;
 
 import com.travelguide.models.Checkpoint;
 import com.travelguide.models.Hunt;
+import com.travelguide.models.HuntJoin;
 import com.travelguide.models.KurtinInteraction;
 import com.travelguide.models.Questions;
 
@@ -35,9 +36,15 @@ public interface KurtinListener {
 
     void setCurrentCheckpoints(List<Checkpoint> checkpoints);
 
+    Checkpoint getSelectedCheckpoint();
+
+    void setSelectedCheckpoint(Checkpoint checkpoint);
+
     List<KurtinInteraction> getCurrentInteractions();
 
     void setCurrentInteractions(List<KurtinInteraction> interactions);
 
     void onSuccessfulCloudScanRecognition(JSONArray contentToDisplay);
+
+    void onHuntCompleted(HuntJoin huntJoinRecord);
 }

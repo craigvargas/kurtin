@@ -2,6 +2,7 @@ package com.travelguide.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.TypedValue;
@@ -17,15 +18,19 @@ import com.makeramen.roundedimageview.RoundedDrawable;
 import com.squareup.picasso.Transformation;
 import com.travelguide.R;
 import com.travelguide.fragments.HuntDetailFragment;
+import com.travelguide.models.KurtinInteraction;
 import com.travelguide.models.Questions;
 import com.travelguide.scanner.OnClickCloudTrackingActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.loopj.android.http.AsyncHttpClient.log;
+import static com.wikitude.native_android_sdk.a.c;
+
 public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.ViewHolder> {
 
-    private   final List<Questions> mQuestions;
+    private final List<Questions> mQuestions;
     private final Context mContext;
 
     private final float mRadius;
@@ -36,14 +41,37 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
     //private Integer points;
     //private Integer questionNo;
     //private String questionDetails;
-    private  String parentQuestionID;
+    private String parentQuestionID;
     List answerlist;
+
+    private QuestionsAdapterListener questionsAdapterListener;
+
+    public interface QuestionsAdapterListener{
+        public void onOptionSelected(String interactionID, int selectedOption);
+    }
 
 
     public QuestionsAdapter(List<Questions> questions, Context context) {
         this.mQuestions = questions;
         this.mContext = context;
         answerlist = new ArrayList();
+
+        if(context instanceof QuestionsAdapterListener) {
+            questionsAdapterListener = (QuestionsAdapterListener) context;
+        }
+
+        mRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30,
+                mContext.getResources().getDisplayMetrics());
+    }
+
+    public QuestionsAdapter(List<Questions> questions, Context context, Fragment callingFragment) {
+        this.mQuestions = questions;
+        this.mContext = context;
+        answerlist = new ArrayList();
+
+        if(callingFragment instanceof QuestionsAdapterListener) {
+            questionsAdapterListener = (QuestionsAdapterListener) callingFragment;
+        }
 
         mRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30,
                 mContext.getResources().getDisplayMetrics());
@@ -60,15 +88,15 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
     public void onBindViewHolder(final QuestionsAdapter.ViewHolder holder, final int position) {
         //System.out.print(mQuestions.get(position).toString());
         //Log.e("test",mQuestions.get(position).toString());
-        final Questions question =  mQuestions.get(position);
-        if(position == 0){
+        final Questions question = mQuestions.get(position);
+        if (position == 0) {
             holder.ivPlace.setBackgroundResource(R.drawable.ic_one100);
 
-        }else if(position == 1){
+        } else if (position == 1) {
             holder.ivPlace.setBackgroundResource(R.drawable.ic_two100);
-        }else  if(position ==2){
+        } else if (position == 2) {
             holder.ivPlace.setBackgroundResource(R.drawable.ic_three100);
-        }else{
+        } else {
             holder.ivPlace.setBackgroundResource(R.drawable.ic_questiondefault100);
         }
         holder.tvVisitingTime.setText(question.getQuestionDetails());
@@ -77,9 +105,9 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
         holder.rbOptionThree.setText(question.getOption3());
         holder.tvQuestionID.setText(question.getObjectId());
 
+        holder.interactionID = question.get(KurtinInteraction.KURTIN_INTERACTION_ID_KEY).toString();
+
 //        answerlist.add(position,"0");
-
-
 
 
         try {
@@ -94,43 +122,50 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
 
                 RadioButton checked_rb = (RadioButton) group.findViewById(checkedId);
 
-            int    pos=holder.rgOptions.indexOfChild(group.findViewById(checkedId));
+                int radioPosition = holder.rgOptions.indexOfChild(group.findViewById(checkedId));
 
-                Log.e("onCheckedChanged", "onCheckedChanged:33333:  "+position);
+                if(questionsAdapterListener != null) {
+                    questionsAdapterListener.onOptionSelected(holder.interactionID, radioPosition);
+                }else{
+                    Log.e("QuestionsAdapter","Need to implement questionsAdapterListener");
+                }
+
+                Log.e("onCheckedChanged", "onCheckedChanged:33333:  " + position);
+                Log.v("onCheckedChanged","Radio index: " + radioPosition);
 
                 try {
 //                    if(pos < answerlist.size())
 //                    answerlist.remove(position);
 
-                    HuntDetailFragment.UpdateSelectedValue(holder.tvQuestionID.getText().toString(),holder.rbOptionOne.getText().toString());
+                    HuntDetailFragment.UpdateSelectedValue(holder.tvQuestionID.getText().toString(), holder.rbOptionOne.getText().toString());
 
-                    if(position == 0){
-                        if(answerlist.size() > position){
-                            answerlist.set(0,pos);
-                        }else {
-                            answerlist.add(0,pos);
+                    if (position == 0) {
+                        if (answerlist.size() > position) {
+                            answerlist.set(0, radioPosition);
+                        } else {
+                            answerlist.add(0, radioPosition);
                         }
-                    }else if(position == 1){
-                        if(answerlist.size() > position){
-                            answerlist.set(1,pos);
-                        }else {
-                            answerlist.add(1,pos);
+                    } else if (position == 1) {
+                        if (answerlist.size() > position) {
+                            answerlist.set(1, radioPosition);
+                        } else {
+                            answerlist.add(1, radioPosition);
                         }
-                    }else if(position == 2){
-                        if(answerlist.size() > position){
-                            answerlist.set(2,pos);
-                        }else {
-                            answerlist.add(2,pos);
+                    } else if (position == 2) {
+                        if (answerlist.size() > position) {
+                            answerlist.set(2, radioPosition);
+                        } else {
+                            answerlist.add(2, radioPosition);
                         }
                     }
 
                     String ans = "";
 
-                    if(pos == 0){
+                    if (radioPosition == 0) {
                         ans = question.getOption1();
-                    }else if(pos == 1){
+                    } else if (radioPosition == 1) {
                         ans = question.getOption2();
-                    }else if(pos == 2){
+                    } else if (radioPosition == 2) {
                         ans = question.getOption3();
                     }
 
@@ -138,13 +173,13 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
 //                    Toast.makeText(mContext, question.getQuestionDetails()+"--:"+ans, Toast.LENGTH_SHORT).show();
 
 
-                    Log.e("onCheckedChanged", "onCheckedChanged:1111111 "+answerlist.toString() );
-                    Log.e("onCheckedChanged", "onCheckedChanged:2222222 "+answerlist.get(position) );
+                    Log.e("onCheckedChanged", "onCheckedChanged:1111111 " + answerlist.toString());
+                    Log.e("onCheckedChanged", "onCheckedChanged:2222222 " + answerlist.get(position));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-                switch (checkedId){
+                switch (checkedId) {
 
                 }
 
@@ -152,14 +187,14 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
         });
 
         /** Commented for questions as image is not needed
-        Picasso.with(mContext)
+         Picasso.with(mContext)
 
-                .load(place.getPlaceImageUrl())
-                .fit()
-                .placeholder(R.drawable.ic_public_white_48dp)
-                .transform(mTransformation)
-                .into(holder.ivPlace);
-        */
+         .load(place.getPlaceImageUrl())
+         .fit()
+         .placeholder(R.drawable.ic_public_white_48dp)
+         .transform(mTransformation)
+         .into(holder.ivPlace);
+         */
     }
 
     @Override
@@ -167,14 +202,17 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
         return mQuestions.size();
     }
 
-       static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView ivPlace;
         TextView tvVisitingTime;
-          RadioGroup rgOptions;
+        RadioGroup rgOptions;
         RadioButton rbOptionOne;
         RadioButton rbOptionTwo;
         RadioButton rbOptionThree;
         TextView tvQuestionID;
+
+        String interactionID;
+
         public ViewHolder(View itemView) {
             super(itemView);
             ivPlace = (ImageView) itemView.findViewById(R.id.ivPlace);
@@ -190,9 +228,9 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
                 @Override
                 public void onClick(View v) {
                     int sam = ViewHolder.this.getAdapterPosition();
-                    if(sam == 0){
+                    if (sam == 0) {
                         try {
-                            RecyclerView r = (RecyclerView)  ((v.getParent()).getParent()).getParent();
+                            RecyclerView r = (RecyclerView) ((v.getParent()).getParent()).getParent();
                             RadioGroup rgOptionTwo = (RadioGroup) r.getChildAt(1).findViewById(R.id.rg_RadioGroup);
                             rgOptionTwo.clearCheck();
                             RadioGroup rgOptionThree = (RadioGroup) r.getChildAt(2).findViewById(R.id.rg_RadioGroup);
@@ -205,31 +243,31 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
                         //RadioGroup rgOptionTwo = (RadioGroup) r.getChildAt(1).findViewById(R.id.rg_RadioGroup);
                         //rgOptionTwo.clearCheck();
                         //rgOptionThree.clearCheck();
-                    }else if(sam ==1){
-                        try{
-                            RecyclerView r = (RecyclerView)  ((v.getParent()).getParent()).getParent();
+                    } else if (sam == 1) {
+                        try {
+                            RecyclerView r = (RecyclerView) ((v.getParent()).getParent()).getParent();
                             RadioGroup rgOptionTwo = (RadioGroup) r.getChildAt(0).findViewById(R.id.rg_RadioGroup);
                             RadioGroup rgOptionThree = (RadioGroup) r.getChildAt(2).findViewById(R.id.rg_RadioGroup);
                             rgOptionTwo.clearCheck();
                             rgOptionThree.clearCheck();
 
-                        }catch(NullPointerException e){
+                        } catch (NullPointerException e) {
                             System.out.print("Caught the NullPointerException");
                         }
-                    }else{
-                        try{
-                            RecyclerView r = (RecyclerView)  ((v.getParent()).getParent()).getParent();
+                    } else {
+                        try {
+                            RecyclerView r = (RecyclerView) ((v.getParent()).getParent()).getParent();
                             RadioGroup rgOptionTwo = (RadioGroup) r.getChildAt(0).findViewById(R.id.rg_RadioGroup);
                             RadioGroup rgOptionThree = (RadioGroup) r.getChildAt(1).findViewById(R.id.rg_RadioGroup);
                             rgOptionTwo.clearCheck();
                             rgOptionThree.clearCheck();
-                        }catch (NullPointerException e){
+                        } catch (NullPointerException e) {
                             System.out.print("Caught the NullPointerException");
                         }
 
                     }
                     //CoordinatorLayout cl = (CoordinatorLayout) v.getParent().getParent().getParent().getParent().getParent();
-                    OnClickCloudTrackingActivity.UpdateSelectedValue(tvQuestionID.getText().toString(),rbOptionOne.getText().toString());
+                    OnClickCloudTrackingActivity.UpdateSelectedValue(tvQuestionID.getText().toString(), rbOptionOne.getText().toString());
                 }
             });
             rbOptionTwo.setOnClickListener(new View.OnClickListener() {
@@ -242,45 +280,43 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
                     //paramsOptionTwo[1] = rbOptionTwo.getText().toString();
 
                     int sam = ViewHolder.this.getAdapterPosition();
-                    if(sam == 0){
+                    if (sam == 0) {
                         try {
                             RecyclerView r = (RecyclerView) ((v.getParent()).getParent()).getParent();
                             RadioGroup rgOptionTwo = (RadioGroup) r.getChildAt(1).findViewById(R.id.rg_RadioGroup);
                             RadioGroup rgOptionThree = (RadioGroup) r.getChildAt(2).findViewById(R.id.rg_RadioGroup);
                             rgOptionTwo.clearCheck();
                             rgOptionThree.clearCheck();
-                        }catch (NullPointerException e){
+                        } catch (NullPointerException e) {
                             System.out.print("Caught the NullPointerException");
 
                         }
-                    }else if(sam ==1){
+                    } else if (sam == 1) {
                         try {
                             RecyclerView r = (RecyclerView) ((v.getParent()).getParent()).getParent();
                             RadioGroup rgOptionTwo = (RadioGroup) r.getChildAt(0).findViewById(R.id.rg_RadioGroup);
                             RadioGroup rgOptionThree = (RadioGroup) r.getChildAt(2).findViewById(R.id.rg_RadioGroup);
                             rgOptionTwo.clearCheck();
                             rgOptionThree.clearCheck();
-                        }catch (NullPointerException e){
+                        } catch (NullPointerException e) {
                             System.out.print("Caught the NullPointerException");
 
                         }
-                    }else{
+                    } else {
                         try {
                             RecyclerView r = (RecyclerView) ((v.getParent()).getParent()).getParent();
                             RadioGroup rgOptionTwo = (RadioGroup) r.getChildAt(0).findViewById(R.id.rg_RadioGroup);
                             RadioGroup rgOptionThree = (RadioGroup) r.getChildAt(1).findViewById(R.id.rg_RadioGroup);
                             rgOptionTwo.clearCheck();
                             rgOptionThree.clearCheck();
-                        }catch (NullPointerException e){
+                        } catch (NullPointerException e) {
                             System.out.print("Caught the NullPointerException");
 
                         }
                     }
                     //CoordinatorLayout cl = (CoordinatorLayout) v.getParent().getParent().getParent().getParent().getParent();
                     ////////////////////////////////////////////////////////cl.findViewById(R.id.btnSave).setVisibility(View.VISIBLE);
-                    OnClickCloudTrackingActivity.UpdateSelectedValue(tvQuestionID.getText().toString(),rbOptionTwo.getText().toString());
-
-
+                    OnClickCloudTrackingActivity.UpdateSelectedValue(tvQuestionID.getText().toString(), rbOptionTwo.getText().toString());
 
 
                 }
@@ -296,43 +332,43 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
                     //paramsOptionThree[1] = rbOptionThree.getText().toString();
 
                     int sam = ViewHolder.this.getAdapterPosition();
-                    if(sam == 0){
+                    if (sam == 0) {
                         try {
                             RecyclerView r = (RecyclerView) ((v.getParent()).getParent()).getParent();
                             RadioGroup rgOptionTwo = (RadioGroup) r.getChildAt(1).findViewById(R.id.rg_RadioGroup);
                             RadioGroup rgOptionThree = (RadioGroup) r.getChildAt(2).findViewById(R.id.rg_RadioGroup);
                             rgOptionTwo.clearCheck();
                             rgOptionThree.clearCheck();
-                        }catch (NullPointerException e){
+                        } catch (NullPointerException e) {
 
                         }
-                    }else if(sam ==1){
+                    } else if (sam == 1) {
                         try {
                             RecyclerView r = (RecyclerView) ((v.getParent()).getParent()).getParent();
                             RadioGroup rgOptionTwo = (RadioGroup) r.getChildAt(0).findViewById(R.id.rg_RadioGroup);
                             RadioGroup rgOptionThree = (RadioGroup) r.getChildAt(2).findViewById(R.id.rg_RadioGroup);
                             rgOptionTwo.clearCheck();
                             rgOptionThree.clearCheck();
-                        }catch (NullPointerException e){
+                        } catch (NullPointerException e) {
                             System.out.print("Caught the NullPointerException");
 
                         }
-                    }else{
+                    } else {
                         try {
                             RecyclerView r = (RecyclerView) ((v.getParent()).getParent()).getParent();
                             RadioGroup rgOptionTwo = (RadioGroup) r.getChildAt(0).findViewById(R.id.rg_RadioGroup);
                             RadioGroup rgOptionThree = (RadioGroup) r.getChildAt(1).findViewById(R.id.rg_RadioGroup);
                             rgOptionTwo.clearCheck();
                             rgOptionThree.clearCheck();
-                        }catch(NullPointerException e){
+                        } catch (NullPointerException e) {
                             System.out.print("Caught the NullPointerException");
 
                         }
                     }
-                   // CoordinatorLayout cl = (CoordinatorLayout) v.getParent().getParent().getParent().getParent().getParent();
+                    // CoordinatorLayout cl = (CoordinatorLayout) v.getParent().getParent().getParent().getParent().getParent();
                     ////////////////////////////////////////////////////////////////////cl.findViewById(R.id.btnSave).setVisibility(View.VISIBLE);
 
-                    OnClickCloudTrackingActivity.UpdateSelectedValue(tvQuestionID.getText().toString(),rbOptionThree.getText().toString());
+                    OnClickCloudTrackingActivity.UpdateSelectedValue(tvQuestionID.getText().toString(), rbOptionThree.getText().toString());
                 }
 
             });
@@ -340,14 +376,14 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
 
         }
 
-           @Override
-           public void onClick(View v) {
+        @Override
+        public void onClick(View v) {
 
-               int position = getLayoutPosition(); // gets item position
-               // We can access the data within the views
+            int position = getLayoutPosition(); // gets item position
+            // We can access the data within the views
 
-           }
-       }
+        }
+    }
 
     private final Transformation mTransformation = new Transformation() {
 

@@ -40,6 +40,7 @@ import android.widget.VideoView;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 import com.travelguide.R;
@@ -50,6 +51,8 @@ import com.travelguide.listener.KurtinListener;
 import com.travelguide.models.Checkpoint;
 import com.travelguide.models.Day;
 import com.travelguide.models.Hunt;
+import com.travelguide.models.HuntJoin;
+import com.travelguide.models.KurtinInteraction;
 import com.travelguide.models.LeaderBoard;
 import com.travelguide.models.Questions;
 import com.travelguide.scanner.CustomSurfaceView;
@@ -72,6 +75,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import static android.widget.ImageView.ScaleType.FIT_XY;
@@ -82,7 +86,7 @@ import static com.travelguide.R.id.q1;
 import static com.travelguide.R.id.q2;
 import static com.travelguide.R.id.q4;
 
-public class CloudScannerFragment extends Fragment implements CloudTrackerEventListener, ExternalRendering {
+public class CloudScannerFragment extends Fragment implements CloudTrackerEventListener, ExternalRendering, QuestionsAdapter.QuestionsAdapterListener {
 
     private static final String TAG = "OnClickCloudTracking";
     private static final String WIKITUDE_METADATA_KEY = "metadata";
@@ -111,7 +115,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
     public static String selectedValueToSave;
     public static String questionIDToSave;
 
-    private List < Questions > mQuestionsList;
+    private List<Questions> mQuestionsList;
     private QuestionsAdapter mQuestionsAdapter;
     private String mSelectedDayObjectId = "";
     Button recognizeButton;
@@ -134,10 +138,10 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
     private Integer wbCompleted4ID;
 
 
-    private Boolean isQ1Complated = false;
-    private Boolean isQ2Complated = false;
-    private Boolean isQ3Complated = false;
-    private Boolean isQ4Complated = false;
+    private Boolean isQ1Completed = false;
+    private Boolean isQ2Completed = false;
+    private Boolean isQ3Completed = false;
+    private Boolean isQ4Completed = false;
 
 
     private EditText on_click_cloud_tracking_info;
@@ -171,7 +175,38 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
     private Integer q3ImageViewID;
     private Integer q4WebViewID;
 
+    //Cvar: start Cvar member variables
     private KurtinListener mKurtinListener;
+    private JSONObject mWikitudeMetaData;
+
+    private String q1Type = null;
+    private String q2Type = null;
+    private String q3Type = null;
+    private String q4Type = null;
+    private String levelId = null;
+    private String q1DataSource = null;
+    private String q2DataSource = null;
+    private String q3DataSource = null;
+    private String q4DataSource = null;
+    private Uri q1DataSourceURI = null;
+    private Uri q2DataSourceURI = null;
+    private Uri q3DataSourceURI = null;
+    private Uri q4DataSourceURI = null;
+    private String nameToDisplay = null;
+    private String QuadHeadname = "";
+
+    private ArrayList QTypes = new ArrayList();
+
+    private List<KurtinInteraction> mInteractionList;
+    private List<Checkpoint> mCheckpointList;
+    private List<String> mQuestions;
+    private Checkpoint mSelectedCheckpoint;
+    private Hunt mCurrentHunt;
+    private HuntJoin mUserHuntJoinRecord;
+    private ParseUser mCurrentUser;
+    private Integer mSelectedOption;
+    private HashMap<String,Integer> mSelectedOptionsMap;
+    //Cvar: end Cvar member variables
 
     @
             Override
@@ -200,7 +235,6 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
             Log.e("CID", wikitudeClientId);
 
 
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -218,8 +252,10 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         webviewHeight = dm.heightPixels / 2;
         double fheight = height / 2.3;
         quadheightsmall = (int) fheight;
-        mQuestionsList = new ArrayList < Questions > ();
-        mQuestionsAdapter = new QuestionsAdapter(mQuestionsList, getContext());
+        mQuestionsList = new ArrayList<Questions>();
+//        mQuestionsAdapter = new QuestionsAdapter(mQuestionsList, getContext());
+        mQuestionsAdapter = new QuestionsAdapter(mQuestionsList, getContext(), this);
+
     }
 
     @Override
@@ -283,23 +319,26 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         viewHolder = (FrameLayout) controls.findViewById(R.id.track_frame);
         viewHolder.addView(_customSurfaceView);
         recognizeButton = (Button) controls.findViewById(R.id.on_click_cloud_tracking_recognize_button);
-        recognizeButton.setOnClickListener(new View.OnClickListener() {@
-                Override
-        public void onClick(final View view_) {
-            _cloudTracker.recognize();
+        recognizeButton.setOnClickListener(new View.OnClickListener() {
+            @
+                    Override
+            public void onClick(final View view_) {
+                _cloudTracker.recognize();
 
-            Log.e(TAG, "onClick: recognizeButton");
+                Log.e(TAG, "onClick: recognizeButton");
 
-            controls.findViewById(R.id.q1).setVisibility(View.GONE);
-            controls.findViewById(R.id.q2).setVisibility(View.GONE);
-            controls.findViewById(R.id.q3).setVisibility(View.GONE);
-            controls.findViewById(R.id.q4).setVisibility(View.GONE);
-            controls.findViewById(on_click_cloud_tracking_info_field).setVisibility(View.GONE);
-            destroyWebView();
-        }
+                controls.findViewById(R.id.q1).setVisibility(View.GONE);
+                controls.findViewById(R.id.q2).setVisibility(View.GONE);
+                controls.findViewById(R.id.q3).setVisibility(View.GONE);
+                controls.findViewById(R.id.q4).setVisibility(View.GONE);
+                controls.findViewById(on_click_cloud_tracking_info_field).setVisibility(View.GONE);
+                destroyWebView();
+            }
         });
 
-    }@
+    }
+
+    @
             Override
     public void onTrackerFinishedLoading(final CloudTracker cloudTracker_) {
     }
@@ -309,21 +348,25 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
     public void onTrackerLoadingError(final CloudTracker cloudTracker_, final String errorMessage_) {
         Log.d(TAG, "onTrackerLoadingError: " + errorMessage_);
     }
+
     @
             Override
     public void onTargetRecognized(final Tracker cloudTracker_, final String targetName_) {
 
     }
+
     @
             Override
     public void onTracking(final Tracker cloudTracker_, final RecognizedTarget recognizedTarget_) {
         _glRenderer.setCurrentlyRecognizedTarget(recognizedTarget_);
     }
+
     @
             Override
     public void onTargetLost(final Tracker cloudTracker_, final String targetName_) {
         _glRenderer.setCurrentlyRecognizedTarget(null);
     }
+
     @
             Override
     public void onExtendedTrackingQualityUpdate(final Tracker tracker_, final String targetName_, final int oldTrackingQuality_, final int newTrackingQuality_) {
@@ -333,400 +376,112 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
             Override
     public void onRecognitionFailed(final CloudTracker cloudTracker_, final int errorCode_, final String errorMessage_) {
         try {
-            getActivity().runOnUiThread(new Runnable() {@
-                    Override
-            public void run() {
-                try {
-                    Log.v("Recognition Failed", "Failed");
-                    EditText targetInformationTextField = (EditText) controls.findViewById(on_click_cloud_tracking_info_field);
-                    targetInformationTextField.setText("Recognition failed - Error code: " + errorCode_ + " Message: " + errorMessage_);
-                    targetInformationTextField.setVisibility(View.VISIBLE);
-                } catch (Exception e) {
-                    e.printStackTrace();
+            getActivity().runOnUiThread(new Runnable() {
+                @
+                        Override
+                public void run() {
+                    try {
+                        Log.v("Recognition Failed", "Failed");
+                        EditText targetInformationTextField = (EditText) controls.findViewById(on_click_cloud_tracking_info_field);
+                        targetInformationTextField.setText("Recognition failed - Error code: " + errorCode_ + " Message: " + errorMessage_);
+                        targetInformationTextField.setVisibility(View.VISIBLE);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
             });
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     @
             Override
     public void onRecognitionSuccessful(final CloudTracker cloudTracker_, boolean recognized_, final JSONObject jsonObject_) {
         try {
-            Log.e(TAG, "onRecognitionSuccessful:jsonObject_:  " + jsonObject_ );
+            Log.e(TAG, "onRecognitionSuccessful:jsonObject_:  " + jsonObject_);
             Log.v(TAG, "Recognized: " + recognized_);
             Log.v(TAG, "Cloud Tracker" + cloudTracker_.toString());
 
+            //Send wikitude data to activity if image was recognized
+            if (recognized_) {
+                sendContentDataToActivity(jsonObject_);
+            }
+
             //Check if wikitude recognized the image
-            if(recognized_){
-//                Toast.makeText(getContext(), "Success. Kurtin is hunting for your content", Toast.LENGTH_SHORT);
-                //Immediately send jsonObject with data to another fragment
-                if(mKurtinListener != null){
-                    JSONObject parentContentObject = jsonObject_.getJSONObject(WIKITUDE_METADATA_KEY);
-                    JSONArray contentArray = parentContentObject.getJSONArray("content");
-                    mKurtinListener.onSuccessfulCloudScanRecognition(contentArray);
-                }
-            }else if (false){ //recognized_) {
-                getActivity().runOnUiThread(new Runnable() {@
-                        Override
-                public void run() {
-                    String q1Type = null;
-                    String q2Type = null;
-                    String q3Type = null;
-                    String q4Type = null;
-                    String levleID = null;
-                    String q1DataSource = null;
-                    String q2DataSource = null;
-                    String q3DataSource = null;
-                    String q4DataSource = null;
-                    Uri q1DataSourceURI = null;
-                    Uri q2DataSourceURI = null;
-                    Uri q3DataSourceURI = null;
-                    Uri q4DataSourceURI = null;
-                    String nameToDisplay = null;
-                    System.out.println(jsonObject_.toString());
+            if (recognized_) {
+                //Start displaying content to the user
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
 
-                    try {
-                        //Quadrant- Type
-                        JSONObject metadata = jsonObject_.getJSONObject("metadata");
-                        //System.out.println(metadata.toString());
-                        q1Type = metadata.getString("q1Type");
-                        q2Type = metadata.getString("q2Type");
-                        q3Type = metadata.getString("q3Type");
-                        q4Type = metadata.getString("q4Type");
-                        levleID = metadata.getString("level_id");
-                        //System.out.println(q4Type.toString());
+                        System.out.println(jsonObject_.toString());
 
-                        //get name
-                        nameToDisplay = metadata.getString("idetified_name");
-                        //Quadrant- Source
-                        q1DataSource = metadata.getString("q1DataSource");
-                        q1DataSourceURI = Uri.parse(q1DataSource);
-                        q2DataSource = metadata.getString("q2DataSource");
-                        q2DataSourceURI = Uri.parse(q2DataSource);
-                        q3DataSource = metadata.getString("q3DataSource");
-                        q3DataSourceURI = Uri.parse(q3DataSource);
-                        q4DataSource = metadata.getString("q4DataSource");
-                        q4DataSourceURI = Uri.parse(q4DataSource);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        if (levleID.equals(mSelectedDayObjectId.toString())) {
+                        //Get content data out of Wikitude Json file and populate content member variables
+                        try {
+                            JSONObject metadata = jsonObject_.getJSONObject("metadata");
+                            levelId = metadata.getString("level_id");
+                            mSelectedCheckpoint = mKurtinListener.getSelectedCheckpoint();
+                            mCurrentHunt = mKurtinListener.getCurrentHunt();
+                            mCheckpointList = mKurtinListener.getCurrentCheckpoints();
+                            mCurrentUser = ParseUser.getCurrentUser();
+                            mUserHuntJoinRecord = null;
 
-                            ArrayList QTypes = new ArrayList();
-                            QTypes.add(0, q1Type);
-                            QTypes.add(1, q2Type);
-                            QTypes.add(2, q3Type);
-                            QTypes.add(3, q4Type);
+                            //Query the Join table
+                            ParseQuery<HuntJoin> huntJoinParseQuery = ParseQuery.getQuery(HuntJoin.class);
+                            huntJoinParseQuery.whereEqualTo(HuntJoin.USER_POINTER_KEY, mCurrentUser);
+                            huntJoinParseQuery.whereEqualTo(HuntJoin.HUNT_POINTER_KEY, mCurrentHunt);
 
-
-                            q2 = (RelativeLayout) controls.findViewById(R.id.q2);
-                            q1 = (RelativeLayout) controls.findViewById(R.id.q1);
-                            q3 = (RelativeLayout) controls.findViewById(R.id.q3);
-                            q4 = (RelativeLayout) controls.findViewById(R.id.q4);
-
-                            submitbtn1 = new Button(getActivity());
-                            submitbtn2 = new Button(getActivity());
-                            submitbtn3 = new Button(getActivity());
-                            submitbtn4 = new Button(getActivity());
-
-                            completedTV = new TextView(getActivity());
-
-                            on_click_cloud_tracking_info = (EditText) controls.findViewById(on_click_cloud_tracking_info_field);
-
-                            final String QuadHeadname = nameToDisplay;
-
-                            setQ1Small(q1, q2, q3, q4, submitbtn1, on_click_cloud_tracking_info, QuadHeadname);
-                            setQ2Small(q1, q2, q3, q4, submitbtn2, on_click_cloud_tracking_info, QuadHeadname);
-                            setQ3Small(q1, q2, q3, q4, submitbtn3, on_click_cloud_tracking_info, QuadHeadname);
-                            setQ4Small(q1, q2, q3, q4, submitbtn4, on_click_cloud_tracking_info, QuadHeadname);
-
-                            setSubmitButton("0", submitbtn1);
-                            setSubmitButton("0", submitbtn2);
-                            setSubmitButton("0", submitbtn3);
-                            setSubmitButton("0", submitbtn4);
-                            setCompletedText("0", completedTV);
-                            //Log.e(TAG, "run: Display: " + height + "---" + width);
-                            //Log.e(TAG, "run: For loop starts");
-
-                            for (int i = 0; i <= QTypes.size(); i++) {
-                                if (i == 0) {
-                                    // LinearLayout q1 = (LinearLayout)controls. findViewById(R.id.q1); // get your WebView form your xml file
-                                    q1.removeAllViews();
-                                    q1YouTubeViewb1 = new ImageView(getActivity());
-                                    q1YouTubeViewb2 = new ImageView(getActivity());
-                                    //final ImageView ytCompleted = new ImageView(getActivity());
-                                    wbCompleted1 = new ImageView(getActivity());
-                                    wbCompleted1ID = wbCompleted1.generateViewId();
-                                    wbCompleted1.setId(wbCompleted1ID);
-                                    //check if full screen is needed....
-                                    webViewYT = new WebView(getActivity());
-                                    if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, 1)) {
-                                        webViewYT.setLayoutParams(new LinearLayout.LayoutParams(
-                                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                                webviewHeight));
-                                    } else {
-                                        webViewYT.setLayoutParams(new LinearLayout.LayoutParams(
-                                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                                height));
-                                    }
-                                    //System.out.println("Choice3 selected");
-                                    webViewYT.setWebViewClient(new WebViewClient() {
-                                        @
-                                                Override
-                                        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                                            return false;
-                                        }
-                                    });
-                                    webViewYT.loadUrl(q1DataSource);
-                                    webViewYT.getSettings().setPluginState(WebSettings.PluginState.ON);
-                                    webViewYT.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
-                                    webViewYT.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-                                    webViewYT.getSettings().setAppCacheEnabled(true);
-                                    webViewYT.getSettings().setJavaScriptEnabled(true);
-                                    webViewYT.getSettings().setDomStorageEnabled(true);
-                                    webViewYT.getSettings().setLoadWithOverviewMode(true);
-                                    webViewYT.setBackgroundColor(Color.BLACK);
-                                    webViewYT.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
-                                    webViewYT.setVerticalScrollBarEnabled(false);
-                                    q1YouTubeViewID = webViewYT.generateViewId();
-                                    webViewYT.setId(q1YouTubeViewID);
-                                    webViewYT.setVisibility(View.VISIBLE);
-                                    q1.setVisibility(View.VISIBLE);
-                                    q1YouTubeViewb1.setOnClickListener(new View.OnClickListener() {
-                                        @
-                                                Override
-                                        public void onClick(View v) {
-                                            q1YouTubeViewb2.setVisibility(View.VISIBLE);
-                                            q1YouTubeViewb1.setVisibility(View.GONE);
-                                            setQ1Large(q1, q2, q3, q4, on_click_cloud_tracking_info, submitbtn1, completedTV);
-                                        }
-                                    });
-
-                                    q1YouTubeViewb2.setOnClickListener(new View.OnClickListener() {
-                                        @
-                                                Override
-                                        public void onClick(View v) {
-                                            q1YouTubeViewb2.setVisibility(View.GONE);
-                                            q1YouTubeViewb1.setVisibility(View.VISIBLE);
-                                            setQ1Small(q1, q2, q3, q4, submitbtn1, on_click_cloud_tracking_info, QuadHeadname);
-                                        }
-                                    });
-
-                                    RecyclerView recyclerView4 = new RecyclerView(getActivity());
-                                    setWebviewAddview(q1, webViewYT, recyclerView4, q1YouTubeViewb1, q1YouTubeViewb2, submitbtn1, wbCompleted1, mSelectedDayObjectId, 1);
-
-
-                                } else if (i == 1) {
-                                    //                            LinearLayout q2 = (LinearLayout) controls.findViewById(R.id.q2); // get your WebView form your xml file
-                                    q2.removeAllViews();
-                                    q2.removeAllViewsInLayout();
-                                    q2WebViewb1 = new ImageView(getActivity());
-                                    q2WebViewb2 = new ImageView(getActivity());
-                                    wbCompleted2 = new ImageView(getActivity());
-                                    wbCompleted2ID = q2WebViewb2.generateViewId();
-                                    wbCompleted2.setId(wbCompleted2ID);
-                                    //System.out.println("Choice2 selected");
-                                    WebView webView = new WebView(getActivity());
-                                    webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
-
-                                    if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, 2)) {
-                                        webView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, webviewHeight));
-
-                                    } else {
-                                        webView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height));
-
-                                    }
-
-
-                                    webView.setWebViewClient(new WebViewClient()); // set the WebViewClient
-                                    webView.loadUrl(q2DataSource); // Load your desired url
-                                    webView.getSettings().setBuiltInZoomControls(true);
-                                    if (Build.VERSION.SDK_INT >= 11) {
-                                        webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-                                    }
-                                    webView.getSettings().setJavaScriptEnabled(true);
-                                    webView.getSettings().setLoadWithOverviewMode(true);
-                                    webView.getSettings().setUseWideViewPort(true);
-                                    webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
-                                    webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
-                                    q2WebViewID = webView.generateViewId();
-                                    webView.setId(q2WebViewID);
-                                    q2WebViewb1.setOnClickListener(new View.OnClickListener() {
-                                        @
-                                                Override
-                                        public void onClick(View v) {
-                                            q2WebViewb2.setVisibility(View.VISIBLE);
-                                            q2WebViewb1.setVisibility(View.GONE);
-                                            setQ2Large(q1, q2, q3, q4, on_click_cloud_tracking_info, submitbtn2);
-                                        }
-                                    });
-
-                                    q2WebViewb2.setOnClickListener(new View.OnClickListener() {
-                                        @
-                                                Override
-                                        public void onClick(View v) {
-                                            q2WebViewb2.setVisibility(View.GONE);
-                                            q2WebViewb1.setVisibility(View.VISIBLE);
-                                            setQ2Small(q1, q2, q3, q4, submitbtn2, on_click_cloud_tracking_info, QuadHeadname);
-                                        }
-                                    });
-                                    RecyclerView recyclerView2 = new RecyclerView(getActivity());
-                                    setWebviewAddview(q2, webView, recyclerView2, q2WebViewb1, q2WebViewb2, submitbtn2, wbCompleted2, mSelectedDayObjectId, 2);
-                                } else if (i == 2) {
-                                    //                            LinearLayout q3 = (LinearLayout) controls.findViewById(R.id.q3); // get your WebView form your xml file
-                                    q3.removeAllViews();
-                                    q3ImageViewb1 = new ImageView(getActivity());
-                                    q3ImageViewb2 = new ImageView(getActivity());
-                                    wbCompleted3 = new ImageView(getActivity());
-                                    wbCompleted3ID = wbCompleted3.generateViewId();
-                                    wbCompleted3.setId(wbCompleted3ID);
-                                    //System.out.println("Choice3 selected");
-
-                                    ImageView imageView = new ImageView(getActivity());
-                                    Picasso.with(getActivity()).load(q3DataSourceURI).into(imageView);
-                                    imageView.setScaleType(FIT_XY);
-                                    imageView.setAdjustViewBounds(true);
-                                    imageView.setBackgroundColor(Color.BLACK);
-
-                                    if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, 3)) {
-
-                                        imageView.setLayoutParams(new LinearLayout.LayoutParams(
-                                                LinearLayout.LayoutParams.FILL_PARENT,
-                                                webviewHeight, Gravity.CENTER));
-                                    } else {
-
-                                        imageView.setLayoutParams(new LinearLayout.LayoutParams(
-                                                LinearLayout.LayoutParams.FILL_PARENT,
-                                                height, Gravity.CENTER));
-                                    }
-
-                                    //q3.setBackgroundColor(Color.BLACK);
-                                    RecyclerView recyclerView3 = new RecyclerView(getActivity());
-                                    recyclerView3.setBackgroundColor(Color.BLACK);
-                                    q3ImageViewID = imageView.generateViewId();
-                                    imageView.setId(q3ImageViewID);
-                                    setImageAddview(q3, imageView, recyclerView3, q3ImageViewb1, q3ImageViewb2, submitbtn3, wbCompleted3, mSelectedDayObjectId, 3);
-                                    q3ImageViewb1.setOnClickListener(new View.OnClickListener() {
-                                        @
-                                                Override
-                                        public void onClick(View v) {
-                                            q3ImageViewb2.setVisibility(View.VISIBLE);
-                                            q3ImageViewb1.setVisibility(View.GONE);
-                                            setQ3Large(q1, q2, q3, q4, on_click_cloud_tracking_info, submitbtn3);
-                                        }
-                                    });
-
-                                    q3ImageViewb2.setOnClickListener(new View.OnClickListener() {
-                                        @
-                                                Override
-                                        public void onClick(View v) {
-                                            setQ3Small(q1, q2, q3, q4, submitbtn3, on_click_cloud_tracking_info, QuadHeadname);
-                                            q3ImageViewb2.setVisibility(View.GONE);
-                                            q3ImageViewb1.setVisibility(View.VISIBLE);
-                                        }
-                                    });
-                                } else if (i == 3) {
-                                    //                            LinearLayout q4 = (LinearLayout) controls.findViewById(R.id.q4); // get your WebView form your xml file
-                                    q4.removeAllViews();
-                                    q4WebViewb1 = new ImageView(getActivity());
-                                    q4WebViewb2 = new ImageView(getActivity());
-                                    wbCompleted4 = new ImageView(getActivity());
-                                    wbCompleted4ID = wbCompleted4.generateViewId();
-                                    wbCompleted4.setId(wbCompleted4ID);
-                                    //System.out.println("Choice2 selected");
-                                    WebView webView = new WebView(getActivity());
-                                    webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
-
-                                    if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, 4)) {
-                                        webView.setLayoutParams(new LinearLayout.LayoutParams(
-                                                LinearLayout.LayoutParams.WRAP_CONTENT,
-                                                webviewHeight));
-
-                                    } else {
-                                        webView.setLayoutParams(new LinearLayout.LayoutParams(
-                                                LinearLayout.LayoutParams.WRAP_CONTENT,
-                                                height));
-                                    }
-
-                                    webView.setWebViewClient(new WebViewClient()); // set the WebViewClient
-                                    webView.loadUrl(q4DataSource); // Load your desired url
-                                    webView.getSettings().setBuiltInZoomControls(true);
-                                    if (Build.VERSION.SDK_INT >= 11) {
-                                        webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-                                    }
-                                    webView.getSettings().setJavaScriptEnabled(true);
-                                    webView.getSettings().setLoadWithOverviewMode(true);
-                                    webView.getSettings().setUseWideViewPort(true);
-                                    webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
-
-                                    webView.getSettings().setPluginState(WebSettings.PluginState.ON);
-                                    webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-                                    webView.getSettings().setAppCacheEnabled(true);
-                                    webView.getSettings().setDomStorageEnabled(true);
-                                    q4WebViewID = webView.generateViewId();
-                                    webView.setId(q4WebViewID);
-                                    RecyclerView recyclerView2 = new RecyclerView(getActivity());
-                                    setWebviewAddview(q4, webView, recyclerView2, q4WebViewb1, q4WebViewb2, submitbtn4, wbCompleted4, mSelectedDayObjectId, 4);
-
-                                    q4WebViewb1.setOnClickListener(new View.OnClickListener() {
-                                        @
-                                                Override
-                                        public void onClick(View v) {
-                                            q4WebViewb2.setVisibility(View.VISIBLE);
-                                            q4WebViewb1.setVisibility(View.GONE);
-                                            setQ4Large(q1, q2, q3, q4, on_click_cloud_tracking_info, submitbtn4);
-                                        }
-                                    });
-
-                                    q4WebViewb2.setOnClickListener(new View.OnClickListener() {
-                                        @
-                                                Override
-                                        public void onClick(View v) {
-                                            q4WebViewb2.setVisibility(View.GONE);
-                                            q4WebViewb1.setVisibility(View.VISIBLE);
-                                            setQ4Small(q1, q2, q3, q4, submitbtn4, on_click_cloud_tracking_info, QuadHeadname);
-                                        }
-                                    });
-
-                                } else {
-                                }
-                            }
                             try {
-                                EditText targetInformationTextField = (EditText) controls.findViewById(on_click_cloud_tracking_info_field);
-                                targetInformationTextField.setText(nameToDisplay);
-                                targetInformationTextField.setVisibility(View.VISIBLE);
-                            } catch (Exception e) {
+                                mUserHuntJoinRecord = huntJoinParseQuery.getFirst();
+                            } catch (ParseException e) {
                                 e.printStackTrace();
                             }
 
+                            if (levelId.equals(mSelectedCheckpoint.getObjectId())) {
+                                //Get Interaction(Question) data from parse
+                                ParseRelation<KurtinInteraction> interactionParseRelation = mSelectedCheckpoint.getInteractions();
+                                ParseQuery<KurtinInteraction> interactionParseQuery = interactionParseRelation.getQuery();
+                                interactionParseQuery.orderByAscending(KurtinInteraction.QUADRANT_KEY);
+                                interactionParseQuery.findInBackground(new FindCallback<KurtinInteraction>() {
+                                    @Override
+                                    public void done(List<KurtinInteraction> interactionList, ParseException e) {
+                                        if (e == null) {
+                                            mInteractionList = interactionList;
+                                            Log.v("InteractionList", "Interaction List: " + interactionList);
+                                            initializeContentViews();
 
-                        } else {
+                                            try {
+                                                displayTextInInfoView(nameToDisplay);
+                                            } catch (Exception exception) {
+                                                exception.printStackTrace();
+                                            }
+                                        } else {
+                                            Log.e("GetInteractions", "Error pulling interactions from relation in checkpoint");
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                });
+                            } else {
+                                displayTextInInfoView("Incorrect Image recognized - Please try again");
+                            }
 
-                            EditText targetInformationTextField = (EditText) controls.findViewById(on_click_cloud_tracking_info_field);
-                            targetInformationTextField.setText("Incorrect Image recognized - Please try again", TextView.BufferType.NORMAL);
-                            targetInformationTextField.setVisibility(View.VISIBLE);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                    }catch(Exception e){
-                        e.printStackTrace();
                     }
-                }
                 });
             } else {
-                getActivity().runOnUiThread(new Runnable() {@
-                        Override
-                public void run() {
-                    try {
-                        EditText targetInformationTextField = (EditText) controls.findViewById(on_click_cloud_tracking_info_field);
-                        targetInformationTextField.setText("Recognition failed - Please try again", TextView.BufferType.NORMAL);
-                        targetInformationTextField.setVisibility(View.VISIBLE);
-                        Log.v(TAG, "Wikitude returned boolean value of false for recognized_");
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                getActivity().runOnUiThread(new Runnable() {
+                    @
+                            Override
+                    public void run() {
+                        try {
+                            displayTextInInfoView("Recognition failed - Please try again");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
                 });
             }
         } catch (Exception e) {
@@ -739,13 +494,16 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
     public void onRecognitionInterruption(final CloudTracker cloudTracker_, final double suggestedInterval_) {
 
     }
-    public class MyWebViewClient extends WebViewClient {@
-            Override
-    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        view.loadUrl(url);
-        return true;
+
+    public class MyWebViewClient extends WebViewClient {
+        @
+                Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            view.loadUrl(url);
+            return true;
+        }
     }
-    }
+
     public void setQ1Large(RelativeLayout q1, RelativeLayout q2, RelativeLayout q3, RelativeLayout q4, EditText windText, Button submitbtn, TextView completedTV) {
 
         q1.setVisibility(View.VISIBLE);
@@ -758,11 +516,13 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
 
         windText.setText("YouTube");
 
-        loadTripPlacesFromRemote(mSelectedDayObjectId, 1, submitbtn, completedTV);
+//        loadTripPlacesFromRemote(mSelectedDayObjectId, 1, submitbtn, completedTV);
+        setupInteractionView(mSelectedDayObjectId, 1, submitbtn, completedTV);
         recognizeButton.setVisibility(View.GONE);
         completedTV.setVisibility(View.VISIBLE);
 
     }
+
     public void setQ1Small(RelativeLayout q1, RelativeLayout q2, RelativeLayout q3, RelativeLayout q4, Button submitbtn, EditText namedisp, String sname) {
 
         q1.setVisibility(View.VISIBLE);
@@ -777,7 +537,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         namedisp.setText(sname);
         recognizeButton.setVisibility(View.VISIBLE);
 
-        if (isQ1Complated) {
+        if (isQ1Completed) {
             wbCompleted1.setVisibility(View.VISIBLE);
         }
     }
@@ -793,10 +553,12 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         q2.setLayoutParams(linearlayout);
         windText.setText("Facebook");
 
-        loadTripPlacesFromRemote(mSelectedDayObjectId, 2, submitbtn, completedTV);
+//        loadTripPlacesFromRemote(mSelectedDayObjectId, 2, submitbtn, completedTV);
+        setupInteractionView(mSelectedDayObjectId, 2, submitbtn, completedTV);
         recognizeButton.setVisibility(View.GONE);
 
     }
+
     public void setQ2Small(RelativeLayout q1, RelativeLayout q2, RelativeLayout q3, RelativeLayout q4, Button submit, EditText namedisp, String sname) {
         q1.setVisibility(View.VISIBLE);
         q2.setVisibility(View.VISIBLE);
@@ -809,7 +571,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         namedisp.setText(sname);
         clearRecyData(submit);
         recognizeButton.setVisibility(View.VISIBLE);
-        if (isQ2Complated) {
+        if (isQ2Completed) {
             wbCompleted2.setVisibility(View.VISIBLE);
         }
     }
@@ -824,7 +586,8 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         q3.setLayoutParams(linearlayout);
         windText.setText("Image");
 
-        loadTripPlacesFromRemote(mSelectedDayObjectId, 3, submitbtn, completedTV);
+//        loadTripPlacesFromRemote(mSelectedDayObjectId, 3, submitbtn, completedTV);
+        setupInteractionView(mSelectedDayObjectId, 3, submitbtn, completedTV);
         recognizeButton.setVisibility(View.GONE);
     }
 
@@ -841,7 +604,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         namedisp.setText(sname);
         clearRecyData(submit);
         recognizeButton.setVisibility(View.VISIBLE);
-        if (isQ3Complated) {
+        if (isQ3Completed) {
             wbCompleted3.setVisibility(View.VISIBLE);
         }
     }
@@ -856,9 +619,11 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         linearlayout.setMargins(0, 60, 0, 0);
         q4.setLayoutParams(linearlayout);
         windText.setText("WebPage");
-        loadTripPlacesFromRemote(mSelectedDayObjectId, 4, submitbtn, completedTV);
+//        loadTripPlacesFromRemote(mSelectedDayObjectId, 4, submitbtn, completedTV);
+        setupInteractionView(mSelectedDayObjectId, 4, submitbtn, completedTV);
         recognizeButton.setVisibility(View.GONE);
     }
+
     public void setQ4Small(RelativeLayout q1, RelativeLayout q2, RelativeLayout q3, RelativeLayout q4, Button submit, EditText namedisp, String sname) {
 
         q1.setVisibility(View.VISIBLE);
@@ -871,11 +636,12 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         namedisp.setText(sname);
         clearRecyData(submit);
         recognizeButton.setVisibility(View.VISIBLE);
-        if (isQ4Complated) {
+        if (isQ4Completed) {
             wbCompleted4.setVisibility(View.VISIBLE);
         }
 
     }
+
     public ImageView setImgB1(ImageView b1) {
 
         b1.setImageDrawable(getResources().getDrawable(R.drawable.expand));
@@ -885,6 +651,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         b1.setScaleType(FIT_XY);
         return b1;
     }
+
     public ImageView setq2q4ImgB1(ImageView b1) {
 
         b1.setImageDrawable(getResources().getDrawable(R.drawable.expand));
@@ -894,6 +661,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         b1.setScaleType(FIT_XY);
         return b1;
     }
+
     public ImageView setImgB2(ImageView b2) {
 
         b2.setImageDrawable(getResources().getDrawable(R.drawable.expand));
@@ -906,6 +674,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         b2.setVisibility(View.GONE);
         return b2;
     }
+
     public ImageView setCompletedImage(ImageView completed) {
         completed.setImageDrawable(getResources().getDrawable(R.drawable.completed));
         RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(72, 72);
@@ -917,6 +686,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         completedID = completed.getId();
         return completed;
     }
+
     public ImageView setCompletedImageHidden(ImageView completedHidden) {
 
         completedHidden.setImageDrawable(getResources().getDrawable(R.drawable.completed));
@@ -928,7 +698,8 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         //completedID = completedHidden.getId();
         return completedHidden;
     }
-    public void setWebviewAddview(RelativeLayout q2, WebView webView, RecyclerView recyclerView, ImageView b1, ImageView b2, Button submitbtn, ImageView completed, String selectedLevelId, Integer levelId) {
+
+    public void setWebviewAddview(RelativeLayout q2, WebView webView, RecyclerView recyclerView, ImageView b1, ImageView b2, Button submitbtn, ImageView completed, String selectedLevelId, Integer quadrant) {
 
         LinearLayout l = new LinearLayout(getActivity());
         l.setOrientation(LinearLayout.VERTICAL);
@@ -939,17 +710,25 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         q2.addView(setq2q4ImgB1(b1));
         q2.addView(setImgB2(b2));
 
-        if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, levelId)) {
-            q2.addView(setCompletedImageHidden(completed));
-        } else {
+//        if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, quadrant)) {
+//            q2.addView(setCompletedImageHidden(completed));
+//        } else {
+//            q2.addView(setCompletedImage(completed));
+//            //q2.addView(setCompletedImageHidden(completed));
+//        }
+        if (quadrantIsCompleted(quadrant)) {
             q2.addView(setCompletedImage(completed));
-            //q2.addView(setCompletedImageHidden(completed));
+//            q2.addView(setCompletedImageHidden(completed));
+        } else {
+            q2.addView(setCompletedImageHidden(completed));
+//            q2.addView(setCompletedImage(completed));
         }
+
         q2.setVisibility(View.VISIBLE);
         //--Add
     }
 
-    public void setImageAddview(RelativeLayout q2, ImageView img, RecyclerView recyclerView, ImageView b1, ImageView b2, Button submit, ImageView completed, String selectedLevelId, Integer levelId) {
+    public void setImageAddview(RelativeLayout q2, ImageView img, RecyclerView recyclerView, ImageView b1, ImageView b2, Button submit, ImageView completed, String selectedLevelId, Integer quadrant) {
         LinearLayout l = new LinearLayout(getActivity());
         LinearLayout.LayoutParams linpa = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         l.setLayoutParams(linpa);
@@ -964,14 +743,24 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         q2.addView(l);
         q2.addView(setq2q4ImgB1(b1));
         q2.addView(setImgB2(b2));
-        if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, levelId)) {
-            q2.addView(setCompletedImageHidden(completed));
-        } else {
+
+//        if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, quadrant)) {
+//            q2.addView(setCompletedImageHidden(completed));
+//        } else {
+//            q2.addView(setCompletedImage(completed));
+//            //q2.addView(setCompletedImageHidden(completed));
+//        }
+        if (quadrantIsCompleted(quadrant)) {
             q2.addView(setCompletedImage(completed));
-            //q2.addView(setCompletedImageHidden(completed));
+//            q2.addView(setCompletedImageHidden(completed));
+        } else {
+            q2.addView(setCompletedImageHidden(completed));
+//            q2.addView(setCompletedImage(completed));
         }
+
         q2.setVisibility(View.VISIBLE);
     }
+
     public ImageView quadImg(ImageView ivg) {
         RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         linearlayout.addRule(RelativeLayout.ALIGN_PARENT_TOP);
@@ -980,6 +769,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         ivg.setScaleType(FIT_XY);
         return ivg;
     }
+
     public Button setSubmitButton(String s, final Button button) {
         RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         linearlayout.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
@@ -994,56 +784,64 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         button.setBackgroundColor(getResources().getColor(R.color.blue));
         button.setTextColor(Color.WHITE);
         button.setText("Submit");
-        button.setOnClickListener(new View.OnClickListener() {@
-                Override
-        public void onClick(View v) {
-            SaveValuesToParse();
-            //Hide Everything......
-            mQuestionsList.clear();
-            mQuestionsAdapter.notifyDataSetChanged();
-            button.setVisibility(View.INVISIBLE);
-            RelativeLayout paretRL = (RelativeLayout) button.getParent();
-            if (paretRL == q1) {
-                q1YouTubeViewb2.setVisibility(View.GONE);
-                q1YouTubeViewb1.setVisibility(View.VISIBLE);
-                isQ1Complated = true;
-                setQ1Small(q1, q2, q3, q4, submitbtn1, on_click_cloud_tracking_info, null);
-                WebView tempWV1 = (WebView) q1.findViewById(q1YouTubeViewID);
-                ViewGroup.LayoutParams params = tempWV1.getLayoutParams();
-                params.height = height;
-                tempWV1.setLayoutParams(params);
-            } else if (paretRL == q2) {
-                q2WebViewb2.setVisibility(View.GONE);
-                q2WebViewb1.setVisibility(View.VISIBLE);
-                isQ2Complated = true;
-                setQ2Small(q1, q2, q3, q4, submitbtn2, on_click_cloud_tracking_info, null);
-                WebView tempWV2 = (WebView) q2.findViewById(q2WebViewID);
-                ViewGroup.LayoutParams params = tempWV2.getLayoutParams();
-                params.height = height;
-                tempWV2.setLayoutParams(params);
-            } else if (paretRL == q3) {
-                q3ImageViewb2.setVisibility(View.GONE);
-                q3ImageViewb1.setVisibility(View.VISIBLE);
-                isQ3Complated = true;
-                setQ3Small(q1, q2, q3, q4, submitbtn3, on_click_cloud_tracking_info, null);
-                ImageView tempWV3 = (ImageView) q3.findViewById(q3ImageViewID);
-                ViewGroup.LayoutParams params = tempWV3.getLayoutParams();
-                params.height = height;
-                tempWV3.setLayoutParams(params);
-            } else if (paretRL == q4) {
-                q4WebViewb2.setVisibility(View.GONE);
-                q4WebViewb1.setVisibility(View.VISIBLE);
-                isQ4Complated = true;
-                setQ4Small(q1, q2, q3, q4, submitbtn4, on_click_cloud_tracking_info, null);
-                WebView tempWV4 = (WebView) q4.findViewById(q4WebViewID);
-                ViewGroup.LayoutParams params = tempWV4.getLayoutParams();
-                params.height = height;
-                tempWV4.setLayoutParams(params);
+        button.setOnClickListener(new View.OnClickListener() {
+            @
+                    Override
+            public void onClick(View v) {
+                int quadrant=1;
+//                SaveValuesToParse();
+                //Hide Everything......
+                mQuestionsList.clear();
+                mQuestionsAdapter.notifyDataSetChanged();
+                button.setVisibility(View.INVISIBLE);
+                RelativeLayout parentRL = (RelativeLayout) button.getParent();
+                if (parentRL == q1) {
+                    q1YouTubeViewb2.setVisibility(View.GONE);
+                    q1YouTubeViewb1.setVisibility(View.VISIBLE);
+                    isQ1Completed = true;
+                    setQ1Small(q1, q2, q3, q4, submitbtn1, on_click_cloud_tracking_info, null);
+                    WebView tempWV1 = (WebView) q1.findViewById(q1YouTubeViewID);
+                    ViewGroup.LayoutParams params = tempWV1.getLayoutParams();
+                    params.height = height;
+                    tempWV1.setLayoutParams(params);
+                    quadrant = 1;
+                } else if (parentRL == q2) {
+                    q2WebViewb2.setVisibility(View.GONE);
+                    q2WebViewb1.setVisibility(View.VISIBLE);
+                    isQ2Completed = true;
+                    setQ2Small(q1, q2, q3, q4, submitbtn2, on_click_cloud_tracking_info, null);
+                    WebView tempWV2 = (WebView) q2.findViewById(q2WebViewID);
+                    ViewGroup.LayoutParams params = tempWV2.getLayoutParams();
+                    params.height = height;
+                    tempWV2.setLayoutParams(params);
+                    quadrant = 2;
+                } else if (parentRL == q3) {
+                    q3ImageViewb2.setVisibility(View.GONE);
+                    q3ImageViewb1.setVisibility(View.VISIBLE);
+                    isQ3Completed = true;
+                    setQ3Small(q1, q2, q3, q4, submitbtn3, on_click_cloud_tracking_info, null);
+                    ImageView tempWV3 = (ImageView) q3.findViewById(q3ImageViewID);
+                    ViewGroup.LayoutParams params = tempWV3.getLayoutParams();
+                    params.height = height;
+                    tempWV3.setLayoutParams(params);
+                    quadrant = 3;
+                } else if (parentRL == q4) {
+                    q4WebViewb2.setVisibility(View.GONE);
+                    q4WebViewb1.setVisibility(View.VISIBLE);
+                    isQ4Completed = true;
+                    setQ4Small(q1, q2, q3, q4, submitbtn4, on_click_cloud_tracking_info, null);
+                    WebView tempWV4 = (WebView) q4.findViewById(q4WebViewID);
+                    ViewGroup.LayoutParams params = tempWV4.getLayoutParams();
+                    params.height = height;
+                    tempWV4.setLayoutParams(params);
+                    quadrant = 4;
+                }
+                recordSelectedOption(quadrant);
             }
-        }
         });
         return button;
     }
+
     public TextView setCompletedText(String sTV, TextView txtView) {
         RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         linearlayout.addRule(RelativeLayout.CENTER_HORIZONTAL);
@@ -1090,6 +888,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         recy.setLayoutParams(linearlayout);
         return recy;
     }
+
     //Check leaderboard to see if user completed checkpoint already
     //If user did not complete it then get questions from database and load questions into adapter
     private void loadTripPlacesFromRemote(String s, int quadno, Button submitbtn, TextView completedTV) {
@@ -1097,7 +896,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         LeaderBoard tempLeaderBoard = null;
         //First get user
         ParseUser currentUser = ParseUser.getCurrentUser();
-        ParseQuery < LeaderBoard > query1 = ParseQuery.getQuery(LeaderBoard.class);
+        ParseQuery<LeaderBoard> query1 = ParseQuery.getQuery(LeaderBoard.class);
         //query1.whereEqualTo("huntID", innerQuery);
         query1.whereEqualTo("levelID", s.toString());
         query1.whereEqualTo("quadrantNo", quadno);
@@ -1111,29 +910,121 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
 
         if (tempLeaderBoard == null) {
             setSubmitButton("1", submitbtn);
-            ParseQuery < Day > innerQuery = ParseQuery.getQuery(Day.class);
+            ParseQuery<Day> innerQuery = ParseQuery.getQuery(Day.class);
             innerQuery.whereEqualTo("objectId", s);
 
-            ParseQuery < Questions > query = ParseQuery.getQuery(Questions.class);
+            ParseQuery<Questions> query = ParseQuery.getQuery(Questions.class);
             query.whereMatchesQuery("parentId", innerQuery);
             query.whereEqualTo("quadrantNo", quadno);
             query.whereEqualTo("levelID", s.toString());
             query.orderByAscending("questionNo");
-            query.findInBackground(new FindCallback < Questions > () {@
-                    Override
-            public void done(List < Questions > questions, ParseException e) {
-                if (e == null) {
-                    populateTripPlanPlaces(questions);
-                } else {
-                    Log.d("ERROR", "Data not fetched");
+            query.findInBackground(new FindCallback<Questions>() {
+                @
+                        Override
+                public void done(List<Questions> questions, ParseException e) {
+                    if (e == null) {
+                        populateTripPlanPlaces(questions);
+                    } else {
+                        Log.d("ERROR", "Data not fetched");
+                    }
                 }
-            }
             });
         } else {
             /////Do Nothing
             setCompletedText("1", completedTV);
         }
     }
+
+    //Cvar: cvar's version of loadTripPlacesFromRemote
+    //Check leaderboard to see if user completed checkpoint already
+    //If user did not complete it then get questions from database and load questions into adapter
+    private void setupInteractionView(String s, int quadrant, Button submitbtn, TextView completedTV) {
+
+        if (userHasCompletedThisInteraction(quadrant)) {
+            setCompletedText("1", completedTV);
+        } else {
+            setSubmitButton("1", submitbtn);
+            loadInteractionsIntoAdapter(quadrant);
+        }
+    }
+
+    //Adapt the interactions model to fit inside the questions model for the initial relealse
+    private void loadInteractionsIntoAdapter(int quadrant) {
+        if (mInteractionList.isEmpty()) {
+            Log.v("oadInteractions", "No Interactions to load into Adapter");
+        } else {
+            try {
+                Questions question = new Questions();
+                KurtinInteraction interaction = mInteractionList.get(quadrant - 1);
+                JSONArray answerChoices = interaction.getAnswerChoices();
+                Log.v("AnswerChoices", "Answer Choices: " + answerChoices);
+                question.putQuestionDetails(interaction.getQuestion());
+                question.putOption1(answerChoices.getJSONObject(0).getString(KurtinInteraction.JSON_OBJ_ANSWER_KEY));
+                question.putOption2(answerChoices.getJSONObject(1).getString(KurtinInteraction.JSON_OBJ_ANSWER_KEY));
+                question.putOption3(answerChoices.getJSONObject(2).getString(KurtinInteraction.JSON_OBJ_ANSWER_KEY));
+                question.put(KurtinInteraction.KURTIN_INTERACTION_ID_KEY, interaction.getObjectId());
+                mQuestionsList.clear();
+                mQuestionsList.add(question);
+                mQuestionsAdapter.notifyDataSetChanged();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void onOptionSelected(String interactionID, int selectedOption){
+        mSelectedOptionsMap.put(interactionID, selectedOption);
+    }
+
+    private HuntJoin getHuntJoinRecord(){
+        //Get Current Hunt info
+        Hunt currentHunt = mKurtinListener.getCurrentHunt();
+        Checkpoint selectedCheckpoint = mKurtinListener.getSelectedCheckpoint();
+        ParseUser currentUser = ParseUser.getCurrentUser();
+
+        //Query the Join table
+        ParseQuery<HuntJoin> huntJoinParseQuery = ParseQuery.getQuery(HuntJoin.class);
+        huntJoinParseQuery.whereEqualTo(HuntJoin.USER_POINTER_KEY, currentUser);
+        huntJoinParseQuery.whereEqualTo(HuntJoin.HUNT_POINTER_KEY, currentHunt);
+
+        try {
+            HuntJoin huntJoinRecord = huntJoinParseQuery.getFirst();
+            return huntJoinRecord;
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    //Checks if user has completed a specific quadrant
+    //Pulls results record from the database and parses the object for the specific interaction associated with that quadrant
+    private Boolean userHasCompletedThisInteraction(int quadrant) {
+        //Check if we are already maintaining a Hunt Join Record locally
+        if (mUserHuntJoinRecord == null) {
+            //Try to pull the record again
+            mUserHuntJoinRecord = getHuntJoinRecord();
+        }
+
+        //Now that we either have been maintaining a record locally
+        //or have officially tried to pull the record from the database
+        if (mUserHuntJoinRecord == null) {
+            //No data in HuntJoin table
+            return false;
+        } else {
+            if(HuntJoin.getInteractionFromResults(
+                    mSelectedCheckpoint.getObjectId(),
+                    mInteractionList.get(quadrant -1).getObjectId(),
+                    mUserHuntJoinRecord) == null){
+                return false;
+            }else{
+                return true;
+            }
+        }
+    }
+
+
+    //TODO refactor this code for new schema
     //Check to show if completed box is needed ---
     private boolean checkIfCompletedIconIsNeeded(String s, int quadno) {
         //Pre-Check if user has already completed this  -If Yes then stop this call
@@ -1141,7 +1032,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         LeaderBoard tempLeaderBoard = null;
         //First get user
         ParseUser currentUser = ParseUser.getCurrentUser();
-        ParseQuery < LeaderBoard > query1 = ParseQuery.getQuery(LeaderBoard.class);
+        ParseQuery<LeaderBoard> query1 = ParseQuery.getQuery(LeaderBoard.class);
         //query1.whereEqualTo("huntID", innerQuery);
         query1.whereEqualTo("levelID", s.toString());
         query1.whereEqualTo("quadrantNo", quadno);
@@ -1154,37 +1045,54 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         }
 
         if (tempLeaderBoard == null) {
+            //Cvar: Check should be false???
             check = true;
         } else {
             /////Do Nothing
             setCompletedText("1", completedTV);
+            //Cvar: Check should be true???
             check = false;
             if (quadno == 1) {
-                isQ1Complated = true;
+                isQ1Completed = true;
             } else if (quadno == 2) {
-                isQ2Complated = true;
+                isQ2Completed = true;
             } else if (quadno == 3) {
-                isQ3Complated = true;
+                isQ3Completed = true;
             } else if (quadno == 4) {
-                isQ4Complated = true;
+                isQ4Completed = true;
             }
 
         }
         return check;
     }
+
+    private boolean quadrantIsCompleted(int quadrant) {
+        if(mUserHuntJoinRecord == null){
+            mUserHuntJoinRecord = getHuntJoinRecord();
+            if(mUserHuntJoinRecord == null){
+                return false;
+            }
+        }
+
+        return HuntJoin.isInteractionCompleted(
+                mUserHuntJoinRecord,
+                mSelectedCheckpoint.getObjectId(),
+                mInteractionList.get(quadrant -1).getObjectId());
+    }
+
     public void clearRecyData(Button submitbtn) {
         mQuestionsList.clear();
         mQuestionsAdapter.notifyDataSetChanged();
         setSubmitButton("0", submitbtn);
-
     }
 
     //load data into adapter
-    private void populateTripPlanPlaces(List < Questions > questionses) {
+    private void populateTripPlanPlaces(List<Questions> questionses) {
         mQuestionsList.clear();
         mQuestionsList.addAll(questionses);
         mQuestionsAdapter.notifyDataSetChanged();
     }
+
     public void destroyWebView() {
         try {
             if (webViewYT != null) {
@@ -1194,17 +1102,505 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
             e.printStackTrace();
         }
     }
+
     public static void UpdateSelectedValue(String questionID, String selectedValue) {
         selectedValueToSave = "";
         questionIDToSave = "";
         selectedValueToSave = selectedValue;
         questionIDToSave = questionID;
     }
+
     private void SaveValuesToParse() {
         String[] paramsOptionOne = new String[2];
         paramsOptionOne[0] = questionIDToSave;
         paramsOptionOne[1] = selectedValueToSave;
         new UpdatePointsandLeaderBoard().execute(paramsOptionOne);
         Toast.makeText(getApplicationContext(), "Your answer " + paramsOptionOne[1] + " is saved", Toast.LENGTH_SHORT).show();
+    }
+
+    //Records the option/answer the user selected for the interaction associated with the given quadrant
+    private void recordSelectedOption(int quadrant){
+        //get the huntJoin record
+        if (mUserHuntJoinRecord == null){
+            mUserHuntJoinRecord = getHuntJoinRecord();
+            if(mUserHuntJoinRecord == null){
+                mUserHuntJoinRecord =
+                        HuntJoin.createHuntJoinRecord(mCurrentUser, mCurrentHunt, mSelectedCheckpoint.getObjectId());
+                if(mUserHuntJoinRecord == null){
+                    //Something went wrong
+                    Log.e("CloudScannerFrag","recordSelectedOption: something went wrong pulling the huntJoinRecord");
+                    return;
+                }
+            }
+        }
+
+        JSONObject interactionResult = createInteractionResultObject(quadrant);
+        JSONArray interactionResultsArray;
+        JSONArray checkpointResultsArray = mUserHuntJoinRecord.getResults();
+        JSONArray newCheckpointResultsArray = new JSONArray();
+        JSONObject checkpointResult;
+
+        if(checkpointResultsArray == null){
+            try {
+                newCheckpointResultsArray = HuntJoin.createCheckpointResultsArray(mSelectedCheckpoint.getObjectId(), interactionResult);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }else {
+            /*
+            Loop Below finds the current checkpoint in the array of checkpoint results data in the HuntJoin record
+            Once it finds the entry that corresponds to this checkpoint it adds the result of this quadrant's
+            interaction to the checkpoint's array of interaction results
+            */
+            for (int checkpointIndex = 0; checkpointIndex < checkpointResultsArray.length(); checkpointIndex++) {
+                try {
+                    checkpointResult = checkpointResultsArray.getJSONObject(checkpointIndex);
+                    String checkpointId = checkpointResult.getString(HuntJoin.JSON_OBJ_CHECKPOINT_ID_KEY);
+                    if (checkpointId.equals(mSelectedCheckpoint.getObjectId())) {
+                        interactionResultsArray = checkpointResult.getJSONArray(HuntJoin.JSON_OBJ_CHECKPOINT_INTERACTIONS_KEY);
+                        interactionResultsArray.put(interactionResult);
+                        checkpointResult.put(HuntJoin.JSON_OBJ_CHECKPOINT_INTERACTIONS_KEY, interactionResultsArray);
+                        newCheckpointResultsArray.put(checkpointResult);
+                    } else {
+                        newCheckpointResultsArray.put(checkpointResult);
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        }
+        mUserHuntJoinRecord.putResults(newCheckpointResultsArray);
+        HuntJoin.calculatePointTotalsInHuntJoinRecord(mUserHuntJoinRecord, mCheckpointList.size(), mInteractionList.size());
+        mUserHuntJoinRecord.saveInBackground();
+        if(mUserHuntJoinRecord.getCompletionStatus()){
+            //Show hunt completion screen (trophy)
+        }
+    }
+
+    private JSONObject createInteractionResultObject(int quadrant){
+        KurtinInteraction interaction = mInteractionList.get(quadrant -1);
+        String interactionID = interaction.getObjectId();
+        int selectedOptionIndex;
+        if(!mSelectedOptionsMap.containsKey(interactionID)){
+            mSelectedOptionsMap.put(interactionID, KurtinInteraction.FIRST_OPTION_INDEX);
+            selectedOptionIndex = KurtinInteraction.FIRST_OPTION_INDEX;
+        }else{
+            selectedOptionIndex = mSelectedOptionsMap.get(interactionID);
+        }
+
+        return HuntJoin.createInteractionResultObjectWithUserSelection(interaction, selectedOptionIndex);
+    }
+
+
+
+
+
+
+
+    //*
+    //**
+    //***
+    //Cvar: modular functions
+    //***
+    //**
+    //*
+
+    private void sendContentDataToActivity(JSONObject rawContent) {
+        if (mKurtinListener != null) {
+            try {
+                mWikitudeMetaData = rawContent.getJSONObject(WIKITUDE_METADATA_KEY);
+                JSONArray contentArray = mWikitudeMetaData.getJSONArray("content");
+                mKurtinListener.onSuccessfulCloudScanRecognition(contentArray);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void initializeContentViews() {
+        populateContentFieldsFromJson();
+        createArrayOfQuadrantTypes();
+        bindQuadrantVariablesToView();
+        initializeSubmitButtons();
+        setInitialViewValues();
+
+        determineQuadrantCompletionStatuses();
+        minimizeAllQuadrants();
+        hideAllSubmitButtons();
+        initializeMemberVariables();
+
+        loadAllQuadrants();
+    }
+
+    private void populateContentFieldsFromJson() {
+        try {
+
+            q1Type = mInteractionList.get(0).getContentType();
+            q2Type = mInteractionList.get(1).getContentType();
+            q3Type = mInteractionList.get(2).getContentType();
+            q4Type = mInteractionList.get(3).getContentType();
+
+            //get name
+            nameToDisplay = mCurrentHunt.getHuntName();
+
+            //Quadrant- Source
+            q1DataSource = mInteractionList.get(0).getSource();
+            q1DataSourceURI = Uri.parse(q1DataSource);
+            q2DataSource = mInteractionList.get(1).getSource();
+            q2DataSourceURI = Uri.parse(q2DataSource);
+            q3DataSource = mInteractionList.get(2).getSource();
+            q3DataSourceURI = Uri.parse(q3DataSource);
+            q4DataSource = mInteractionList.get(3).getSource();
+            q4DataSourceURI = Uri.parse(q4DataSource);
+
+            //initialize question list
+            mQuestions = new ArrayList<String>();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createArrayOfQuadrantTypes() {
+        QTypes.clear();
+        QTypes.add(0, q1Type);
+        QTypes.add(1, q2Type);
+        QTypes.add(2, q3Type);
+        QTypes.add(3, q4Type);
+    }
+
+    private void bindQuadrantVariablesToView() {
+        q2 = (RelativeLayout) controls.findViewById(R.id.q2);
+        q1 = (RelativeLayout) controls.findViewById(R.id.q1);
+        q3 = (RelativeLayout) controls.findViewById(R.id.q3);
+        q4 = (RelativeLayout) controls.findViewById(R.id.q4);
+    }
+
+    private void initializeSubmitButtons() {
+        submitbtn1 = new Button(getActivity());
+        submitbtn2 = new Button(getActivity());
+        submitbtn3 = new Button(getActivity());
+        submitbtn4 = new Button(getActivity());
+    }
+
+    private void determineQuadrantCompletionStatuses(){
+        if(mUserHuntJoinRecord == null){
+            mUserHuntJoinRecord = getHuntJoinRecord();
+            if(mUserHuntJoinRecord == null){
+                isQ1Completed = false;
+                isQ2Completed = false;
+                isQ3Completed = false;
+                isQ4Completed = false;
+                return;
+            }
+        }
+
+        isQ1Completed = HuntJoin.isInteractionCompleted(
+                mUserHuntJoinRecord,
+                mSelectedCheckpoint.getObjectId(),
+                mInteractionList.get(0).getObjectId());
+
+        isQ2Completed = HuntJoin.isInteractionCompleted(
+                mUserHuntJoinRecord,
+                mSelectedCheckpoint.getObjectId(),
+                mInteractionList.get(1).getObjectId());
+
+        isQ3Completed = HuntJoin.isInteractionCompleted(
+                mUserHuntJoinRecord,
+                mSelectedCheckpoint.getObjectId(),
+                mInteractionList.get(2).getObjectId());
+
+        isQ4Completed = HuntJoin.isInteractionCompleted(
+                mUserHuntJoinRecord,
+                mSelectedCheckpoint.getObjectId(),
+                mInteractionList.get(3).getObjectId());
+    }
+
+    private void minimizeAllQuadrants() {
+        setQ1Small(q1, q2, q3, q4, submitbtn1, on_click_cloud_tracking_info, QuadHeadname);
+        setQ2Small(q1, q2, q3, q4, submitbtn2, on_click_cloud_tracking_info, QuadHeadname);
+        setQ3Small(q1, q2, q3, q4, submitbtn3, on_click_cloud_tracking_info, QuadHeadname);
+        setQ4Small(q1, q2, q3, q4, submitbtn4, on_click_cloud_tracking_info, QuadHeadname);
+    }
+
+    private void hideAllSubmitButtons() {
+        setSubmitButton("0", submitbtn1);
+        setSubmitButton("0", submitbtn2);
+        setSubmitButton("0", submitbtn3);
+        setSubmitButton("0", submitbtn4);
+    }
+
+    private void setInitialViewValues(){
+        //Create a textView to show the completed message
+        completedTV = new TextView(getActivity());
+        //Bind text field tht displays wikitude status messages
+        on_click_cloud_tracking_info = (EditText) controls.findViewById(on_click_cloud_tracking_info_field);
+        //get overall content Name
+        QuadHeadname = nameToDisplay;
+        //Hide completed text view
+        setCompletedText("0", completedTV);
+    }
+
+    private void initializeMemberVariables(){
+        mSelectedOptionsMap = new HashMap<>();
+    }
+
+    private void loadAllQuadrants() {
+        loadQuadrantOne();
+        loadQuadrantTwo();
+        loadQuadrantThree();
+        loadQuadrantFour();
+    }
+
+    private void loadQuadrantOne() {
+        // LinearLayout q1 = (LinearLayout)controls. findViewById(R.id.q1); // get your WebView form your xml file
+        q1.removeAllViews();
+        q1YouTubeViewb1 = new ImageView(getActivity());
+        q1YouTubeViewb2 = new ImageView(getActivity());
+        //final ImageView ytCompleted = new ImageView(getActivity());
+        wbCompleted1 = new ImageView(getActivity());
+        wbCompleted1ID = wbCompleted1.generateViewId();
+        wbCompleted1.setId(wbCompleted1ID);
+        //check if full screen is needed....
+        webViewYT = new WebView(getActivity());
+        if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, 1)) {
+            webViewYT.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    webviewHeight));
+        } else {
+            webViewYT.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    height));
+        }
+        //System.out.println("Choice3 selected");
+        webViewYT.setWebViewClient(new WebViewClient() {
+            @
+                    Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                return false;
+            }
+        });
+        webViewYT.loadUrl(q1DataSource);
+        webViewYT.getSettings().setPluginState(WebSettings.PluginState.ON);
+        webViewYT.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+        webViewYT.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        webViewYT.getSettings().setAppCacheEnabled(true);
+        webViewYT.getSettings().setJavaScriptEnabled(true);
+        webViewYT.getSettings().setDomStorageEnabled(true);
+        webViewYT.getSettings().setLoadWithOverviewMode(true);
+        webViewYT.setBackgroundColor(Color.BLACK);
+        webViewYT.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+        webViewYT.setVerticalScrollBarEnabled(false);
+        q1YouTubeViewID = webViewYT.generateViewId();
+        webViewYT.setId(q1YouTubeViewID);
+        webViewYT.setVisibility(View.VISIBLE);
+        q1.setVisibility(View.VISIBLE);
+        q1YouTubeViewb1.setOnClickListener(new View.OnClickListener() {
+            @
+                    Override
+            public void onClick(View v) {
+                q1YouTubeViewb2.setVisibility(View.VISIBLE);
+                q1YouTubeViewb1.setVisibility(View.GONE);
+                setQ1Large(q1, q2, q3, q4, on_click_cloud_tracking_info, submitbtn1, completedTV);
+            }
+        });
+
+        q1YouTubeViewb2.setOnClickListener(new View.OnClickListener() {
+            @
+                    Override
+            public void onClick(View v) {
+                q1YouTubeViewb2.setVisibility(View.GONE);
+                q1YouTubeViewb1.setVisibility(View.VISIBLE);
+                setQ1Small(q1, q2, q3, q4, submitbtn1, on_click_cloud_tracking_info, QuadHeadname);
+            }
+        });
+
+        RecyclerView recyclerView4 = new RecyclerView(getActivity());
+        setWebviewAddview(q1, webViewYT, recyclerView4, q1YouTubeViewb1, q1YouTubeViewb2, submitbtn1, wbCompleted1, mSelectedDayObjectId, 1);
+    }
+
+    private void loadQuadrantTwo() {
+        //                            LinearLayout q2 = (LinearLayout) controls.findViewById(R.id.q2); // get your WebView form your xml file
+        q2.removeAllViews();
+        q2.removeAllViewsInLayout();
+        q2WebViewb1 = new ImageView(getActivity());
+        q2WebViewb2 = new ImageView(getActivity());
+        wbCompleted2 = new ImageView(getActivity());
+        wbCompleted2ID = q2WebViewb2.generateViewId();
+        wbCompleted2.setId(wbCompleted2ID);
+        //System.out.println("Choice2 selected");
+        WebView webView = new WebView(getActivity());
+        webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+
+        if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, 2)) {
+            webView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, webviewHeight));
+
+        } else {
+            webView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height));
+
+        }
+
+
+        webView.setWebViewClient(new WebViewClient()); // set the WebViewClient
+        webView.loadUrl(q2DataSource); // Load your desired url
+        webView.getSettings().setBuiltInZoomControls(true);
+        if (Build.VERSION.SDK_INT >= 11) {
+            webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        }
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setLoadWithOverviewMode(true);
+        webView.getSettings().setUseWideViewPort(true);
+        webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+        webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+        q2WebViewID = webView.generateViewId();
+        webView.setId(q2WebViewID);
+        q2WebViewb1.setOnClickListener(new View.OnClickListener() {
+            @
+                    Override
+            public void onClick(View v) {
+                q2WebViewb2.setVisibility(View.VISIBLE);
+                q2WebViewb1.setVisibility(View.GONE);
+                setQ2Large(q1, q2, q3, q4, on_click_cloud_tracking_info, submitbtn2);
+            }
+        });
+
+        q2WebViewb2.setOnClickListener(new View.OnClickListener() {
+            @
+                    Override
+            public void onClick(View v) {
+                q2WebViewb2.setVisibility(View.GONE);
+                q2WebViewb1.setVisibility(View.VISIBLE);
+                setQ2Small(q1, q2, q3, q4, submitbtn2, on_click_cloud_tracking_info, QuadHeadname);
+            }
+        });
+        RecyclerView recyclerView2 = new RecyclerView(getActivity());
+        setWebviewAddview(q2, webView, recyclerView2, q2WebViewb1, q2WebViewb2, submitbtn2, wbCompleted2, mSelectedDayObjectId, 2);
+    }
+
+    private void loadQuadrantThree() {
+        //                            LinearLayout q3 = (LinearLayout) controls.findViewById(R.id.q3); // get your WebView form your xml file
+        q3.removeAllViews();
+        q3ImageViewb1 = new ImageView(getActivity());
+        q3ImageViewb2 = new ImageView(getActivity());
+        wbCompleted3 = new ImageView(getActivity());
+        wbCompleted3ID = wbCompleted3.generateViewId();
+        wbCompleted3.setId(wbCompleted3ID);
+        //System.out.println("Choice3 selected");
+
+        ImageView imageView = new ImageView(getActivity());
+        Picasso.with(getActivity()).load(q3DataSourceURI).into(imageView);
+        imageView.setScaleType(FIT_XY);
+        imageView.setAdjustViewBounds(true);
+        imageView.setBackgroundColor(Color.BLACK);
+
+        if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, 3)) {
+
+            imageView.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.FILL_PARENT,
+                    webviewHeight, Gravity.CENTER));
+        } else {
+
+            imageView.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.FILL_PARENT,
+                    height, Gravity.CENTER));
+        }
+
+        //q3.setBackgroundColor(Color.BLACK);
+        RecyclerView recyclerView3 = new RecyclerView(getActivity());
+        recyclerView3.setBackgroundColor(Color.BLACK);
+        q3ImageViewID = imageView.generateViewId();
+        imageView.setId(q3ImageViewID);
+        setImageAddview(q3, imageView, recyclerView3, q3ImageViewb1, q3ImageViewb2, submitbtn3, wbCompleted3, mSelectedDayObjectId, 3);
+        q3ImageViewb1.setOnClickListener(new View.OnClickListener() {
+            @
+                    Override
+            public void onClick(View v) {
+                q3ImageViewb2.setVisibility(View.VISIBLE);
+                q3ImageViewb1.setVisibility(View.GONE);
+                setQ3Large(q1, q2, q3, q4, on_click_cloud_tracking_info, submitbtn3);
+            }
+        });
+
+        q3ImageViewb2.setOnClickListener(new View.OnClickListener() {
+            @
+                    Override
+            public void onClick(View v) {
+                setQ3Small(q1, q2, q3, q4, submitbtn3, on_click_cloud_tracking_info, QuadHeadname);
+                q3ImageViewb2.setVisibility(View.GONE);
+                q3ImageViewb1.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    private void loadQuadrantFour() {
+        //                            LinearLayout q4 = (LinearLayout) controls.findViewById(R.id.q4); // get your WebView form your xml file
+        q4.removeAllViews();
+        q4WebViewb1 = new ImageView(getActivity());
+        q4WebViewb2 = new ImageView(getActivity());
+        wbCompleted4 = new ImageView(getActivity());
+        wbCompleted4ID = wbCompleted4.generateViewId();
+        wbCompleted4.setId(wbCompleted4ID);
+        //System.out.println("Choice2 selected");
+        WebView webView = new WebView(getActivity());
+        webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+
+        if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, 4)) {
+            webView.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    webviewHeight));
+
+        } else {
+            webView.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    height));
+        }
+
+        webView.setWebViewClient(new WebViewClient()); // set the WebViewClient
+        webView.loadUrl(q4DataSource); // Load your desired url
+        webView.getSettings().setBuiltInZoomControls(true);
+        if (Build.VERSION.SDK_INT >= 11) {
+            webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        }
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setLoadWithOverviewMode(true);
+        webView.getSettings().setUseWideViewPort(true);
+        webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+
+        webView.getSettings().setPluginState(WebSettings.PluginState.ON);
+        webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        webView.getSettings().setAppCacheEnabled(true);
+        webView.getSettings().setDomStorageEnabled(true);
+        q4WebViewID = webView.generateViewId();
+        webView.setId(q4WebViewID);
+        RecyclerView recyclerView2 = new RecyclerView(getActivity());
+        setWebviewAddview(q4, webView, recyclerView2, q4WebViewb1, q4WebViewb2, submitbtn4, wbCompleted4, mSelectedDayObjectId, 4);
+
+        q4WebViewb1.setOnClickListener(new View.OnClickListener() {
+            @
+                    Override
+            public void onClick(View v) {
+                q4WebViewb2.setVisibility(View.VISIBLE);
+                q4WebViewb1.setVisibility(View.GONE);
+                setQ4Large(q1, q2, q3, q4, on_click_cloud_tracking_info, submitbtn4);
+            }
+        });
+
+        q4WebViewb2.setOnClickListener(new View.OnClickListener() {
+            @
+                    Override
+            public void onClick(View v) {
+                q4WebViewb2.setVisibility(View.GONE);
+                q4WebViewb1.setVisibility(View.VISIBLE);
+                setQ4Small(q1, q2, q3, q4, submitbtn4, on_click_cloud_tracking_info, QuadHeadname);
+            }
+        });
+    }
+
+    private void displayTextInInfoView(String textToDisplay) {
+        EditText targetInformationTextField = (EditText) controls.findViewById(on_click_cloud_tracking_info_field);
+        targetInformationTextField.setText(textToDisplay);
+        targetInformationTextField.setVisibility(View.VISIBLE);
     }
 }
