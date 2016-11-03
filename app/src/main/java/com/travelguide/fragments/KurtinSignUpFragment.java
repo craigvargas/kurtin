@@ -19,6 +19,7 @@ import com.parse.ParseUser;
 import com.parse.ParseException;
 import com.parse.SignUpCallback;
 import com.travelguide.R;
+import com.travelguide.helpers.AppCodesKeys;
 import com.travelguide.helpers.Preferences;
 
 import static com.wikitude.native_android_sdk.a.c;
@@ -27,6 +28,8 @@ import static com.wikitude.native_android_sdk.a.c;
  * A simple {@link Fragment} subclass.
  */
 public class KurtinSignUpFragment extends Fragment {
+
+    private static final int ZERO_POINTS = 0;
 
     SignUpViewHolder viewHolder;
 
@@ -148,7 +151,7 @@ public class KurtinSignUpFragment extends Fragment {
         user.setUsername(viewHolder.etEmail.getText().toString());
         user.setEmail(viewHolder.etEmail.getText().toString());
         user.setPassword(viewHolder.etPassword.getText().toString());
-        user.put("nickname", viewHolder.etUsername.getText().toString());
+        user.put(AppCodesKeys.PARSE_USER_NICKNAME_KEY, viewHolder.etUsername.getText().toString());
 
         user.signUpInBackground(new SignUpCallback() {
             public void done(ParseException e) {
@@ -156,6 +159,7 @@ public class KurtinSignUpFragment extends Fragment {
                     // Hooray! Let them use the app now.
                     mIsLoggedIn = true;
                     saveUserLocally();
+                    initializeNonDefaultFeilds();
                     completeSignUp();
                 } else {
                     // Sign up didn't succeed. Look at the ParseException
@@ -172,6 +176,11 @@ public class KurtinSignUpFragment extends Fragment {
         Preferences.writeString(context, Preferences.User.NAME, parseUser.getUsername());
         Preferences.writeString(context, Preferences.User.EMAIL, parseUser.getEmail());
         Preferences.writeBoolean(context, Preferences.User.LOG_IN_STATUS, mIsLoggedIn);
+    }
+
+    private void initializeNonDefaultFeilds(){
+        ParseUser parseUser = ParseUser.getCurrentUser();
+        parseUser.put(AppCodesKeys.PARSE_USER_TOTAL_POINTS_KEY, ZERO_POINTS);
     }
 
     private void completeSignUp(){

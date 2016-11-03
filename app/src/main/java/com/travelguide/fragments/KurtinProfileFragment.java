@@ -26,6 +26,7 @@ import com.parse.SaveCallback;
 import com.travelguide.R;
 import com.travelguide.helpers.Preferences;
 import com.travelguide.helpers.AppCodesKeys;
+import com.travelguide.listener.KurtinListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -52,6 +53,8 @@ public class KurtinProfileFragment extends Fragment {
     ParseUser mParseUser;
 
     Boolean mIsNewUser;
+
+    private KurtinListener mKurtinListener;
 
 
     public KurtinProfileFragment() {
@@ -89,6 +92,16 @@ public class KurtinProfileFragment extends Fragment {
         }
 
         return kurtinProfileView;
+    }
+
+    @Override
+    public void onAttach(Context context){
+        super.onAttach(context);
+        try{
+            mKurtinListener = (KurtinListener) context;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private class ViewHolder {
@@ -145,7 +158,8 @@ public class KurtinProfileFragment extends Fragment {
         vh.btnFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getActivity().getSupportFragmentManager().popBackStack();
+                mKurtinListener.onReturnToHomeScreen(true);
+//                getActivity().getSupportFragmentManager().popBackStack();
             }
         });
     }

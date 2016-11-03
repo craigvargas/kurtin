@@ -4,8 +4,10 @@ import android.util.Log;
 
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.ParseException;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -183,7 +185,7 @@ public class HuntJoin extends ParseObject {
     }
 
     //use interaction points to calculate points for the entire huntjoin record
-    public static HuntJoin calculatePointTotalsInHuntJoinRecord(
+    public static int calculatePointTotalsAndReturnPointIncrease(
             HuntJoin huntJoinRecord, int totalNumberOfCheckpoints, int totalNumberOfInteractions){
         JSONArray checkpointResultsArray = huntJoinRecord.getResults();
         JSONObject checkpointResult;
@@ -191,9 +193,12 @@ public class HuntJoin extends ParseObject {
         JSONObject interactionResult;
         JSONArray newCheckpointResultsArray = new JSONArray();
         if(checkpointResultsArray == null){
-            return huntJoinRecord;
+            Log.e("HuntJoin","Something went wrong. HuntJoin record should have been created with a results array");
+            return 0;
         }
-        int huntPointsSum = 0;
+        int pointIncrease = 0;
+        int oldHuntPointsSum = huntJoinRecord.getPointsEarned();
+        int newHuntPointsSum = 0;
         int checkpointTally = 0;
         for (int checkpointIndex = 0; checkpointIndex < checkpointResultsArray.length(); checkpointIndex++) {
             try {
@@ -213,7 +218,7 @@ public class HuntJoin extends ParseObject {
                             interactionTally++;
                         }
                     }
-                    huntPointsSum += checkpointPointsSum;
+                    newHuntPointsSum += checkpointPointsSum;
                     checkpointResult.put(HuntJoin.JSON_OBJ_CHECKPOINT_POINTS_KEY, checkpointPointsSum);
                     if (interactionTally == totalNumberOfInteractions) {
                         checkpointResult.put(HuntJoin.JSON_OBJ_CHECKPOINT_IS_FINISHED, true);
@@ -223,15 +228,16 @@ public class HuntJoin extends ParseObject {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                return huntJoinRecord;
+                return 0;
             }
         }
-        huntJoinRecord.putPointsEarned(huntPointsSum);
+        pointIncrease = newHuntPointsSum - oldHuntPointsSum;
+        huntJoinRecord.putPointsEarned(newHuntPointsSum);
         if(checkpointTally == totalNumberOfCheckpoints){
             huntJoinRecord.putCompletionStatus(true);
         }
         huntJoinRecord.putResults(newCheckpointResultsArray);
-        return huntJoinRecord;
+        return pointIncrease;
     }
 
     //Determine if a given interaction has already been completed by the user in the HuntJoin record
@@ -294,6 +300,22 @@ public class HuntJoin extends ParseObject {
             newCheckpointResultsArray.put(checkpointResult);
             return newCheckpointResultsArray;
         }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static HuntJoin getHuntJoinFromDatabase(ParseUser parseUser, Hunt hunt){
+        //Retrieve huntJoin record from database
+        ParseQuery<HuntJoin> huntJoinParseQuery = ParseQuery.getQuery(HuntJoin.class);
+        huntJoinParseQuery.whereEqualTo(HuntJoin.USER_POINTER_KEY, parseUser);
+        huntJoinParseQuery.whereEqualTo(HuntJoin.HUNT_POINTER_KEY, hunt);
+
+
+        try {
+            HuntJoin huntJoinRecord = huntJoinParseQuery.getFirst();
+            return huntJoinRecord;
+        } catch (ParseException e) {
             e.printStackTrace();
             return null;
         }

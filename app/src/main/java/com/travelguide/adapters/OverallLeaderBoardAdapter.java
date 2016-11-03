@@ -21,6 +21,7 @@ import com.parse.ParseUser;
 import com.travelguide.R;
 import com.travelguide.fragments.KurtinProfileFragment;
 import com.travelguide.fragments.OverallLeaderBoardFragment;
+import com.travelguide.helpers.AppCodesKeys;
 import com.travelguide.models.Competitor;
 import com.travelguide.models.MasterLeaderBoard;
 
@@ -29,10 +30,10 @@ import java.util.List;
 public class OverallLeaderBoardAdapter extends RecyclerView.Adapter<OverallLeaderBoardAdapter.ViewHolder> {
 
     private final Context mContext;
-    private final List<Competitor> mCompetitors;
+    private final List<ParseUser> mLeaderBoardList;
 
-    public OverallLeaderBoardAdapter(List<Competitor> tripPlans, Context context) {
-        this.mCompetitors = tripPlans;
+    public OverallLeaderBoardAdapter(List<ParseUser> parseUserList, Context context) {
+        this.mLeaderBoardList = parseUserList;
         this.mContext = context;
     }
 
@@ -47,19 +48,24 @@ public class OverallLeaderBoardAdapter extends RecyclerView.Adapter<OverallLeade
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        final Competitor competitor = mCompetitors.get(position);
+        final ParseUser parseUser = mLeaderBoardList.get(position);
 
         Integer currentPosition = position + 1;
 
 
-        holder.tvPoints.setText(competitor.getPoints().toString());
+        holder.tvPoints.setText(parseUser.get(AppCodesKeys.PARSE_USER_TOTAL_POINTS_KEY).toString());
         holder.tvPosition.setText("#" + currentPosition);
         holder.rlHuntItem.setBackgroundColor(Color.TRANSPARENT);
-        holder.tvName.setText(competitor.getName());
-        if (competitor.getParseFilePic() != null) {
-            KurtinProfileFragment.loadImageFromParseFileIntoImageView(
-                    competitor.getParseFilePic(),
-                    holder.ivUserImage);
+        holder.tvName.setText(parseUser.get(AppCodesKeys.PARSE_USER_NICKNAME_KEY).toString());
+        try {
+            ParseFile userProfilePic = (ParseFile) parseUser.get(AppCodesKeys.PARSE_USER_PROFILE_PIC_KEY);
+            if ( userProfilePic !=null){
+                KurtinProfileFragment.loadImageFromParseFileIntoImageView(
+                        userProfilePic,
+                        holder.ivUserImage);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -162,16 +168,16 @@ public class OverallLeaderBoardAdapter extends RecyclerView.Adapter<OverallLeade
 
     @Override
     public int getItemCount() {
-        return mCompetitors.size();
+        return mLeaderBoardList.size();
     }
 
     @Override
     public long getItemId(int position) {
-        return mCompetitors.get(position).getObjId();
+        return mLeaderBoardList.get(position).getCreatedAt().hashCode();
     }
 
-    public Competitor get(int position) {
-        return mCompetitors.get(position);
+    public ParseUser get(int position) {
+        return mLeaderBoardList.get(position);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

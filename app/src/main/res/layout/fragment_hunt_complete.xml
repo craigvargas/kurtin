@@ -1,13 +1,75 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.travelguide.fragments.HuntCompleteFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:background="@color/outer_space">
 
-</FrameLayout>
+
+        <ImageView
+            android:id="@+id/ivTrophy"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="48dp"
+            android:background="@drawable/circle"
+            android:backgroundTint="@color/kurtin_text_primary"
+            android:padding="32dp"
+            android:src="@drawable/trophy_black_240"
+            android:tint="@color/usc_gold" />
+
+        <TextView
+            android:id="@+id/tvCongrats"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ivTrophy"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:text="@string/congrats"
+            android:textColor="@color/completion_screen_text"
+            android:textSize="36sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvHuntComplete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvCongrats"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="32dp"
+            android:text="@string/hunt_complete"
+            android:textColor="@color/completion_screen_text"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/tvPointsEarned"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvHuntComplete"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp"
+            android:text="@string/points_earned"
+            android:textColor="@color/completion_screen_text"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btnNextHunt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvPointsEarned"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="48dp"
+            android:background="@drawable/btn_round"
+            android:backgroundTint="@color/kurtin_text_primary"
+            android:paddingLeft="64dp"
+            android:paddingRight="64dp"
+            android:text="@string/next_hunt"
+            android:textColor="@color/completion_screen_text"
+            android:textSize="20sp" />
+
+    </RelativeLayout>
+</RelativeLayout>

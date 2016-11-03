@@ -2,6 +2,7 @@
 <android.support.percent.PercentRelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -131,6 +132,24 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
+    <com.getbase.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabUserContent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_alignParentRight="true"
+        android:layout_above="@+id/on_click_cloud_tracking_recognize_button"
+        android:src="@drawable/ic_kurtin_finish"
+        android:padding="8dp"
+        android:scaleType="centerCrop"
+        fab:fab_colorNormal="@color/kurtin_primary_light"
+        fab:fab_colorPressed="@color/kurtin_primary_dark"
+        />
+    <!--app:layout_anchor="@id/rvTripPlans"-->
+    <!--app:layout_anchorGravity="bottom|right|end"-->
+    <!--android:layout_alignParentBottom="true"-->
 
 </android.support.percent.PercentRelativeLayout>
 

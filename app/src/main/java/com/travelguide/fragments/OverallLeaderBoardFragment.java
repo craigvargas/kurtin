@@ -29,6 +29,7 @@ import com.travelguide.helpers.AppCodesKeys;
 import com.travelguide.helpers.NetworkAvailabilityCheck;
 import com.travelguide.helpers.Preferences;
 import com.travelguide.models.Competitor;
+import com.travelguide.models.HuntJoin;
 import com.travelguide.models.MasterLeaderBoard;
 import com.travelguide.models.TripPlan;
 
@@ -44,12 +45,15 @@ import static android.media.CamcorderProfile.get;
 public class OverallLeaderBoardFragment extends LeaderBoardFragment {
     private static final String TAG = ProfileItemsFragment.class.getSimpleName();
 
+    private static final int LEADER_BOARD_DEFAULT_SIZE = 20;
+
     private TextView tvBanner;
     private TextView tvEmpty;
     private RecyclerView rvTripPlans;
     private MaterialDialog progressDialog;
     private OverallLeaderBoardAdapter mTripPlanAdapter;
     private OverallLeaderBoardAdapter mLeaderBoardAdapter;
+    private List<ParseUser> mLeaderBoardList;
     private List<MasterLeaderBoard> mTripPlans;
     private TextView tvEmptyLeaderBoardOverall;
 
@@ -98,9 +102,9 @@ public class OverallLeaderBoardFragment extends LeaderBoardFragment {
         setupSwipeRefresh();
 
         mTripPlans = new ArrayList<>();
-        mCompetitors2 = new ArrayList<>();
+        mLeaderBoardList = new ArrayList<>();
 //        mTripPlanAdapter = new OverallLeaderBoardAdapter(mTripPlans, getContext());
-        mLeaderBoardAdapter = new OverallLeaderBoardAdapter(mCompetitors2, getContext());
+        mLeaderBoardAdapter = new OverallLeaderBoardAdapter(mLeaderBoardList, getContext());
 
         rvTripPlans = (RecyclerView) view.findViewById(R.id.rvTripPlansInProfile);
         rvTripPlans.setAdapter(mLeaderBoardAdapter);
@@ -160,8 +164,6 @@ public class OverallLeaderBoardFragment extends LeaderBoardFragment {
             public void onRefresh() {
                 // Make sure to call swipeContainer.setRefreshing(false)
                 // once the network request has completed successfully.
-//                mTripPlans.clear();
-//                mTripPlanAdapter.notifyDataSetChanged();
                 refreshLeaderBoardPage();
             }
         });
@@ -183,33 +185,21 @@ public class OverallLeaderBoardFragment extends LeaderBoardFragment {
 
     private void refreshLeaderBoardPage() {
         //Pull in data from leaderboard table
-        ParseQuery<MasterLeaderBoard> query = ParseQuery.getQuery(MasterLeaderBoard.class);
-        query.include(AppCodesKeys.PARSE_LEADER_BOARD_USER_POINTER_KEY);
-        query.setLimit(1000);
-        query.findInBackground(new FindCallback<MasterLeaderBoard>() {
+        ParseQuery<ParseUser> query = ParseQuery.getQuery(ParseUser.class);
+        query.addDescendingOrder(AppCodesKeys.PARSE_USER_TOTAL_POINTS_KEY);
+        query.setLimit(LEADER_BOARD_DEFAULT_SIZE);
+        query.findInBackground(new FindCallback<ParseUser>() {
             @Override
-            public void done(List<MasterLeaderBoard> huntEntries, ParseException e) {
+            public void done(List<ParseUser> parseUserList, ParseException e) {
                 progressDialog.dismiss();
                 if (e == null) {
-                    if(huntEntries.isEmpty()){
+                    if (parseUserList.isEmpty()) {
                         showEmptyView();
-                    }else {
+                    } else {
                         hideEmptyView();
 
-                        //Create a hashmap of UserIds and Competitors
-                        HashMap<String, Competitor> linkPointsMap = listToHashMap(huntEntries);
-                        //Put Competitors from hashmap into a list
-                        List<Competitor> competitors = new ArrayList<Competitor>(linkPointsMap.values());
-                        //Sort list in descending order
-                        Collections.sort(competitors, new Comparator<Competitor>() {
-                            @Override
-                            public int compare(Competitor lhs, Competitor rhs) {
-                                return rhs.getPoints().compareTo(lhs.getPoints());
-                            }
-                        });
-                        //Update the list that the adapter references
-                        mCompetitors2.clear();
-                        mCompetitors2.addAll(competitors);
+                        mLeaderBoardList.clear();
+                        mLeaderBoardList.addAll(parseUserList);
                         mLeaderBoardAdapter.notifyDataSetChanged();
                         //Fill the podium: 1st, 2nd, and 3rd place
                         fillPodiumViews();
@@ -225,8 +215,54 @@ public class OverallLeaderBoardFragment extends LeaderBoardFragment {
         });
     }
 
-    private HashMap listToHashMap(List<MasterLeaderBoard> huntEntries){
-        MasterLeaderBoard huntEntry;
+
+//    private void refreshLeaderBoardPage() {
+//        //Pull in data from leaderboard table
+//        ParseQuery<HuntJoin> query = ParseQuery.getQuery(HuntJoin.class);
+//        query.include(HuntJoin.USER_POINTER_KEY);
+//        query.addDescendingOrder(HuntJoin.POINTS_EARNED_KEY);
+//        query.setLimit(LEADER_BOARD_DEFAULT_SIZE);
+//        query.findInBackground(new FindCallback<HuntJoin>() {
+//            @Override
+//            public void done(List<HuntJoin> huntJoinList, ParseException e) {
+//                progressDialog.dismiss();
+//                if (e == null) {
+//                    if(huntJoinList.isEmpty()){
+//                        showEmptyView();
+//                    }else {
+//                        hideEmptyView();
+//
+//                        //Create a hashmap of UserIds and Competitors
+//                        HashMap<String, Competitor> linkPointsMap = listToHashMap(huntJoinList);
+//                        //Put Competitors from hashmap into a list
+//                        List<Competitor> competitors = new ArrayList<Competitor>(linkPointsMap.values());
+//                        //Sort list in descending order
+//                        Collections.sort(competitors, new Comparator<Competitor>() {
+//                            @Override
+//                            public int compare(Competitor lhs, Competitor rhs) {
+//                                return rhs.getPoints().compareTo(lhs.getPoints());
+//                            }
+//                        });
+//                        //Update the list that the adapter references
+//                        mCompetitors2.clear();
+//                        mCompetitors2.addAll(competitors);
+//                        mLeaderBoardAdapter.notifyDataSetChanged();
+//                        //Fill the podium: 1st, 2nd, and 3rd place
+//                        fillPodiumViews();
+//                        //Load the user's pic and points
+//                        loadUserData();
+//
+//                        swipeContainer.setRefreshing(false);
+//                    }
+//                } else {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//    }
+
+    private HashMap listToHashMap(List<HuntJoin> huntJoinList) {
+        HuntJoin huntEntry;
         ParseUser parseUser;
         String userId;
         String name;
@@ -238,11 +274,11 @@ public class OverallLeaderBoardFragment extends LeaderBoardFragment {
         HashMap<String, Competitor> linkPointsMap = new HashMap<String, Competitor>();
 
         //Create a HashMap of UserIds and Competitor objects
-        for (int i = 0; i < huntEntries.size(); i++) {
-            huntEntry = huntEntries.get(i);
-            parseUser = huntEntry.getParseUser(AppCodesKeys.PARSE_LEADER_BOARD_USER_POINTER_KEY);
+        for (int i = 0; i < huntJoinList.size(); i++) {
+            huntEntry = huntJoinList.get(i);
+            parseUser = huntEntry.getParseUser(HuntJoin.USER_POINTER_KEY);
             userId = parseUser.getObjectId();
-            points = huntEntry.getPoints();
+            points = huntEntry.getPointsEarned();
             if (linkPointsMap.containsKey(userId)) {
                 currentCompetitor = linkPointsMap.get(userId);
                 oldPoints = currentCompetitor.getPoints();
@@ -252,170 +288,159 @@ public class OverallLeaderBoardFragment extends LeaderBoardFragment {
                 name = parseUser.get(AppCodesKeys.PARSE_USER_USERNAME_KEY).toString();
                 profilePicFile = (ParseFile) parseUser.get(AppCodesKeys.PARSE_USER_PROFILE_PIC_KEY);
                 linkPointsMap.put(userId, new Competitor(userId, name, points, profilePicFile, rank));
-
-//                try {
-//                    parseUser = parseUser.fetchIfNeeded();
-//                } catch (Exception eFetchIfNeeded) {
-//                    eFetchIfNeeded.printStackTrace();
-//                }
-//                if (parseUser != null) {
-//                    name = parseUser.get(AppCodesKeys.PARSE_USER_USERNAME_KEY).toString();
-//                    profilePicFile = (ParseFile) parseUser.get(AppCodesKeys.PARSE_USER_PROFILE_PIC_KEY);
-//                    linkPointsMap.put(userId, new Competitor(userId, name, points, profilePicFile, rank));
-//                }
             }
         }
         return linkPointsMap;
     }
 
-    private void loadTripPlansFromRemote() {
-
-        /** commented to bring in leader board
-
-         ParseQuery<TripPlan> query = ParseQuery.getQuery(TripPlan.class);
-         query.whereEqualTo("createdUserId", userObjectId);
-         query.addDescendingOrder("createdAt");
-         query.findInBackground(new FindCallback<TripPlan>() {
-        @Override public void done(List<TripPlan> tripPlans, ParseException e) {
-        progressDialog.dismiss();
-        if (e == null) {
-        hideEmptyView();
-        mTripPlans.clear();
-        mTripPlans.addAll(tripPlans);
-        mTripPlanAdapter.notifyDataSetChanged();
-        savingOnDatabase(tripPlans);
-        } else {
-        Log.d(TAG, "Error: " + e.getMessage());
-        }
-        if (mTripPlans.size() == 0) {
-        showEmptyView();
-        }
-        }
-        });
-         */
-
-
-        ParseQuery<MasterLeaderBoard> query = ParseQuery.getQuery(MasterLeaderBoard.class);
-        query.addDescendingOrder("points");
-        query.findInBackground(new FindCallback<MasterLeaderBoard>() {
-            @Override
-            public void done(List<MasterLeaderBoard> tripPlans, ParseException e) {
-                progressDialog.dismiss();
-                if (e == null) {
-                    hideEmptyView();
-
-
-                    //Adding unique users-to get overall scroe--
-                    HashSet<String> uniqueUserList = new HashSet<String>();
-
-//                    ArrayList<String> ids = new ArrayList<String>();
-
-                    //Populate HashSet of UserIDs
-                    for (int l = 0; l < tripPlans.size(); l++) {
-
-                        ParseUser parseUser = tripPlans.get(l).getParseUser("userID");
-                        String userID = parseUser.getObjectId().toString();
-//                        String userIdCv = tripPlans.get(l).get("userID").toString();
-                        uniqueUserList.add(userID);
-//                        ids.add(userIdCv);
-                    }
-
-//                    Log.v("Load Data", "users: " + ids.toString());
-
-
-                    List<String> completeUserList = new ArrayList<String>(uniqueUserList);
-
-                    List<String> completeUserListTemp = new ArrayList<String>();
-
-
-                    List<MasterLeaderBoard> mNewTripPlans = new ArrayList<MasterLeaderBoard>();
-
-                    List<MasterLeaderBoard> mNewTripPlansTemp = new ArrayList<MasterLeaderBoard>();
-
-                    //For each UserID: sum the points they've totalked in each hunt
-                    //Store the result as a concatenated string "UserID + "@" + TotalPoints"
-                    for (int value = 0; value < completeUserList.size(); value++) {
-                        String userIDDetails = completeUserList.get(value).toString();
-                        Integer userTotal = 0;
-                        for (int k = 0; k < tripPlans.size(); k++) {
-                            if (userIDDetails.equals(tripPlans.get(k).getParseUser("userID").getObjectId().toString())) {
-                                userTotal = userTotal + tripPlans.get(k).getPoints();
-                                //userIDDetails = userIDDetails + "@"+userTotal;
-                                //completeUserList.add(value,userIDDetails);
-                                //tripPlans.get(k).putPoints(userTotal);
-                                //mNewTripPlans.add(tripPlans.get(k));
-                            }
-                        }
-                        userIDDetails = userIDDetails + "@" + userTotal;
-                        completeUserListTemp.add(value, userIDDetails);
-
-                    }
-
-                    //Populate ArrayList mNewTripPlans with UserID's in the tempDetails field
-                    //and points
-                    //Sort the list by points at the end.
-                    for (int valueCheck = 0; valueCheck < completeUserListTemp.size(); valueCheck++) {
-                        MasterLeaderBoard tempList = new MasterLeaderBoard();
-                        //String tempDetails = completeUserList.get(valueCheck);
-
-                        String str = completeUserListTemp.get((valueCheck)).toString();
-                        String substr = "@";
-                        String[] parts = str.split(substr);
-                        String before = parts[0];
-
-                        Integer after = Integer.parseInt(parts[1]);
-
-                        //Integer tempPoints =  Integer.parseInt(tempDetails.substring(tempDetails.lastIndexOf(";") + 1));
-                        tempList.putPoints(after);
-
-                        tempList.putTempDetails(before);
-                        //tempList.putTempDetails(completeUserList.get(valueCheck));
-                        //tempList.putTempDetails(completeUserList);
-                        //mNewTripPlans.add(tempList);
-
-
-                        mNewTripPlans.add(tempList);
-
-                        /*
-
-
-                        Comparator<MasterLeaderBoard> comparator = new Comparator<MasterLeaderBoard>() {
-                            @Override
-                            public int compare(MasterLeaderBoard lhs, MasterLeaderBoard rhs) {
-                                Integer  left = lhs.getPoints();
-                                Integer right = rhs.getPoints();
-
-                                return left.compareTo(right);                            }
-                        };
-                        **/
-
-                        Collections.sort(mNewTripPlans, new Comparator<MasterLeaderBoard>() {
-                            @Override
-                            public int compare(MasterLeaderBoard lhs, MasterLeaderBoard rhs) {
-                                return rhs.getPoints().compareTo(lhs.getPoints());
-                            }
-                        });
-
-                    }
-                    //Collections.sort(mNewTripPlans);
-
-                    mTripPlans.clear();
-                    //mTripPlans.addAll(tripPlans);
-                    mTripPlans.addAll(mNewTripPlans);
-//                    mTripPlanAdapter.notifyDataSetChanged();
-                    //savingOnDatabase(tripPlans);
-                } else {
-                    Log.d(TAG, "Error: " + e.getMessage());
-                }
-                if (mTripPlans.size() == 0) {
-                    showEmptyView();
-                    tvEmptyLeaderBoardOverall.setVisibility(View.VISIBLE);
-                }
-//                loadCompetitors();
-//                loadUserData();
-            }
-        });
-    }
+//    private void loadTripPlansFromRemote() {
+//
+//        /** commented to bring in leader board
+//
+//         ParseQuery<TripPlan> query = ParseQuery.getQuery(TripPlan.class);
+//         query.whereEqualTo("createdUserId", userObjectId);
+//         query.addDescendingOrder("createdAt");
+//         query.findInBackground(new FindCallback<TripPlan>() {
+//        @Override public void done(List<TripPlan> tripPlans, ParseException e) {
+//        progressDialog.dismiss();
+//        if (e == null) {
+//        hideEmptyView();
+//        mTripPlans.clear();
+//        mTripPlans.addAll(tripPlans);
+//        mTripPlanAdapter.notifyDataSetChanged();
+//        savingOnDatabase(tripPlans);
+//        } else {
+//        Log.d(TAG, "Error: " + e.getMessage());
+//        }
+//        if (mTripPlans.size() == 0) {
+//        showEmptyView();
+//        }
+//        }
+//        });
+//         */
+//
+//
+//        ParseQuery<MasterLeaderBoard> query = ParseQuery.getQuery(MasterLeaderBoard.class);
+//        query.addDescendingOrder("points");
+//        query.findInBackground(new FindCallback<MasterLeaderBoard>() {
+//            @Override
+//            public void done(List<MasterLeaderBoard> tripPlans, ParseException e) {
+//                progressDialog.dismiss();
+//                if (e == null) {
+//                    hideEmptyView();
+//
+//
+//                    //Adding unique users-to get overall scroe--
+//                    HashSet<String> uniqueUserList = new HashSet<String>();
+//
+////                    ArrayList<String> ids = new ArrayList<String>();
+//
+//                    //Populate HashSet of UserIDs
+//                    for (int l = 0; l < tripPlans.size(); l++) {
+//
+//                        ParseUser parseUser = tripPlans.get(l).getParseUser("userID");
+//                        String userID = parseUser.getObjectId().toString();
+////                        String userIdCv = tripPlans.get(l).get("userID").toString();
+//                        uniqueUserList.add(userID);
+////                        ids.add(userIdCv);
+//                    }
+//
+////                    Log.v("Load Data", "users: " + ids.toString());
+//
+//
+//                    List<String> completeUserList = new ArrayList<String>(uniqueUserList);
+//
+//                    List<String> completeUserListTemp = new ArrayList<String>();
+//
+//
+//                    List<MasterLeaderBoard> mNewTripPlans = new ArrayList<MasterLeaderBoard>();
+//
+//                    List<MasterLeaderBoard> mNewTripPlansTemp = new ArrayList<MasterLeaderBoard>();
+//
+//                    //For each UserID: sum the points they've totalked in each hunt
+//                    //Store the result as a concatenated string "UserID + "@" + TotalPoints"
+//                    for (int value = 0; value < completeUserList.size(); value++) {
+//                        String userIDDetails = completeUserList.get(value).toString();
+//                        Integer userTotal = 0;
+//                        for (int k = 0; k < tripPlans.size(); k++) {
+//                            if (userIDDetails.equals(tripPlans.get(k).getParseUser("userID").getObjectId().toString())) {
+//                                userTotal = userTotal + tripPlans.get(k).getPoints();
+//                                //userIDDetails = userIDDetails + "@"+userTotal;
+//                                //completeUserList.add(value,userIDDetails);
+//                                //tripPlans.get(k).putPoints(userTotal);
+//                                //mNewTripPlans.add(tripPlans.get(k));
+//                            }
+//                        }
+//                        userIDDetails = userIDDetails + "@" + userTotal;
+//                        completeUserListTemp.add(value, userIDDetails);
+//
+//                    }
+//
+//                    //Populate ArrayList mNewTripPlans with UserID's in the tempDetails field
+//                    //and points
+//                    //Sort the list by points at the end.
+//                    for (int valueCheck = 0; valueCheck < completeUserListTemp.size(); valueCheck++) {
+//                        MasterLeaderBoard tempList = new MasterLeaderBoard();
+//                        //String tempDetails = completeUserList.get(valueCheck);
+//
+//                        String str = completeUserListTemp.get((valueCheck)).toString();
+//                        String substr = "@";
+//                        String[] parts = str.split(substr);
+//                        String before = parts[0];
+//
+//                        Integer after = Integer.parseInt(parts[1]);
+//
+//                        //Integer tempPoints =  Integer.parseInt(tempDetails.substring(tempDetails.lastIndexOf(";") + 1));
+//                        tempList.putPoints(after);
+//
+//                        tempList.putTempDetails(before);
+//                        //tempList.putTempDetails(completeUserList.get(valueCheck));
+//                        //tempList.putTempDetails(completeUserList);
+//                        //mNewTripPlans.add(tempList);
+//
+//
+//                        mNewTripPlans.add(tempList);
+//
+//                        /*
+//
+//
+//                        Comparator<MasterLeaderBoard> comparator = new Comparator<MasterLeaderBoard>() {
+//                            @Override
+//                            public int compare(MasterLeaderBoard lhs, MasterLeaderBoard rhs) {
+//                                Integer  left = lhs.getPoints();
+//                                Integer right = rhs.getPoints();
+//
+//                                return left.compareTo(right);                            }
+//                        };
+//                        **/
+//
+//                        Collections.sort(mNewTripPlans, new Comparator<MasterLeaderBoard>() {
+//                            @Override
+//                            public int compare(MasterLeaderBoard lhs, MasterLeaderBoard rhs) {
+//                                return rhs.getPoints().compareTo(lhs.getPoints());
+//                            }
+//                        });
+//
+//                    }
+//                    //Collections.sort(mNewTripPlans);
+//
+//                    mTripPlans.clear();
+//                    //mTripPlans.addAll(tripPlans);
+//                    mTripPlans.addAll(mNewTripPlans);
+////                    mTripPlanAdapter.notifyDataSetChanged();
+//                    //savingOnDatabase(tripPlans);
+//                } else {
+//                    Log.d(TAG, "Error: " + e.getMessage());
+//                }
+//                if (mTripPlans.size() == 0) {
+//                    showEmptyView();
+//                    tvEmptyLeaderBoardOverall.setVisibility(View.VISIBLE);
+//                }
+////                loadCompetitors();
+////                loadUserData();
+//            }
+//        });
+//    }
 
     private void loadTripPlansFromDatabase() {
         ParseQuery<MasterLeaderBoard> query = ParseQuery.getQuery(MasterLeaderBoard.class);
@@ -442,105 +467,105 @@ public class OverallLeaderBoardFragment extends LeaderBoardFragment {
         });
     }
 
-    private void loadCompetitors() {
-        MasterLeaderBoard masterLeaderBoard;
-        int competitorPoints;
-        int podiumSize;
-
-        mCompetitors.clear();
-        mUserIds.clear();
-
-        if (mTripPlans == null) {
-            //TODO: Load default podium
-            return;
-        } else if (mTripPlans.size() == 0) {
-            return;
-        } else if (mTripPlans.size() > 3) {
-            podiumSize = 3;
-        } else {
-            podiumSize = mTripPlans.size();
-        }
-
-        //get name and picture data for top three leaders
-        for (int i = 0; i < podiumSize; i++) {
-            mCurrentCompetitor = new Competitor();
-            masterLeaderBoard = mTripPlans.get(i);
-
-            //Try to access userID
-            if (masterLeaderBoard.getTempDetails() != null) {
-                //Save userId
-                String userId = masterLeaderBoard.getTempDetails();
-
-                //Get user's points
-                competitorPoints = mTripPlans.get(i).getPoints();
-                mCurrentCompetitor.setPoints(competitorPoints);
-
-                //find user
-                mUserIds.add(userId);
-                ParseQuery<ParseUser> query = ParseUser.getQuery();
-                query.whereEqualTo("objectId", userId);
-                query.findInBackground(new FindCallback<ParseUser>() {
-                    public void done(List<ParseUser> parseUsers, ParseException e) {
-                        Competitor competitor = new Competitor();
-                        if (e == null) {
-                            //Get userID
-                            String competitorId = parseUsers.get(0).getObjectId().toString();
-                            competitor.setUserId(competitorId);
-                            Log.v("Load Podium", "User info: " + competitorId);
-
-                            //Get user's name
-                            String competitorName = (String) parseUsers.get(0).get(AppCodesKeys.PARSE_USER_NICKNAME_KEY);
-                            if (competitorName == null) {
-                                competitorName = (String) parseUsers.get(0).get(AppCodesKeys.PARSE_USER_USERNAME_KEY);
-                                if (competitorName == null) {
-                                    competitorName = "";
-                                }
-                            }
-                            Log.v("Load Podium", "User name: " + competitorName);
-                            competitor.setName(competitorName);
-
-                            //Get User's Picture
-                            ParseFile competitorPicFile = (ParseFile) parseUsers.get(0).get(AppCodesKeys.PARSE_USER_PROFILE_PIC_KEY);
-                            competitor.setParseFilePic(competitorPicFile);
-
-                        } else {
-                            //Could not find user so add placeholder default values
-                            competitor.setUserId(null);
-                            competitor.setName("");
-                            competitor.setPoints(-1);
-                            competitor.setParseFilePic(null);
-
-                            mCompetitors.add(competitor);
-
-                            Log.v("Load Podium", "Query error");
-                        }
-                        fillPodiumViewEntry(
-                                competitor.getName(),
-                                competitor.getPoints().toString(),
-                                competitor.getParseFilePic(),
-                                competitor.getUserId());
-                    }
-                });
-
-            } else {
-                //Could not find user so add placeholder default values
-                Competitor competitor = new Competitor();
-                competitor.setUserId(null);
-                competitor.setName("");
-                competitor.setPoints(-1);
-                competitor.setParseFilePic(null);
-                mCompetitors.add(competitor);
-
-                fillPodiumViewEntry(
-                        competitor.getName(),
-                        competitor.getPoints().toString(),
-                        competitor.getParseFilePic(),
-                        competitor.getUserId());
-
-                Log.v("Load Podium", "Can't Find parse user");
-            }
-        }
-    }
+//    private void loadCompetitors() {
+//        MasterLeaderBoard masterLeaderBoard;
+//        int competitorPoints;
+//        int podiumSize;
+//
+//        mCompetitors.clear();
+//        mUserIds.clear();
+//
+//        if (mTripPlans == null) {
+//            //TODO: Load default podium
+//            return;
+//        } else if (mTripPlans.size() == 0) {
+//            return;
+//        } else if (mTripPlans.size() > 3) {
+//            podiumSize = 3;
+//        } else {
+//            podiumSize = mTripPlans.size();
+//        }
+//
+//        //get name and picture data for top three leaders
+//        for (int i = 0; i < podiumSize; i++) {
+//            mCurrentCompetitor = new Competitor();
+//            masterLeaderBoard = mTripPlans.get(i);
+//
+//            //Try to access userID
+//            if (masterLeaderBoard.getTempDetails() != null) {
+//                //Save userId
+//                String userId = masterLeaderBoard.getTempDetails();
+//
+//                //Get user's points
+//                competitorPoints = mTripPlans.get(i).getPoints();
+//                mCurrentCompetitor.setPoints(competitorPoints);
+//
+//                //find user
+//                mUserIds.add(userId);
+//                ParseQuery<ParseUser> query = ParseUser.getQuery();
+//                query.whereEqualTo("objectId", userId);
+//                query.findInBackground(new FindCallback<ParseUser>() {
+//                    public void done(List<ParseUser> parseUsers, ParseException e) {
+//                        Competitor competitor = new Competitor();
+//                        if (e == null) {
+//                            //Get userID
+//                            String competitorId = parseUsers.get(0).getObjectId().toString();
+//                            competitor.setUserId(competitorId);
+//                            Log.v("Load Podium", "User info: " + competitorId);
+//
+//                            //Get user's name
+//                            String competitorName = (String) parseUsers.get(0).get(AppCodesKeys.PARSE_USER_NICKNAME_KEY);
+//                            if (competitorName == null) {
+//                                competitorName = (String) parseUsers.get(0).get(AppCodesKeys.PARSE_USER_USERNAME_KEY);
+//                                if (competitorName == null) {
+//                                    competitorName = "";
+//                                }
+//                            }
+//                            Log.v("Load Podium", "User name: " + competitorName);
+//                            competitor.setName(competitorName);
+//
+//                            //Get User's Picture
+//                            ParseFile competitorPicFile = (ParseFile) parseUsers.get(0).get(AppCodesKeys.PARSE_USER_PROFILE_PIC_KEY);
+//                            competitor.setParseFilePic(competitorPicFile);
+//
+//                        } else {
+//                            //Could not find user so add placeholder default values
+//                            competitor.setUserId(null);
+//                            competitor.setName("");
+//                            competitor.setPoints(-1);
+//                            competitor.setParseFilePic(null);
+//
+//                            mCompetitors.add(competitor);
+//
+//                            Log.v("Load Podium", "Query error");
+//                        }
+//                        fillPodiumViewEntry(
+//                                competitor.getName(),
+//                                competitor.getPoints().toString(),
+//                                competitor.getParseFilePic(),
+//                                competitor.getUserId());
+//                    }
+//                });
+//
+//            } else {
+//                //Could not find user so add placeholder default values
+//                Competitor competitor = new Competitor();
+//                competitor.setUserId(null);
+//                competitor.setName("");
+//                competitor.setPoints(-1);
+//                competitor.setParseFilePic(null);
+//                mCompetitors.add(competitor);
+//
+//                fillPodiumViewEntry(
+//                        competitor.getName(),
+//                        competitor.getPoints().toString(),
+//                        competitor.getParseFilePic(),
+//                        competitor.getUserId());
+//
+//                Log.v("Load Podium", "Can't Find parse user");
+//            }
+//        }
+//    }
 
     private void loadUserData() {
         if (Preferences.readString(getContext(), Preferences.User.PROFILE_PIC_LOCAL_PATH) != null) {
@@ -549,16 +574,19 @@ public class OverallLeaderBoardFragment extends LeaderBoardFragment {
                     ivUserPic);
         }
 
-        String info = "";
-        String userId = null;
-        String currentUserId = ParseUser.getCurrentUser().getObjectId().toString();
-        for (int i = 0; i < mCompetitors2.size(); i++) {
-            userId = mCompetitors2.get(i).getUserId();
-            if (userId != null) {
-                if (userId.equals(currentUserId)) {
-                    info = "(#" + i + ")  " + mCompetitors2.get(i).getPoints().toString() + " pts";
-                }
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        String currentUserId = currentUser.getObjectId();
+        int userTotalPoints = (Integer) currentUser.getNumber(AppCodesKeys.PARSE_USER_TOTAL_POINTS_KEY);
+        String info = userTotalPoints + " pts";
+        String listEntryUserId = null;
+        int leaderBoardPosition = -1;
+        for (int i = 0; i < mLeaderBoardList.size(); i++) {
+            listEntryUserId = mLeaderBoardList.get(i).getObjectId();
+            leaderBoardPosition = i + 1;
+            if (currentUserId.equals(listEntryUserId)) {
+                info = "(#" + (leaderBoardPosition) + ")  " + userTotalPoints + " pts";
             }
+
         }
 
         tvUserInfo.setText(info);
@@ -579,16 +607,21 @@ public class OverallLeaderBoardFragment extends LeaderBoardFragment {
     }
 
     private void fillPodiumViews() {
+        ParseUser parseUser;
+        ParseFile userProfilePic;
 //        Log.v("fillPodiumView", "Podium size: " + mPodiumViews.size());
         for (int i = 0; i < mPodiumViews.size(); i++) {
             try {
-                mPodiumViews.get(i).getTvName().setText(mCompetitors2.get(i).getName());
-                mPodiumViews.get(i).getTvPoints().setText(mCompetitors2.get(i).getPoints().toString());
-                if (mCompetitors2.get(i).getParseFilePic() != null) {
+                parseUser = mLeaderBoardList.get(i);
+                mPodiumViews.get(i).getTvName().setText(parseUser.get(AppCodesKeys.PARSE_USER_NICKNAME_KEY).toString());
+                mPodiumViews.get(i).getTvPoints().setText(parseUser.get(AppCodesKeys.PARSE_USER_TOTAL_POINTS_KEY).toString());
+                userProfilePic = null;
+                userProfilePic = parseUser.getParseFile(AppCodesKeys.PARSE_USER_PROFILE_PIC_KEY);
+                if (userProfilePic != null) {
                     KurtinProfileFragment.loadImageFromParseFileIntoImageView(
-                            mCompetitors2.get(i).getParseFilePic(),
+                            userProfilePic,
                             mPodiumViews.get(i).getIvProfilePic());
-                }else{
+                } else {
                     mPodiumViews.get(i).getIvProfilePic().setImageResource(R.drawable.profile_placeholder);
                 }
             } catch (Exception e) {

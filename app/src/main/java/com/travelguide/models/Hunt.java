@@ -25,6 +25,8 @@ public class Hunt extends ParseObject {
     public static String HUNT_CHECKPOINT_RELATIONS = "checkpoints";
     public static String HUNT_CHECKPOINT_POINTER_PREFIX = "huntCheckpoint";
 
+    public static String HUNT_LIST_ORDER = "listOrder";
+
     //Constructor
     public Hunt(){ super(); }
 

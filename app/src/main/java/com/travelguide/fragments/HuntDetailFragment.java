@@ -637,32 +637,41 @@ public class HuntDetailFragment extends TripBaseFragment
 
     //User has entered the hunt so make a record of it
     private void updateHuntJoinTable(){
-        ParseQuery huntJoinQuery = ParseQuery.getQuery(HuntJoin.class);
-        huntJoinQuery.whereEqualTo(HuntJoin.USER_POINTER_KEY, mCurrentUser);
-        huntJoinQuery.whereEqualTo(HuntJoin.HUNT_POINTER_KEY, mCurrentHunt);
-
-        huntJoinQuery.findInBackground(new FindCallback<HuntJoin>() {
-            @Override
-            public void done(List<HuntJoin> huntJoinList, ParseException e) {
-                if(e==null){
-                    if(huntJoinList.size() == 0){
-                        createHuntJoinRecord();
-                    }else{
-                        Toast.makeText(getContext(), "Welcome back to the hunt", Toast.LENGTH_SHORT).show();
-                    }
-                }else{
-                    e.printStackTrace();
-                }
-            }
-        });
+        HuntJoin huntJoinRecord = mKurtinListener.getHuntJoinRecord();
+        if(huntJoinRecord == null){
+            createHuntJoinRecord();
+        }else{
+            Toast.makeText(getContext(), "Welcome back to the hunt", Toast.LENGTH_SHORT).show();
+        }
+//        ParseQuery huntJoinQuery = ParseQuery.getQuery(HuntJoin.class);
+//        huntJoinQuery.whereEqualTo(HuntJoin.USER_POINTER_KEY, mCurrentUser);
+//        huntJoinQuery.whereEqualTo(HuntJoin.HUNT_POINTER_KEY, mCurrentHunt);
+//
+//        huntJoinQuery.findInBackground(new FindCallback<HuntJoin>() {
+//            @Override
+//            public void done(List<HuntJoin> huntJoinList, ParseException e) {
+//                if(e==null){
+//                    if(huntJoinList.size() == 0){
+//                        createHuntJoinRecord();
+//                    }else{
+//                        mKurtinListener.setHuntJoinRecord(huntJoinList.get(0));
+//                        Toast.makeText(getContext(), "Welcome back to the hunt", Toast.LENGTH_SHORT).show();
+//                    }
+//                }else{
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
     }
 
     private void createHuntJoinRecord(){
-        HuntJoin huntJoin = HuntJoin.createHuntJoinRecord(mCurrentUser, mCurrentHunt, mSelectedCheckpoint.getObjectId());
-        huntJoin.saveInBackground(new SaveCallback() {
+        HuntJoin newHuntJoinRecord = HuntJoin.createHuntJoinRecord(mCurrentUser, mCurrentHunt, mSelectedCheckpoint.getObjectId());
+        mKurtinListener.setHuntJoinRecord(newHuntJoinRecord);
+        newHuntJoinRecord.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if(e==null){
+                    //Should save HuntJoin Record here if it needs an object id
                 }else{
                     e.printStackTrace();
                 }

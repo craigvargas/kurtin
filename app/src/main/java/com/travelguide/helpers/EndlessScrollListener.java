@@ -3,6 +3,10 @@ package com.travelguide.helpers;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import java.util.List;
+
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
+
 public abstract class EndlessScrollListener extends RecyclerView.OnScrollListener {
     // The minimum amount of items to have below the current scroll position before loading more.
     private int visibleThreshold = 3;
@@ -18,9 +22,15 @@ public abstract class EndlessScrollListener extends RecyclerView.OnScrollListene
     private int firstVisibleItem, visibleItemCount, totalItemCount;
 
     private LinearLayoutManager mLinearLayoutManager;
+    private List<?> mList = null;
 
     public EndlessScrollListener(LinearLayoutManager linearLayoutManager) {
         this.mLinearLayoutManager = linearLayoutManager;
+    }
+
+    public EndlessScrollListener(LinearLayoutManager linearLayoutManager, List<?> list){
+        this.mLinearLayoutManager = linearLayoutManager;
+        this.mList = list;
     }
 
     @Override
@@ -29,7 +39,12 @@ public abstract class EndlessScrollListener extends RecyclerView.OnScrollListene
 
         firstVisibleItem = mLinearLayoutManager.findFirstVisibleItemPosition();
         visibleItemCount = recyclerView.getChildCount();
-        totalItemCount = mLinearLayoutManager.getItemCount();
+//        totalItemCount = mLinearLayoutManager.getItemCount();
+        if(mList == null){
+            totalItemCount = mLinearLayoutManager.getItemCount();
+        }else{
+            totalItemCount = mList.size();
+        }
 
         if (totalItemCount < previousTotalItemCount) {
             currentPage = this.startingPageIndex;

@@ -56,6 +56,7 @@ import com.travelguide.R;
 import com.travelguide.foursquare.constants.FoursquareConstants;
 import com.travelguide.fragments.CloudScannerFragment;
 import com.travelguide.fragments.FullscreenFragment;
+import com.travelguide.fragments.HuntCompleteFragment;
 import com.travelguide.fragments.HuntDetailFragment;
 import com.travelguide.fragments.HuntListFragment;
 import com.travelguide.fragments.KurtinLoginFragment;
@@ -139,6 +140,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
     private Checkpoint mSelectedCheckpoint;
     private List<Checkpoint> mCurrentCheckpoints;
     private List<KurtinInteraction> mCurrentInteractions;
+    private HuntJoin mUserHuntJoinRecord;
 
     private String referenceFragmentNameTag;
 
@@ -215,7 +217,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
         setContentFragment(
                 R.id.fragment_frame,
                 new HuntListFragment(),
-                AppCodesKeys.TRIP_PLAN_LIST_FRAGMENT_ID);
+                AppCodesKeys.HUNT_LIST_FRAGMENT_ID);
     }
 
     @Override
@@ -288,7 +290,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
                 setContentFragment(
                         R.id.fragment_frame,
                         new HuntListFragment(),
-                        AppCodesKeys.TRIP_PLAN_LIST_FRAGMENT_ID);
+                        AppCodesKeys.HUNT_LIST_FRAGMENT_ID);
                 break;
             case R.id.my_hunts_fragment:
                 break;
@@ -407,50 +409,51 @@ public class TravelGuideActivity extends AppCompatActivity implements
         ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_travel_guide_activity, menu);
-        final MenuItem searchItem = menu.findItem(R.id.action_search);
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                if (TextUtils.isEmpty(query))
-                    query = "Any";
-                city = formatQueryForSearch(query.trim());
-                searchItem.collapseActionView();
-                //Figure out how to set the title in the call below
-                setContentFragment(R.id.fragment_frame, SearchListFragment.newInstance(city, group, season));
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                if (!TextUtils.isEmpty(newText) && newText.length() > 2) {
-                    if (NetworkAvailabilityCheck.networkAvailable(TravelGuideActivity.this)) {
-                        loadCitySuggestions(searchView, formatQueryForSuggestions(newText));
-                        return true;
-                    }
-                }
-                return false;
-            }
-        });
-        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
-            @Override
-            public boolean onSuggestionClick(int position) {
-                MatrixCursor cursor = (MatrixCursor) searchView.getSuggestionsAdapter().getItem(position);
-                int indexColumnSuggestion = cursor.getColumnIndex("city");
-                searchView.setQuery(cursor.getString(indexColumnSuggestion), false);
-                return true;
-            }
-
-            @Override
-            public boolean onSuggestionSelect(int position) {
-                return false;
-            }
-        });
-        return true;
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.menu_travel_guide_activity, menu);
+//        final MenuItem searchItem = menu.findItem(R.id.action_search);
+//        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//                return true;
+////                if (TextUtils.isEmpty(query))
+////                    query = "Any";
+////                city = formatQueryForSearch(query.trim());
+////                searchItem.collapseActionView();
+////                //Figure out how to set the title in the call below
+////                setContentFragment(R.id.fragment_frame, SearchListFragment.newInstance(city, group, season));
+////                return true;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String newText) {
+//                if (!TextUtils.isEmpty(newText) && newText.length() > 2) {
+//                    if (NetworkAvailabilityCheck.networkAvailable(TravelGuideActivity.this)) {
+//                        loadCitySuggestions(searchView, formatQueryForSuggestions(newText));
+//                        return true;
+//                    }
+//                }
+//                return false;
+//            }
+//        });
+//        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+//            @Override
+//            public boolean onSuggestionClick(int position) {
+//                MatrixCursor cursor = (MatrixCursor) searchView.getSuggestionsAdapter().getItem(position);
+//                int indexColumnSuggestion = cursor.getColumnIndex("city");
+//                searchView.setQuery(cursor.getString(indexColumnSuggestion), false);
+//                return true;
+//            }
+//
+//            @Override
+//            public boolean onSuggestionSelect(int position) {
+//                return false;
+//            }
+//        });
+//        return true;
+//    }
 
     private void loadCitySuggestions(final SearchView searchView, String input) {
         final ArrayList<String> cityList = new ArrayList<>();
@@ -549,6 +552,77 @@ public class TravelGuideActivity extends AppCompatActivity implements
     //***
     //**
     //*
+    //Listener for Kurtin Logins and Logouts
+    @Override
+    public void onCompletedLoginLogout(boolean isLoggedIn, boolean isNewUser) {
+        mLoginStatus = isLoggedIn;
+//        setMenuItemLoginTitle();
+        prepareNavMenu();
+//        setHeaderProfileInfo(false);
+        refreshBackdrop();
+        refreshNavHeader();
+        hideOrShowFAB();
+//        if(mLoginStatus) {
+//            getSupportFragmentManager().popBackStack();
+//        }
+
+        if(isNewUser){
+            KurtinProfileFragment kurtinProfileFragment = KurtinProfileFragment.newInstance(isNewUser);
+//            setContentFragment(R.id.fragment_frame, kurtinProfileFragment);
+            setContentFragment(
+                    R.id.fragment_frame,
+                    kurtinProfileFragment,
+                    AppCodesKeys.KURTIN_PROFILE_FRAGMENT_ID);
+        }else{
+            onReturnToHomeScreen(true);
+        }
+    }
+
+    @Override
+    public void onSignUpRequested(){
+        KurtinSignUpFragment fragment = new KurtinSignUpFragment();
+//        setContentFragment(R.id.fragment_frame, fragment);
+        setContentFragment(
+                R.id.fragment_frame,
+                fragment,
+                AppCodesKeys.KURTIN_SIGN_UP_FRAGMENT_ID);
+    }
+
+    @Override
+    public void onLoginRequested(){
+//        KurtinLoginFragment fragment = new KurtinLoginFragment();
+//        setContentFragment(R.id.fragment_frame, fragment);
+        setContentFragment(
+                R.id.fragment_frame,
+                new KurtinLoginFragment(),
+                AppCodesKeys.KURTIN_LOGIN_FRAGMENT_ID);
+
+    }
+
+    @Override
+    public void onSignUpCompleted(Boolean isLoggedIn){
+        mLoginStatus = isLoggedIn;
+        prepareNavMenu();
+//        setHeaderProfileInfo(false);
+        refreshBackdrop();
+        refreshNavHeader();
+        hideOrShowFAB();
+//        if(mLoginStatus) {
+////            getSupportFragmentManager().popBackStack("home", NO_FLAGS);
+//            getSupportFragmentManager().popBackStack(AppCodesKeys.HUNT_LIST_FRAGMENT_ID, NO_FLAGS);
+//        }
+
+        Boolean isNewUser = true;
+        KurtinProfileFragment kurtinProfileFragment = KurtinProfileFragment.newInstance(isNewUser);
+        setContentFragment(
+                R.id.fragment_frame,
+                kurtinProfileFragment,
+                AppCodesKeys.KURTIN_PROFILE_FRAGMENT_ID);
+    }
+
+    private void setToolbarTitle(String fragmentId){
+        tvToolbarTitle.setText(AppCodesKeys.FRAGMENT_TITLE_MAP.get(fragmentId));
+    }
     @Override
     public void onTripPlanItemSelected(String objectId){
         Log.v("From Activity", "onTripPlanItemSelected is an empty function");
@@ -561,17 +635,17 @@ public class TravelGuideActivity extends AppCompatActivity implements
         setContentFragment(
                 R.id.fragment_frame,
                 fragment,
-                AppCodesKeys.TRIP_PLAN_DETAILS_FRAGMENT_ID);
+                AppCodesKeys.HUNT_DETAIL_FRAGMENT_ID);
     }
 
     @Override
-    public void onHuntSelected(Hunt hunt) {
+    public void onHuntSelected(Hunt hunt, Boolean userAlreadyStartedThisHunt) {
         mCurrentHunt = hunt;
         Log.v("onHuntSelected", "mCurrentHunt: " + mCurrentHunt.getHuntName());
         setContentFragment(
                 R.id.fragment_frame,
                 new HuntDetailFragment(),
-                AppCodesKeys.TRIP_PLAN_DETAILS_FRAGMENT_ID);
+                AppCodesKeys.HUNT_DETAIL_FRAGMENT_ID);
     }
 
     @Override
@@ -596,7 +670,12 @@ public class TravelGuideActivity extends AppCompatActivity implements
 
     @Override
     public Hunt getCurrentHunt(){
-        return mCurrentHunt;
+        try{
+            return mCurrentHunt;
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
@@ -606,7 +685,12 @@ public class TravelGuideActivity extends AppCompatActivity implements
 
     @Override
     public List<Checkpoint> getCurrentCheckpoints(){
-        return mCurrentCheckpoints;
+        try{
+            return mCurrentCheckpoints;
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public void setCurrentCheckpoints(List<Checkpoint> checkpoints){
@@ -616,20 +700,47 @@ public class TravelGuideActivity extends AppCompatActivity implements
     }
 
     @Override
-    public Checkpoint getSelectedCheckpoint(){ return mSelectedCheckpoint; }
+    public Checkpoint getSelectedCheckpoint() {
+        try {
+            return mSelectedCheckpoint;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     @Override
     public void setSelectedCheckpoint(Checkpoint checkpoint){ mSelectedCheckpoint = checkpoint;}
 
     @Override
     public List<KurtinInteraction> getCurrentInteractions(){
-        return mCurrentInteractions;
+        try {
+            return mCurrentInteractions;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
     public void setCurrentInteractions(List<KurtinInteraction> interactions){
         mCurrentInteractions.clear();
         mCurrentInteractions.addAll(interactions);
+    }
+
+    @Override
+    public HuntJoin getHuntJoinRecord(){
+        try {
+            return mUserHuntJoinRecord;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public void setHuntJoinRecord(HuntJoin huntJoinRecord){
+        mUserHuntJoinRecord = huntJoinRecord;
     }
 
     @Override
@@ -646,7 +757,23 @@ public class TravelGuideActivity extends AppCompatActivity implements
     @Override
     public void onHuntCompleted(HuntJoin huntJoinRecord){
         //Show hunt completion screen (trophy)
+        mUserHuntJoinRecord = huntJoinRecord;
+
+        setContentFragment(
+                R.id.fragment_frame,
+                new HuntCompleteFragment(),
+                AppCodesKeys.HUNT_COMPLETE_FRAGMENT_ID);
     }
+
+    @Override
+    public void onReturnToHomeScreen(Boolean needToClearHuntData){
+        getSupportFragmentManager().popBackStack(AppCodesKeys.HUNT_LIST_FRAGMENT_ID, NO_FLAGS);
+        setToolbarTitle(AppCodesKeys.HUNT_LIST_FRAGMENT_ID);
+        if(needToClearHuntData) {
+            clearAllHuntData();
+        }
+    }
+
     //*
     //**
     //***
@@ -655,7 +782,17 @@ public class TravelGuideActivity extends AppCompatActivity implements
     //**
     //*
 
+    private void clearAllHuntData(){
+        mCurrentHunt = null;
+        mSelectedCheckpoint = null;
+        mCurrentCheckpoints = null;
+        mCurrentInteractions = null;
+        mUserHuntJoinRecord = null;
+    }
 
+    private void onHomeScreenRequested(){
+        getSupportFragmentManager().popBackStack(AppCodesKeys.HUNT_LIST_FRAGMENT_ID, NO_FLAGS);
+    }
 
     /* Comented on 09/23 by hemanth fto bring use overallleaderboard in place of ..
     @Override
@@ -693,7 +830,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
         setContentFragment(
                 R.id.fragment_frame,
                 fragment,
-                AppCodesKeys.TRIP_PLAN_DETAILS_FRAGMENT_ID);
+                AppCodesKeys.HUNT_DETAIL_FRAGMENT_ID);
     }
 
     @Override
@@ -833,10 +970,12 @@ public class TravelGuideActivity extends AppCompatActivity implements
                         }else {
                             int numEntries = getSupportFragmentManager().getBackStackEntryCount();
                             int indexLastFragment = numEntries - 2;
+                            //Get the id of the last fragment
                             String fragmentId = getSupportFragmentManager()
                                     .getBackStackEntryAt(indexLastFragment)
                                     .getName();
                             getSupportFragmentManager().popBackStack();
+                            //Refresh the toolbar title
                             setToolbarTitle(fragmentId);
 //                            getSupportFragmentManager().popBackStack();
                         }
@@ -1044,50 +1183,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
     //////////////////////////
     //////////////////////////
 
-    //Listener for Kurtin Logins and Logouts
-    @Override
-    public void onCompletedLoginLogout(boolean isLoggedIn, boolean isNewUser) {
-        mLoginStatus = isLoggedIn;
-//        setMenuItemLoginTitle();
-        prepareNavMenu();
-//        setHeaderProfileInfo(false);
-        refreshBackdrop();
-        refreshNavHeader();
-        hideOrShowFAB();
-        if(mLoginStatus) {
-            getSupportFragmentManager().popBackStack();
-        }
 
-        if(isNewUser){
-            KurtinProfileFragment kurtinProfileFragment = KurtinProfileFragment.newInstance(isNewUser);
-//            setContentFragment(R.id.fragment_frame, kurtinProfileFragment);
-            setContentFragment(
-                    R.id.fragment_frame,
-                    kurtinProfileFragment,
-                    AppCodesKeys.KURTIN_PROFILE_FRAGMENT_ID);
-        }
-    }
-
-    @Override
-    public void onSignUpRequested(){
-        KurtinSignUpFragment fragment = new KurtinSignUpFragment();
-//        setContentFragment(R.id.fragment_frame, fragment);
-        setContentFragment(
-                R.id.fragment_frame,
-                fragment,
-                AppCodesKeys.KURTIN_SIGN_UP_FRAGMENT_ID);
-    }
-
-    @Override
-    public void onLoginRequested(){
-//        KurtinLoginFragment fragment = new KurtinLoginFragment();
-//        setContentFragment(R.id.fragment_frame, fragment);
-        setContentFragment(
-                R.id.fragment_frame,
-                new KurtinLoginFragment(),
-                AppCodesKeys.KURTIN_LOGIN_FRAGMENT_ID);
-
-    }
 
     //Setup the navigation menu depending on the whether or not the user is logged in
     private void prepareNavMenu() {
@@ -1166,31 +1262,6 @@ public class TravelGuideActivity extends AppCompatActivity implements
         getSupportFragmentManager().popBackStack();
     }
 
-    @Override
-    public void onSignUpCompleted(Boolean isLoggedIn){
-        mLoginStatus = isLoggedIn;
-        prepareNavMenu();
-//        setHeaderProfileInfo(false);
-        refreshBackdrop();
-        refreshNavHeader();
-        hideOrShowFAB();
-        if(mLoginStatus) {
-//            getSupportFragmentManager().popBackStack("home", NO_FLAGS);
-            getSupportFragmentManager().popBackStack(AppCodesKeys.TRIP_PLAN_LIST_FRAGMENT_ID, NO_FLAGS);
-        }
-
-        Boolean isNewUser = true;
-        KurtinProfileFragment kurtinProfileFragment = KurtinProfileFragment.newInstance(isNewUser);
-//        setContentFragment(R.id.fragment_frame, kurtinProfileFragment);
-        setContentFragment(
-                R.id.fragment_frame,
-                kurtinProfileFragment,
-                AppCodesKeys.KURTIN_PROFILE_FRAGMENT_ID);
-    }
-
-    private void setToolbarTitle(String fragmentId){
-        tvToolbarTitle.setText(AppCodesKeys.FRAGMENT_TITLE_MAP.get(fragmentId));
-    }
 
     ////////////////////////
     ////////////////////////

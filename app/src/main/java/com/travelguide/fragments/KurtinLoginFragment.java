@@ -56,6 +56,8 @@ import static com.travelguide.fragments.KurtinProfileFragment.getBitmapFromParse
  */
 public class KurtinLoginFragment extends Fragment {
 
+    private static final int ZERO_POINTS = 0;
+
     private ViewHolder viewHolder;
 
     private ParseUser parseUser;
@@ -404,77 +406,77 @@ public class KurtinLoginFragment extends Fragment {
                             } else
                                 coverPicUrl = null;
 
-//                            saveOrUpdateParseUser(requestType);
                             Preferences.writeBoolean(getContext(), Preferences.User.LOG_IN_STATUS, true);
+                            saveOrUpdateParseUser(requestType);
 
-
-                            if (!Preferences.readString(getContext(), Preferences.User.PROFILE_PIC_URL).equals(profilePicUrl)) {
-                                updateCoverPicUrl = false;
-                                Picasso.with(getContext()).load(profilePicUrl).into(viewHolder.ivProfilePic, new Callback() {
-                                    @Override
-                                    public void onSuccess() {
-                                        Preferences.writeString(getContext(), Preferences.User.PROFILE_PIC_URL, profilePicUrl);
-                                        if (coverPicUrl != null) {
-                                            if (!Preferences.readString(getContext(), Preferences.User.COVER_PIC_URL).equals(coverPicUrl)) {
-                                                Picasso.with(getContext()).load(coverPicUrl).into(viewHolder.ivCoverPic, new Callback() {
-                                                    @Override
-                                                    public void onSuccess() {
-                                                        Preferences.writeString(getContext(), Preferences.User.COVER_PIC_URL, coverPicUrl);
-                                                        saveOrUpdateParseUser(requestType);
-                                                    }
-
-                                                    @Override
-                                                    public void onError() {
-                                                        saveOrUpdateParseUser(requestType);
-                                                    }
-                                                });
-                                            }
-                                        } else {
-                                            viewHolder.ivCoverPic.setImageResource(android.R.color.transparent);
-                                            saveOrUpdateParseUser(requestType);
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onError() {
-                                        // TODO: Handle Error
-                                        // saveOrUpdateParseUser(requestType);
-                                    }
-                                });
-                            } else {
-                                saveOrUpdate = false;
-                            }
-
-                            if (updateCoverPicUrl) {
-                                updateCoverPicUrl = false;
-                                if (coverPicUrl != null) {
-                                    if (!Preferences.readString(getContext(), Preferences.User.COVER_PIC_URL).equals(coverPicUrl)) {
-                                        saveOrUpdate = true;
-                                        Picasso.with(getContext()).load(coverPicUrl).resize(getView().getWidth(), 0).into(viewHolder.ivCoverPic, new Callback() {
-                                            @Override
-                                            public void onSuccess() {
-                                                Preferences.writeString(getContext(), Preferences.User.COVER_PIC_URL, coverPicUrl);
-                                                saveOrUpdateParseUser(requestType);
-                                            }
-                                            @Override
-                                            public void onError() {
-                                                saveOrUpdateParseUser(requestType);
-                                            }
-                                        });
-                                    } else {
-                                        saveOrUpdate = false;
-                                    }
-                                } else {
-                                    saveOrUpdate = true;
-                                    viewHolder.ivCoverPic.setImageResource(android.R.color.transparent);
-                                    saveOrUpdateParseUser(requestType);
-                                }
-                            }
-
-                            Preferences.writeBoolean(getContext(), Preferences.User.LOG_IN_STATUS, true);
-                            if (!saveOrUpdate) {
-                                completeLogin();
-                            }
+//
+//                            if (!Preferences.readString(getContext(), Preferences.User.PROFILE_PIC_URL).equals(profilePicUrl)) {
+//                                updateCoverPicUrl = false;
+//                                Picasso.with(getContext()).load(profilePicUrl).into(viewHolder.ivProfilePic, new Callback() {
+//                                    @Override
+//                                    public void onSuccess() {
+//                                        Preferences.writeString(getContext(), Preferences.User.PROFILE_PIC_URL, profilePicUrl);
+//                                        if (coverPicUrl != null) {
+//                                            if (!Preferences.readString(getContext(), Preferences.User.COVER_PIC_URL).equals(coverPicUrl)) {
+//                                                Picasso.with(getContext()).load(coverPicUrl).into(viewHolder.ivCoverPic, new Callback() {
+//                                                    @Override
+//                                                    public void onSuccess() {
+//                                                        Preferences.writeString(getContext(), Preferences.User.COVER_PIC_URL, coverPicUrl);
+//                                                        saveOrUpdateParseUser(requestType);
+//                                                    }
+//
+//                                                    @Override
+//                                                    public void onError() {
+//                                                        saveOrUpdateParseUser(requestType);
+//                                                    }
+//                                                });
+//                                            }
+//                                        } else {
+//                                            viewHolder.ivCoverPic.setImageResource(android.R.color.transparent);
+//                                            saveOrUpdateParseUser(requestType);
+//                                        }
+//                                    }
+//
+//                                    @Override
+//                                    public void onError() {
+//                                        // TODO: Handle Error
+//                                        // saveOrUpdateParseUser(requestType);
+//                                    }
+//                                });
+//                            } else {
+//                                saveOrUpdate = false;
+//                            }
+//
+//                            if (updateCoverPicUrl) {
+//                                updateCoverPicUrl = false;
+//                                if (coverPicUrl != null) {
+//                                    if (!Preferences.readString(getContext(), Preferences.User.COVER_PIC_URL).equals(coverPicUrl)) {
+//                                        saveOrUpdate = true;
+//                                        Picasso.with(getContext()).load(coverPicUrl).resize(getView().getWidth(), 0).into(viewHolder.ivCoverPic, new Callback() {
+//                                            @Override
+//                                            public void onSuccess() {
+//                                                Preferences.writeString(getContext(), Preferences.User.COVER_PIC_URL, coverPicUrl);
+//                                                saveOrUpdateParseUser(requestType);
+//                                            }
+//                                            @Override
+//                                            public void onError() {
+//                                                saveOrUpdateParseUser(requestType);
+//                                            }
+//                                        });
+//                                    } else {
+//                                        saveOrUpdate = false;
+//                                    }
+//                                } else {
+//                                    saveOrUpdate = true;
+//                                    viewHolder.ivCoverPic.setImageResource(android.R.color.transparent);
+//                                    saveOrUpdateParseUser(requestType);
+//                                }
+//                            }
+//
+//                            Preferences.writeBoolean(getContext(), Preferences.User.LOG_IN_STATUS, true);
+//                            if (!saveOrUpdate) {
+//                                completeLogin();
+//                            }
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -489,10 +491,13 @@ public class KurtinLoginFragment extends Fragment {
         parseUser = ParseUser.getCurrentUser();
         Preferences.writeString(getContext(), Preferences.User.USER_OBJECT_ID, parseUser.getObjectId());
         parseUser.setUsername(name);
+        parseUser.put(AppCodesKeys.PARSE_USER_NICKNAME_KEY, name);
         parseUser.setEmail(email);
         final Context context = getContext();
 
         if (requestType == LoginFragment.RequestType.NEW) {
+            parseUser.put(AppCodesKeys.PARSE_USER_TOTAL_POINTS_KEY, ZERO_POINTS);
+            //Save Profile and Cover Pics to parseFiles then Save User to Database
 
             //Load profile pic into a file if it exists
             if (profilePicUrl != null) {
@@ -577,42 +582,6 @@ public class KurtinLoginFragment extends Fragment {
             Log.v("Save", "0");
             completeLogin();
         }
-//        // Saving profile photo as a ParseFile
-//        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//        Bitmap bitmap = ((BitmapDrawable) viewHolder.ivProfilePic.getDrawable()).getBitmap();
-//        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-//        byte[] data = stream.toByteArray();
-//        String thumbName = parseUser.getUsername().replaceAll("\\s+", "");
-//        ParseFile profilePicture = new ParseFile(thumbName + "_thumb.jpg", data);
-//        ParseFile coverPicture = null;
-//        // Saving cover photo as a ParseFile
-//        if (coverPicUrl != null && viewHolder.ivCoverPic.getDrawable() != null) {
-//            ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
-//            Bitmap bitmap2 = ((BitmapDrawable) viewHolder.ivCoverPic.getDrawable()).getBitmap();
-//            bitmap2.compress(Bitmap.CompressFormat.JPEG, 100, stream2);
-//            byte[] data2 = stream2.toByteArray();
-//            String fileName = parseUser.getUsername().replaceAll("\\s+", "");
-//            coverPicture = new ParseFile(fileName + "_cover.jpg", data2);
-//        }
-//        // else {
-//        //     int width = DeviceDimensionsHelper.getDisplayWidth(getContext());
-//        //     int height = DeviceDimensionsHelper.getDisplayHeight(getContext());
-//        //     int[] colors = new int[width * height];
-//        //     for (int i = 0; i < width * height; i++) {
-//        //         colors[i] = R.color.colorPrimary;
-//        //     }
-//        //     bitmap = Bitmap.createBitmap(colors, width, height, Bitmap.Config.ARGB_8888);
-//        //     bitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream);
-//        //     data = stream.toByteArray();
-//        //     String fileName = parseUser.getUsername().replaceAll("\\s+", "");
-//        //     coverPicture = new ParseFile(fileName + "_cover.jpg", data);
-//        // }
-//        if (requestType == LoginFragment.RequestType.NEW) {
-//            parseUser.put("favTrips", new ArrayList<String>());
-//            saveNewParseUser(parseUser, profilePicture, coverPicture);
-//        } else {
-//            updateExistingParseUser(parseUser, profilePicture, coverPicture);
-//        }
     }
 
     //Last step in login process of new user

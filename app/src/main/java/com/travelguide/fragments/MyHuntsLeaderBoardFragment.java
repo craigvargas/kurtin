@@ -47,6 +47,7 @@ public class MyHuntsLeaderBoardFragment extends LeaderBoardFragment {
     private OverallLeaderBoardAdapter mTripPlanAdapter;
     private List<MasterLeaderBoard> mTripPlans;
     private List<Competitor> mCompetitors;
+    private List<ParseUser> mLeaderBoardList;
     ArrayList<String> huntName;
     private TextView tvEmptyLeaderBoard;
     private  TextView tvEmptyInProfile;
@@ -69,7 +70,8 @@ public class MyHuntsLeaderBoardFragment extends LeaderBoardFragment {
 
         mTripPlans = new ArrayList<>();
         mCompetitors = new ArrayList<>();
-        mTripPlanAdapter = new OverallLeaderBoardAdapter(mCompetitors, getContext());
+        mLeaderBoardList = new ArrayList<>();
+        mTripPlanAdapter = new OverallLeaderBoardAdapter(mLeaderBoardList, getContext());
 
         rvTripPlans = (RecyclerView) view.findViewById(R.id.rvTripPlansInProfile);
         rvTripPlans.setAdapter(mTripPlanAdapter);

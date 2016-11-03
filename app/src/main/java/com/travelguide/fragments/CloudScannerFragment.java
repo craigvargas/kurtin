@@ -37,6 +37,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -46,6 +47,7 @@ import com.squareup.picasso.Picasso;
 import com.travelguide.R;
 import com.travelguide.adapters.QuestionsAdapter;
 import com.travelguide.decorations.DividerItemDecoration;
+import com.travelguide.helpers.AppCodesKeys;
 import com.travelguide.helpers.UpdatePointsandLeaderBoard;
 import com.travelguide.listener.KurtinListener;
 import com.travelguide.models.Checkpoint;
@@ -81,6 +83,7 @@ import java.util.List;
 import static android.widget.ImageView.ScaleType.FIT_XY;
 import static com.facebook.FacebookSdk.getApplicationContext;
 import static com.loopj.android.http.AsyncHttpClient.log;
+import static com.travelguide.R.id.fabNewTripPlan;
 import static com.travelguide.R.id.on_click_cloud_tracking_info_field;
 import static com.travelguide.R.id.q1;
 import static com.travelguide.R.id.q2;
@@ -206,6 +209,8 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
     private ParseUser mCurrentUser;
     private Integer mSelectedOption;
     private HashMap<String,Integer> mSelectedOptionsMap;
+
+    private FloatingActionButton fabUserContent;
     //Cvar: end Cvar member variables
 
     @
@@ -255,6 +260,9 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         mQuestionsList = new ArrayList<Questions>();
 //        mQuestionsAdapter = new QuestionsAdapter(mQuestionsList, getContext());
         mQuestionsAdapter = new QuestionsAdapter(mQuestionsList, getContext(), this);
+
+        fabUserContent = (FloatingActionButton) controls.findViewById(R.id.fabUserContent);
+        fabUserContent.setVisibility(View.INVISIBLE);
 
     }
 
@@ -425,18 +433,20 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
                             mCurrentHunt = mKurtinListener.getCurrentHunt();
                             mCheckpointList = mKurtinListener.getCurrentCheckpoints();
                             mCurrentUser = ParseUser.getCurrentUser();
-                            mUserHuntJoinRecord = null;
+                            mUserHuntJoinRecord = mKurtinListener.getHuntJoinRecord();
 
-                            //Query the Join table
-                            ParseQuery<HuntJoin> huntJoinParseQuery = ParseQuery.getQuery(HuntJoin.class);
-                            huntJoinParseQuery.whereEqualTo(HuntJoin.USER_POINTER_KEY, mCurrentUser);
-                            huntJoinParseQuery.whereEqualTo(HuntJoin.HUNT_POINTER_KEY, mCurrentHunt);
+                            //Retrieve huntJoin record from database
+//                            //Query the Join table
+//                            ParseQuery<HuntJoin> huntJoinParseQuery = ParseQuery.getQuery(HuntJoin.class);
+//                            huntJoinParseQuery.whereEqualTo(HuntJoin.USER_POINTER_KEY, mCurrentUser);
+//                            huntJoinParseQuery.whereEqualTo(HuntJoin.HUNT_POINTER_KEY, mCurrentHunt);
 
-                            try {
-                                mUserHuntJoinRecord = huntJoinParseQuery.getFirst();
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
+
+//                            try {
+//                                mUserHuntJoinRecord = huntJoinParseQuery.getFirst();
+//                            } catch (ParseException e) {
+//                                e.printStackTrace();
+//                            }
 
                             if (levelId.equals(mSelectedCheckpoint.getObjectId())) {
                                 //Get Interaction(Question) data from parse
@@ -1172,11 +1182,33 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
             }
         }
         mUserHuntJoinRecord.putResults(newCheckpointResultsArray);
-        HuntJoin.calculatePointTotalsInHuntJoinRecord(mUserHuntJoinRecord, mCheckpointList.size(), mInteractionList.size());
+        int pointsJustEarned = HuntJoin.calculatePointTotalsAndReturnPointIncrease(mUserHuntJoinRecord, mCheckpointList.size(), mInteractionList.size());
+        updateUserTotalPoints(pointsJustEarned);
         mUserHuntJoinRecord.saveInBackground();
+
         if(mUserHuntJoinRecord.getCompletionStatus()){
+            try{
+                mKurtinListener.onHuntCompleted(mUserHuntJoinRecord);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
             //Show hunt completion screen (trophy)
         }
+    }
+
+    private void updateUserTotalPoints(int pointsJustEarned){
+        Integer userTotalPoints = null;
+        try{
+            userTotalPoints = (Integer) mCurrentUser.get(AppCodesKeys.PARSE_USER_TOTAL_POINTS_KEY);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        if (userTotalPoints == null){
+            userTotalPoints = 0;
+        }
+        userTotalPoints += pointsJustEarned;
+        mCurrentUser.put(AppCodesKeys.PARSE_USER_TOTAL_POINTS_KEY, userTotalPoints);
+        mCurrentUser.saveInBackground();
     }
 
     private JSONObject createInteractionResultObject(int quadrant){
@@ -1227,11 +1259,14 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         setInitialViewValues();
 
         determineQuadrantCompletionStatuses();
-        minimizeAllQuadrants();
         hideAllSubmitButtons();
         initializeMemberVariables();
 
         loadAllQuadrants();
+        minimizeAllQuadrants();
+
+        showFab();
+
     }
 
     private void populateContentFieldsFromJson() {
@@ -1316,6 +1351,14 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
                 mUserHuntJoinRecord,
                 mSelectedCheckpoint.getObjectId(),
                 mInteractionList.get(3).getObjectId());
+
+        if(isQ1Completed && isQ2Completed && isQ3Completed && isQ4Completed){
+            try{
+                mKurtinListener.onHuntCompleted(mUserHuntJoinRecord);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
     }
 
     private void minimizeAllQuadrants() {
@@ -1602,5 +1645,25 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         EditText targetInformationTextField = (EditText) controls.findViewById(on_click_cloud_tracking_info_field);
         targetInformationTextField.setText(textToDisplay);
         targetInformationTextField.setVisibility(View.VISIBLE);
+    }
+
+    private void showFab(){
+        fabUserContent.setVisibility(View.VISIBLE);
+        fabUserContent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try{
+                    if(mUserHuntJoinRecord == null){
+                        mKurtinListener.onReturnToHomeScreen(true);
+                    }else {
+                        mUserHuntJoinRecord.putCompletionStatus(true);
+                        mUserHuntJoinRecord.saveInBackground();
+                        mKurtinListener.onHuntCompleted(mUserHuntJoinRecord);
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }

@@ -14,6 +14,7 @@ public class AppCodesKeys {
     public static final String PARSE_USER_PROFILE_PIC_KEY = "profileThumb";
     public static final String PARSE_USER_NICKNAME_KEY = "nickname";
     public static final String PARSE_USER_USERNAME_KEY = "username";
+    public static final String PARSE_USER_TOTAL_POINTS_KEY = "totalPoints";
 
     //Parse Hunt Entry Keys (Hunt Leader Board)
     //A Hunt Entry is a unique player signing up to participate in a hunt
@@ -35,6 +36,8 @@ public class AppCodesKeys {
     public static final String PROFILE_PIC_FILE_NAME = "profile.jpg";
 
     //Fragment Ids
+    public static final String HUNT_LIST_FRAGMENT_ID = "huntList";
+    public static final String HUNT_DETAIL_FRAGMENT_ID = "huntDetail";
     public static final String TRIP_PLAN_LIST_FRAGMENT_ID = "tripPlanList";
     public static final String TRIP_PLAN_DETAILS_FRAGMENT_ID = "tripPlanDetails";
     public static final String OVERALL_LEADER_BOARD_FRAGMENT_ID = "overallLeaderBoard";
@@ -45,8 +48,12 @@ public class AppCodesKeys {
     public static final String KURTIN_PROFILE_FRAGMENT_ID = "kurtinProfile";
     public static final String SCANNER_FRAGMENT_ID = "scanner";
     public static final String SETTINGS_FRAGMENT_ID = "settings";
+    public static final String HUNT_COMPLETE_FRAGMENT_ID = "huntComplete";
+
 
     //Fragment Titles
+    public static final String HUNT_LIST_TITLE = "PUBLIC HUNTS";
+    public static final String HUNT_DETAIL_TITLE = "HUNT DETAILS";
     public static final String TRIP_PLAN_LIST_TITLE = "PUBLIC HUNTS";
     public static final String TRIP_PLAN_DETAILS_TITLE = "HUNT DETAILS";
     public static final String OVERALL_LEADER_BOARD_TITLE = "OVERALL LEADER BOARD";
@@ -57,9 +64,12 @@ public class AppCodesKeys {
     public static final String KURTIN_PROFILE_TITLE = "YOUR PROFILE";
     public static final String SCANNER_TITLE = "SCAN YOUR IMAGE";
     public static final String SETTINGS_TITLE = "SETTINGS";
+    public static final String HUNT_COMPLETE_TITLE = "GREAT JOB!";
 
     //Map to associate fragments with their titles
     public static final HashMap<String, String> FRAGMENT_TITLE_MAP = new HashMap<String, String>(){{
+        put(HUNT_LIST_FRAGMENT_ID, HUNT_LIST_TITLE);
+        put(HUNT_DETAIL_FRAGMENT_ID, HUNT_DETAIL_TITLE);
         put(TRIP_PLAN_LIST_FRAGMENT_ID, TRIP_PLAN_LIST_TITLE);
         put(TRIP_PLAN_DETAILS_FRAGMENT_ID, TRIP_PLAN_DETAILS_TITLE);
         put(OVERALL_LEADER_BOARD_FRAGMENT_ID, OVERALL_LEADER_BOARD_TITLE);
@@ -70,5 +80,6 @@ public class AppCodesKeys {
         put(KURTIN_PROFILE_FRAGMENT_ID, KURTIN_PROFILE_TITLE);
         put(SCANNER_FRAGMENT_ID, SCANNER_TITLE);
         put(SETTINGS_FRAGMENT_ID, SETTINGS_TITLE);
+        put(HUNT_COMPLETE_FRAGMENT_ID, HUNT_COMPLETE_TITLE);
     }};
 }

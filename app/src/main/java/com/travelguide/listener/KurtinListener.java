@@ -16,7 +16,7 @@ public interface KurtinListener {
 
     void onHuntSelected(String tripPlanObjectId);
 
-    void onHuntSelected(Hunt hunt);
+    void onHuntSelected(Hunt hunt, Boolean userAlreadyStartedThisHunt);
 
     void onCheckpointScanSelected(Checkpoint checkpoint);
 
@@ -47,4 +47,10 @@ public interface KurtinListener {
     void onSuccessfulCloudScanRecognition(JSONArray contentToDisplay);
 
     void onHuntCompleted(HuntJoin huntJoinRecord);
+
+    void onReturnToHomeScreen(Boolean needToClearHuntData);
+
+    HuntJoin getHuntJoinRecord();
+
+    void setHuntJoinRecord(HuntJoin huntJoinRecord);
 }

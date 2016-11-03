@@ -19,6 +19,7 @@
     <color name="white">#ffffff</color>
     <color name="gray">#EEEEEE</color>
     <color name="green">#2ecc71</color>
+    <color name="completion_screen_text">@color/white</color>
 
     <!--CVar's colors-->
     <color name="black">#000</color>
@@ -36,6 +37,9 @@
     <color name="sunset_orange">#FF5656</color>
     <color name="tangerine">#EF8300</color>
     <color name="dogwood_rose">#D80068</color>
+    <color name="onyx">#343D46</color>
+    <color name="outer_space">#3D4854</color>
+    <color name="japanese_indigo">#263c54</color>
 
 
 
