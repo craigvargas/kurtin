@@ -64,6 +64,7 @@ import com.travelguide.fragments.KurtinProfileFragment;
 import com.travelguide.fragments.KurtinSignUpFragment;
 import com.travelguide.fragments.LeaderBoardFragment;
 import com.travelguide.fragments.LoginFragment;
+import com.travelguide.fragments.OverallLeaderBoardFragment;
 import com.travelguide.fragments.ProfileFragment;
 import com.travelguide.fragments.SearchListFragment;
 import com.travelguide.helpers.AppCodesKeys;
@@ -297,10 +298,14 @@ public class TravelGuideActivity extends AppCompatActivity implements
             case R.id.favorites_fragment:
                 break;
             case R.id.leaders_fragment:
-//                setContentFragment(R.id.fragment_frame, new LeaderBoardFragment());
+                //Uncomment line below to go back to a tabbed leader board fragment page
+//                setContentFragment(
+//                        R.id.fragment_frame,
+//                        new LeaderBoardFragment(),
+//                        AppCodesKeys.LEADER_BOARD_FRAGMENT_ID);
                 setContentFragment(
                         R.id.fragment_frame,
-                        new LeaderBoardFragment(),
+                        new OverallLeaderBoardFragment(),
                         AppCodesKeys.LEADER_BOARD_FRAGMENT_ID);
                 break;
             case R.id.private_fragment:
