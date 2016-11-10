@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:id="@+id/rlHuntItem"
     android:layout_height="wrap_content"
     android:background="@drawable/selector_place"
@@ -17,8 +17,8 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="4dp"
         android:textSize="16sp"
-        android:layout_alignParentTop="true"
-        android:textColor="@color/black"
+        android:layout_alignBottom="@+id/ivUserImage"
+        android:textColor="@color/outer_space"
         android:layout_toRightOf="@+id/ivUserImage" />
 
 
@@ -30,9 +30,9 @@
         android:layout_marginTop="4dp"
         tools:text="Castello di Amorosa"
         android:textSize="16sp"
-        android:textColor="@color/kurtin_text_primary"
+        android:textColor="@color/outer_space"
         android:layout_marginLeft="16dp"
-        android:layout_alignParentTop="true"
+        android:layout_alignBottom="@+id/ivUserImage"
         android:layout_toRightOf="@+id/tvPosition"
         android:layout_toEndOf="@+id/tvPosition" />
 
@@ -43,6 +43,7 @@
         android:background="@drawable/background_profile"
         android:contentDescription="@null"
         android:src="@drawable/profile_placeholder"
+        android:layout_centerVertical="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
@@ -52,17 +53,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
-        android:layout_marginLeft="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignBottom="@+id/ivUserImage"
         tools:text="400"
-        android:layout_below="@+id/tvPosition"
-        android:textSize="24sp"
+        android:textSize="20sp"
         android:textColor="@color/kurtin_text_primary"
-        android:layout_toRightOf="@+id/ivUserImage"
          />
     <!--android:layout_alignLeft="@+id/tvPosition"-->
     <!--android:layout_alignRight="@+id/tvPosition"-->
     <!--android:layout_toEndOf="@+id/ivUserImage"-->
     <!--android:layout_centerVertical="true"-->
+    <!--android:layout_below="@+id/tvPosition"-->
+    <!--android:layout_toRightOf="@+id/ivUserImage"-->
 
 
 
@@ -78,6 +81,7 @@
         android:textColor="@color/kurtin_text_light"
         android:layout_toRightOf="@+id/tvPoints"
         android:layout_marginLeft="16dp"
+        android:visibility="gone"
         />
 
     <View

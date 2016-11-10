@@ -62,7 +62,7 @@
             android:ellipsize="marquee"
             android:gravity="center"
             android:text="#1 Placeholder"
-            android:textColor="@color/kurtin_text_primary" />
+            android:textColor="@color/outer_space" />
 
         <TextView
             android:id="@+id/tvFirstPlacePoints"
@@ -99,7 +99,7 @@
             android:ellipsize="marquee"
             android:gravity="center"
             android:text="#2 Placeholder"
-            android:textColor="@color/kurtin_text_primary" />
+            android:textColor="@color/outer_space" />
 
         <TextView
             android:id="@+id/tvSecondPlacePoints"
@@ -136,7 +136,7 @@
             android:ellipsize="marquee"
             android:gravity="center"
             android:text="#2 Placeholder"
-            android:textColor="@color/kurtin_text_primary" />
+            android:textColor="@color/outer_space" />
 
         <TextView
             android:id="@+id/tvThirdPlacePoints"
