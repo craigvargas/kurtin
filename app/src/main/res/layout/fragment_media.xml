@@ -1,0 +1,48 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.travelguide.fragments.MediaFragment">
+
+    <RelativeLayout
+        android:id="@+id/rlQuadrantView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:id="@+id/rlQ1"
+            android:layout_width="150dp"
+            android:layout_height="250dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"/>
+
+        <RelativeLayout
+            android:id="@+id/rlQ2"
+            android:layout_width="150dp"
+            android:layout_height="250dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"/>
+
+        <RelativeLayout
+            android:id="@+id/rlQ3"
+            android:layout_width="150dp"
+            android:layout_height="250dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"/>
+
+        <RelativeLayout
+            android:id="@+id/rlQ4"
+            android:layout_width="150dp"
+            android:layout_height="250dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"/>
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/ivBrandLogo"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerInParent="true"/>
+
+    </RelativeLayout>
+
+</FrameLayout>

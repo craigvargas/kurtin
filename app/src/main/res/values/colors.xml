@@ -33,6 +33,7 @@
     <color name="kurtin_home_divider">@color/black</color>
     <color name="transparent">#0000</color>
     <color name="translucent">#77000000</color>
+    <color name="translucent_dark">#CC000000</color>
     <color name="usc_gold">#FFC700</color>
     <color name="sunset_orange">#FF5656</color>
     <color name="tangerine">#EF8300</color>

@@ -6,13 +6,11 @@ package com.travelguide.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,7 +20,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -31,12 +28,15 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.ImageViewTarget;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -58,9 +58,9 @@ import com.travelguide.models.KurtinInteraction;
 import com.travelguide.models.LeaderBoard;
 import com.travelguide.models.Questions;
 import com.travelguide.scanner.CustomSurfaceView;
+import com.travelguide.scanner.Driver;
 import com.travelguide.scanner.GLRenderer;
 import com.travelguide.scanner.WikitudeSDKConstants;
-import com.travelguide.scanner.Driver;
 import com.wikitude.WikitudeSDK;
 import com.wikitude.WikitudeSDKStartupConfiguration;
 import com.wikitude.common.camera.CameraSettings;
@@ -76,23 +76,25 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
+import static android.widget.ImageView.ScaleType.CENTER_INSIDE;
 import static android.widget.ImageView.ScaleType.FIT_XY;
 import static com.facebook.FacebookSdk.getApplicationContext;
-import static com.loopj.android.http.AsyncHttpClient.log;
-import static com.travelguide.R.id.fabNewTripPlan;
+import static com.travelguide.R.id.default_activity_button;
 import static com.travelguide.R.id.on_click_cloud_tracking_info_field;
-import static com.travelguide.R.id.q1;
-import static com.travelguide.R.id.q2;
-import static com.travelguide.R.id.q4;
+import static com.travelguide.R.id.on_click_cloud_tracking_recognize_button;
 
 public class CloudScannerFragment extends Fragment implements CloudTrackerEventListener, ExternalRendering, QuestionsAdapter.QuestionsAdapterListener {
 
     private static final String TAG = "OnClickCloudTracking";
     private static final String WIKITUDE_METADATA_KEY = "metadata";
+
+    private static final String CLOSE_HUNT_PROMPT = "Are you sure you want to leave the hunt?";
+    private static final String COMPLETE_HUNT_PROMPT = "Are you sure you want to complete the hunt early? There are still quadrants to complete";
 
     private WikitudeSDK _wikitudeSDK;
     private CustomSurfaceView _customSurfaceView;
@@ -108,6 +110,10 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
     DisplayMetrics dm;
     int height;
     int width;
+    int fullHeight;
+    int fullWidth;
+    int smallHeight;
+    int smallWidth;
     WebView webViewYT;
 
     int webviewHeight;
@@ -146,6 +152,10 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
     private Boolean isQ3Completed = false;
     private Boolean isQ4Completed = false;
 
+//    private Boolean isQ1Completable = false;
+//    private Boolean isQ2Completable = false;
+//    private Boolean isQ3Completable = false;
+//    private Boolean isQ4Completable = false;
 
     private EditText on_click_cloud_tracking_info;
 
@@ -210,7 +220,22 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
     private Integer mSelectedOption;
     private HashMap<String,Integer> mSelectedOptionsMap;
 
-    private FloatingActionButton fabUserContent;
+//    private FloatingActionButton fabCompleteHunt;
+//    private FloatingActionButton fabClose;
+
+    private android.support.design.widget.FloatingActionButton fabCompleteHunt;
+    private android.support.design.widget.FloatingActionButton fabClose;
+
+    //prompt
+    private RelativeLayout rlPrompt;
+    private TextView tvPromptText;
+    private Button btnYes;
+    private Button btnNo;
+
+    private ImageView ivBrandLogo;
+
+    private final int mQuadrantMargin = 8;
+
     //Cvar: end Cvar member variables
 
     @
@@ -219,8 +244,8 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
                              Bundle savedInstanceState) {
         controls = inflater.inflate(R.layout.activity_on_click_cloud_tracking, container, false);
 
-        //        initUI();
         initData();
+        initializePromptView();
         return controls;
 
     }
@@ -257,12 +282,49 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         webviewHeight = dm.heightPixels / 2;
         double fheight = height / 2.3;
         quadheightsmall = (int) fheight;
+        fullHeight = dm.heightPixels;
+        fullWidth = dm.widthPixels;
+        smallHeight = (int) (fullHeight/2 - (mQuadrantMargin*1.5));
+        smallWidth = (int) (fullWidth/2 - (mQuadrantMargin*1.5));
         mQuestionsList = new ArrayList<Questions>();
 //        mQuestionsAdapter = new QuestionsAdapter(mQuestionsList, getContext());
         mQuestionsAdapter = new QuestionsAdapter(mQuestionsList, getContext(), this);
 
-        fabUserContent = (FloatingActionButton) controls.findViewById(R.id.fabUserContent);
-        fabUserContent.setVisibility(View.INVISIBLE);
+//        fabCompleteHunt = (FloatingActionButton) controls.findViewById(R.id.fabCompleteHunt);
+//        fabClose = (FloatingActionButton) controls.findViewById(R.id.fabClose);
+        fabCompleteHunt = (android.support.design.widget.FloatingActionButton) controls.findViewById(R.id.fabCompleteHunt);
+        fabClose = (android.support.design.widget.FloatingActionButton) controls.findViewById(R.id.fabClose);
+        fabClose.setVisibility(View.INVISIBLE);
+        fabCompleteHunt.setVisibility(View.INVISIBLE);
+
+    }
+
+    private void initializePromptView(){
+        rlPrompt = (RelativeLayout) controls.findViewById(R.id.rlPrompt);
+        tvPromptText = (TextView) controls.findViewById(R.id.tvPromptText);
+        btnYes = (Button) controls.findViewById(R.id.btnYes);
+        btnNo = (Button) controls.findViewById(R.id.btnNo);
+
+        btnYes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String promptText = (String) tvPromptText.getText();
+                if(promptText.equals(CLOSE_HUNT_PROMPT)){
+                    closeHunt();
+                }else if(promptText.equals(COMPLETE_HUNT_PROMPT)){
+                    completeHunt();
+                }
+            }
+        });
+
+        btnNo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rlPrompt.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        rlPrompt.setVisibility(View.INVISIBLE);
 
     }
 
@@ -326,7 +388,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         _driver = new Driver(_customSurfaceView, 30);
         viewHolder = (FrameLayout) controls.findViewById(R.id.track_frame);
         viewHolder.addView(_customSurfaceView);
-        recognizeButton = (Button) controls.findViewById(R.id.on_click_cloud_tracking_recognize_button);
+        recognizeButton = (Button) controls.findViewById(on_click_cloud_tracking_recognize_button);
         recognizeButton.setOnClickListener(new View.OnClickListener() {
             @
                     Override
@@ -460,9 +522,11 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
                                             mInteractionList = interactionList;
                                             Log.v("InteractionList", "Interaction List: " + interactionList);
                                             initializeContentViews();
+                                            controls.findViewById(on_click_cloud_tracking_info_field).setVisibility(View.INVISIBLE);
 
                                             try {
-                                                displayTextInInfoView(nameToDisplay);
+                                                //uncomment line below if you want to show top info banner with brand info
+//                                                displayTextInInfoView(nameToDisplay);
                                             } catch (Exception exception) {
                                                 exception.printStackTrace();
                                             }
@@ -516,12 +580,15 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
 
     public void setQ1Large(RelativeLayout q1, RelativeLayout q2, RelativeLayout q3, RelativeLayout q4, EditText windText, Button submitbtn, TextView completedTV) {
 
+        ivBrandLogo.setVisibility(View.INVISIBLE);
         q1.setVisibility(View.VISIBLE);
         q2.setVisibility(View.INVISIBLE);
         q3.setVisibility(View.INVISIBLE);
         q4.setVisibility(View.INVISIBLE);
-        RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(width, height - 40);
-        linearlayout.setMargins(0, 60, 0, 0);
+        fabClose.setVisibility(View.INVISIBLE);
+        fabCompleteHunt.setVisibility(View.INVISIBLE);
+        RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(fullWidth, fullHeight);
+        linearlayout.setMargins(0, 0, 0, 0);
         q1.setLayoutParams(linearlayout);
 
         windText.setText("YouTube");
@@ -535,17 +602,20 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
 
     public void setQ1Small(RelativeLayout q1, RelativeLayout q2, RelativeLayout q3, RelativeLayout q4, Button submitbtn, EditText namedisp, String sname) {
 
+        ivBrandLogo.setVisibility(View.VISIBLE);
         q1.setVisibility(View.VISIBLE);
         q2.setVisibility(View.VISIBLE);
         q3.setVisibility(View.VISIBLE);
         q4.setVisibility(View.VISIBLE);
-        RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(width / 2 - 15, quadheightsmall - 40);
-        linearlayout.setMargins(20, 60, 20, 20);
+        fabClose.setVisibility(View.VISIBLE);
+        fabCompleteHunt.setVisibility(View.VISIBLE);
+        RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(smallWidth, smallHeight);
+        linearlayout.setMargins(mQuadrantMargin, mQuadrantMargin, 0, 0);
         q1.setLayoutParams(linearlayout);
 
         clearRecyData(submitbtn);
         namedisp.setText(sname);
-        recognizeButton.setVisibility(View.VISIBLE);
+        recognizeButton.setVisibility(View.GONE);
 
         if (isQ1Completed) {
             wbCompleted1.setVisibility(View.VISIBLE);
@@ -554,12 +624,15 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
 
     public void setQ2Large(RelativeLayout q1, RelativeLayout q2, RelativeLayout q3, RelativeLayout q4, EditText windText, Button submitbtn) {
 
+        ivBrandLogo.setVisibility(View.INVISIBLE);
         q1.setVisibility(View.INVISIBLE);
         q2.setVisibility(View.VISIBLE);
         q3.setVisibility(View.INVISIBLE);
         q4.setVisibility(View.INVISIBLE);
-        RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(width, height - 40);
-        linearlayout.setMargins(0, 60, 0, 0);
+        fabClose.setVisibility(View.INVISIBLE);
+        fabCompleteHunt.setVisibility(View.INVISIBLE);
+        RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(fullWidth, fullHeight);
+        linearlayout.setMargins(0, 0, 0, 0);
         q2.setLayoutParams(linearlayout);
         windText.setText("Facebook");
 
@@ -570,29 +643,35 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
     }
 
     public void setQ2Small(RelativeLayout q1, RelativeLayout q2, RelativeLayout q3, RelativeLayout q4, Button submit, EditText namedisp, String sname) {
+        ivBrandLogo.setVisibility(View.VISIBLE);
         q1.setVisibility(View.VISIBLE);
         q2.setVisibility(View.VISIBLE);
         q3.setVisibility(View.VISIBLE);
         q4.setVisibility(View.VISIBLE);
-        RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(width / 2, quadheightsmall - 40);
-        linearlayout.setMargins(width / 2 + 30, 60, 20, 20);
+        fabClose.setVisibility(View.VISIBLE);
+        fabCompleteHunt.setVisibility(View.VISIBLE);
+        RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(smallWidth, smallHeight);
+        linearlayout.setMargins(mQuadrantMargin + smallWidth + mQuadrantMargin, mQuadrantMargin, mQuadrantMargin, 0);
         q2.setLayoutParams(linearlayout);
 
         namedisp.setText(sname);
         clearRecyData(submit);
-        recognizeButton.setVisibility(View.VISIBLE);
+        recognizeButton.setVisibility(View.GONE);
         if (isQ2Completed) {
             wbCompleted2.setVisibility(View.VISIBLE);
         }
     }
 
     public void setQ3Large(RelativeLayout q1, RelativeLayout q2, RelativeLayout q3, RelativeLayout q4, EditText windText, Button submitbtn) {
+        ivBrandLogo.setVisibility(View.INVISIBLE);
         q1.setVisibility(View.INVISIBLE);
         q2.setVisibility(View.INVISIBLE);
         q3.setVisibility(View.VISIBLE);
         q4.setVisibility(View.INVISIBLE);
-        RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(width, height - 40);
-        linearlayout.setMargins(0, 60, 0, 0);
+        fabClose.setVisibility(View.INVISIBLE);
+        fabCompleteHunt.setVisibility(View.INVISIBLE);
+        RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(fullWidth, fullHeight);
+        linearlayout.setMargins(0, 0, 0, 0);
         q3.setLayoutParams(linearlayout);
         windText.setText("Image");
 
@@ -603,17 +682,19 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
 
 
     public void setQ3Small(RelativeLayout q1, RelativeLayout q2, RelativeLayout q3, RelativeLayout q4, Button submit, EditText namedisp, String sname) {
+        ivBrandLogo.setVisibility(View.VISIBLE);
         q1.setVisibility(View.VISIBLE);
         q2.setVisibility(View.VISIBLE);
         q3.setVisibility(View.VISIBLE);
         q4.setVisibility(View.VISIBLE);
-
-        RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(width / 2 - 15, quadheightsmall - 40);
-        linearlayout.setMargins(20, quadheightsmall + 30, 20, 20);
+        fabClose.setVisibility(View.VISIBLE);
+        fabCompleteHunt.setVisibility(View.VISIBLE);
+        RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(smallWidth, smallHeight);
+        linearlayout.setMargins(mQuadrantMargin, mQuadrantMargin + smallHeight + mQuadrantMargin, 0, mQuadrantMargin);
         q3.setLayoutParams(linearlayout);
         namedisp.setText(sname);
         clearRecyData(submit);
-        recognizeButton.setVisibility(View.VISIBLE);
+        recognizeButton.setVisibility(View.GONE);
         if (isQ3Completed) {
             wbCompleted3.setVisibility(View.VISIBLE);
         }
@@ -621,12 +702,15 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
 
     public void setQ4Large(RelativeLayout q1, RelativeLayout q2, RelativeLayout q3, RelativeLayout q4, EditText windText, Button submitbtn) {
 
+        ivBrandLogo.setVisibility(View.INVISIBLE);
         q1.setVisibility(View.INVISIBLE);
         q2.setVisibility(View.INVISIBLE);
         q3.setVisibility(View.INVISIBLE);
         q4.setVisibility(View.VISIBLE);
-        RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(width, height - 40);
-        linearlayout.setMargins(0, 60, 0, 0);
+        fabClose.setVisibility(View.INVISIBLE);
+        fabCompleteHunt.setVisibility(View.INVISIBLE);
+        RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(fullWidth, fullHeight);
+        linearlayout.setMargins(0, 0, 0, 0);
         q4.setLayoutParams(linearlayout);
         windText.setText("WebPage");
 //        loadTripPlacesFromRemote(mSelectedDayObjectId, 4, submitbtn, completedTV);
@@ -636,16 +720,20 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
 
     public void setQ4Small(RelativeLayout q1, RelativeLayout q2, RelativeLayout q3, RelativeLayout q4, Button submit, EditText namedisp, String sname) {
 
+        ivBrandLogo.setVisibility(View.VISIBLE);
         q1.setVisibility(View.VISIBLE);
         q2.setVisibility(View.VISIBLE);
         q3.setVisibility(View.VISIBLE);
         q4.setVisibility(View.VISIBLE);
-        RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(width / 2 - 15, quadheightsmall - 40);
-        linearlayout.setMargins(width / 2 + 30, quadheightsmall + 30, 20, 20);
+        fabClose.setVisibility(View.VISIBLE);
+        fabCompleteHunt.setVisibility(View.VISIBLE);
+        RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(smallWidth, smallHeight);
+        linearlayout.setMargins(mQuadrantMargin + smallWidth + mQuadrantMargin, mQuadrantMargin + smallHeight + mQuadrantMargin, mQuadrantMargin, mQuadrantMargin);
         q4.setLayoutParams(linearlayout);
         namedisp.setText(sname);
         clearRecyData(submit);
-        recognizeButton.setVisibility(View.VISIBLE);
+        recognizeButton.setVisibility(View.GONE);
+
         if (isQ4Completed) {
             wbCompleted4.setVisibility(View.VISIBLE);
         }
@@ -685,6 +773,43 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         return b2;
     }
 
+    //Cvar
+    public ImageView positionCornerButton(ImageView ivButton,int drawableId, int corner, boolean isHidden, int size) {
+        ivButton.setImageDrawable(getResources().getDrawable(drawableId));
+        ivButton.setColorFilter(0XFF15D1EE);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(size, size);
+        //------Corner------
+        //1.) top left
+        //2.) top right
+        //3.) bottom right
+        //4.) bottom left
+        switch (corner){
+            case 1:
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+                layoutParams.setMargins(0,0,16,0);
+                break;
+            case 2:
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                break;
+            case 3:
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                break;
+            case 4:
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                break;
+            default:
+                break;
+        }
+        ivButton.setLayoutParams(layoutParams);
+//        ivButton.setScaleType(CENTER_INSIDE);
+        if (isHidden){
+            ivButton.setVisibility(View.INVISIBLE);
+        }
+        return ivButton;
+    }
+
     public ImageView setCompletedImage(ImageView completed) {
         completed.setImageDrawable(getResources().getDrawable(R.drawable.completed));
         RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(72, 72);
@@ -711,27 +836,43 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
 
     public void setWebviewAddview(RelativeLayout q2, WebView webView, RecyclerView recyclerView, ImageView b1, ImageView b2, Button submitbtn, ImageView completed, String selectedLevelId, Integer quadrant) {
 
+        int expandButtonCorner;
+        switch (quadrant){
+            case 1:
+                //Top Left
+                expandButtonCorner = 1;
+                break;
+            case 2:
+                //Top Right
+                expandButtonCorner = 2;
+                break;
+            case 3:
+                //Top Left
+                expandButtonCorner = 1;
+                break;
+            case 4:
+                //Top Right
+                expandButtonCorner = 2;
+                break;
+            default:
+                //Top Left
+                expandButtonCorner = 1;
+                break;
+        }
+        int collapseButtonCorner = 1;
         LinearLayout l = new LinearLayout(getActivity());
         l.setOrientation(LinearLayout.VERTICAL);
         l.addView(webView);
         l.addView(setRecyView(recyclerView));
         q2.addView(setSubmitButton("0", submitbtn));
         q2.addView(l);
-        q2.addView(setq2q4ImgB1(b1));
-        q2.addView(setImgB2(b2));
+        q2.addView(positionCornerButton(b1, R.drawable.ic_up, expandButtonCorner, false, 150));
+        q2.addView(positionCornerButton(b2, R.drawable.ic_left, collapseButtonCorner, true, 150));
 
-//        if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, quadrant)) {
-//            q2.addView(setCompletedImageHidden(completed));
-//        } else {
-//            q2.addView(setCompletedImage(completed));
-//            //q2.addView(setCompletedImageHidden(completed));
-//        }
         if (quadrantIsCompleted(quadrant)) {
             q2.addView(setCompletedImage(completed));
-//            q2.addView(setCompletedImageHidden(completed));
         } else {
             q2.addView(setCompletedImageHidden(completed));
-//            q2.addView(setCompletedImage(completed));
         }
 
         q2.setVisibility(View.VISIBLE);
@@ -739,6 +880,32 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
     }
 
     public void setImageAddview(RelativeLayout q2, ImageView img, RecyclerView recyclerView, ImageView b1, ImageView b2, Button submit, ImageView completed, String selectedLevelId, Integer quadrant) {
+
+        int expandButtonCorner;
+        switch (quadrant){
+            case 1:
+                //Top Left
+                expandButtonCorner = 1;
+                break;
+            case 2:
+                //Top Right
+                expandButtonCorner = 2;
+                break;
+            case 3:
+                //Top Left
+                expandButtonCorner = 1;
+                break;
+            case 4:
+                //Top Right
+                expandButtonCorner = 2;
+                break;
+            default:
+                //Top Left
+                expandButtonCorner = 1;
+                break;
+        }
+
+        int collapseButtonCorner = 1;
         LinearLayout l = new LinearLayout(getActivity());
         LinearLayout.LayoutParams linpa = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         l.setLayoutParams(linpa);
@@ -751,21 +918,13 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         l.addView(setRecyView(recyclerView));
         q2.addView(setSubmitButton("0", submit));
         q2.addView(l);
-        q2.addView(setq2q4ImgB1(b1));
-        q2.addView(setImgB2(b2));
+        q2.addView(positionCornerButton(b1, R.drawable.ic_up, expandButtonCorner, false, 150));
+        q2.addView(positionCornerButton(b2, R.drawable.ic_left, collapseButtonCorner, true, 150));
 
-//        if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, quadrant)) {
-//            q2.addView(setCompletedImageHidden(completed));
-//        } else {
-//            q2.addView(setCompletedImage(completed));
-//            //q2.addView(setCompletedImageHidden(completed));
-//        }
         if (quadrantIsCompleted(quadrant)) {
             q2.addView(setCompletedImage(completed));
-//            q2.addView(setCompletedImageHidden(completed));
         } else {
             q2.addView(setCompletedImageHidden(completed));
-//            q2.addView(setCompletedImage(completed));
         }
 
         q2.setVisibility(View.VISIBLE);
@@ -773,7 +932,8 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
 
     public ImageView quadImg(ImageView ivg) {
         RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        linearlayout.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+//        linearlayout.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        linearlayout.addRule(RelativeLayout.CENTER_VERTICAL);
         linearlayout.addRule(RelativeLayout.CENTER_HORIZONTAL);
         ivg.setLayoutParams(linearlayout);
         ivg.setScaleType(FIT_XY);
@@ -950,11 +1110,13 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
     //If user did not complete it then get questions from database and load questions into adapter
     private void setupInteractionView(String s, int quadrant, Button submitbtn, TextView completedTV) {
 
-        if (userHasCompletedThisInteraction(quadrant)) {
-            setCompletedText("1", completedTV);
-        } else {
-            setSubmitButton("1", submitbtn);
-            loadInteractionsIntoAdapter(quadrant);
+        if(quadrantIsCompletable(quadrant)) {
+            if (userHasCompletedThisInteraction(quadrant)) {
+                setCompletedText("1", completedTV);
+            } else {
+                setSubmitButton("1", submitbtn);
+                loadInteractionsIntoAdapter(quadrant);
+            }
         }
     }
 
@@ -1087,7 +1249,14 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         return HuntJoin.isInteractionCompleted(
                 mUserHuntJoinRecord,
                 mSelectedCheckpoint.getObjectId(),
-                mInteractionList.get(quadrant -1).getObjectId());
+                mInteractionList.get(quadrant -1).getObjectId(),
+                mInteractionList.get(quadrant -1).getInteractionType());
+    }
+
+    private boolean quadrantIsCompletable(int quadrant){
+        boolean isCompleteable = !mInteractionList.get(quadrant -1).getInteractionType().equals(KurtinInteraction.INTERACTION_TYPE_NONE);
+        Log.v("CloudScanner","Quadrant " + quadrant + " isCompletable = " + isCompleteable);
+        return !mInteractionList.get(quadrant -1).getInteractionType().equals(KurtinInteraction.INTERACTION_TYPE_NONE);
     }
 
     public void clearRecyData(Button submitbtn) {
@@ -1097,9 +1266,9 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
     }
 
     //load data into adapter
-    private void populateTripPlanPlaces(List<Questions> questionses) {
+    private void populateTripPlanPlaces(List<Questions> questions) {
         mQuestionsList.clear();
-        mQuestionsList.addAll(questionses);
+        mQuestionsList.addAll(questions);
         mQuestionsAdapter.notifyDataSetChanged();
     }
 
@@ -1266,7 +1435,6 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         minimizeAllQuadrants();
 
         showFab();
-
     }
 
     private void populateContentFieldsFromJson() {
@@ -1335,30 +1503,32 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         isQ1Completed = HuntJoin.isInteractionCompleted(
                 mUserHuntJoinRecord,
                 mSelectedCheckpoint.getObjectId(),
-                mInteractionList.get(0).getObjectId());
+                mInteractionList.get(0).getObjectId(),
+                mInteractionList.get(0).getInteractionType());
 
         isQ2Completed = HuntJoin.isInteractionCompleted(
                 mUserHuntJoinRecord,
                 mSelectedCheckpoint.getObjectId(),
-                mInteractionList.get(1).getObjectId());
+                mInteractionList.get(1).getObjectId(),
+                mInteractionList.get(1).getInteractionType());
 
         isQ3Completed = HuntJoin.isInteractionCompleted(
                 mUserHuntJoinRecord,
                 mSelectedCheckpoint.getObjectId(),
-                mInteractionList.get(2).getObjectId());
+                mInteractionList.get(2).getObjectId(),
+                mInteractionList.get(2).getInteractionType());
 
         isQ4Completed = HuntJoin.isInteractionCompleted(
                 mUserHuntJoinRecord,
                 mSelectedCheckpoint.getObjectId(),
-                mInteractionList.get(3).getObjectId());
+                mInteractionList.get(3).getObjectId(),
+                mInteractionList.get(3).getInteractionType());
 
-        if(isQ1Completed && isQ2Completed && isQ3Completed && isQ4Completed){
-            try{
-                mKurtinListener.onHuntCompleted(mUserHuntJoinRecord);
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }
+//        isQ1Completable = !(mInteractionList.get(0).getInteractionType().equals(KurtinInteraction.INTERACTION_TYPE_NONE));
+//        isQ2Completable = !(mInteractionList.get(1).getInteractionType().equals(KurtinInteraction.INTERACTION_TYPE_NONE));
+//        isQ3Completable = !(mInteractionList.get(2).getInteractionType().equals(KurtinInteraction.INTERACTION_TYPE_NONE));
+//        isQ4Completable = !(mInteractionList.get(3).getInteractionType().equals(KurtinInteraction.INTERACTION_TYPE_NONE));
+
     }
 
     private void minimizeAllQuadrants() {
@@ -1380,10 +1550,18 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         completedTV = new TextView(getActivity());
         //Bind text field tht displays wikitude status messages
         on_click_cloud_tracking_info = (EditText) controls.findViewById(on_click_cloud_tracking_info_field);
+        on_click_cloud_tracking_info.setVisibility(View.INVISIBLE);
+        recognizeButton.setVisibility(View.INVISIBLE);
         //get overall content Name
         QuadHeadname = nameToDisplay;
         //Hide completed text view
         setCompletedText("0", completedTV);
+        ivBrandLogo = (ImageView) controls.findViewById(R.id.ivBrandLogo);
+        Log.v("Setting Brand logo","scanner image url:" + mSelectedCheckpoint.getScannerImageUrl());
+        Glide.with(getContext())
+                .load(mSelectedCheckpoint.getScannerImageUrl())
+                .into(ivBrandLogo);
+        ivBrandLogo.setVisibility(View.VISIBLE);
     }
 
     private void initializeMemberVariables(){
@@ -1408,15 +1586,17 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         wbCompleted1.setId(wbCompleted1ID);
         //check if full screen is needed....
         webViewYT = new WebView(getActivity());
-        if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, 1)) {
-            webViewYT.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    webviewHeight));
-        } else {
+
+        if (quadrantIsCompleted(1) || !quadrantIsCompletable(1)) {
             webViewYT.setLayoutParams(new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     height));
+        } else {
+            webViewYT.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    webviewHeight));
         }
+
         //System.out.println("Choice3 selected");
         webViewYT.setWebViewClient(new WebViewClient() {
             @
@@ -1425,6 +1605,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
                 return false;
             }
         });
+        //q1DataSource = "https://www.youtube.com/watch?v=vIvK55k13OA";
         webViewYT.loadUrl(q1DataSource);
         webViewYT.getSettings().setPluginState(WebSettings.PluginState.ON);
         webViewYT.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
@@ -1477,26 +1658,42 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         WebView webView = new WebView(getActivity());
         webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
 
-        if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, 2)) {
-            webView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, webviewHeight));
-
+        if (quadrantIsCompleted(2) || !quadrantIsCompletable(2)) {
+            webView.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    height));
         } else {
-            webView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height));
-
+            webView.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    webviewHeight));
         }
-
 
         webView.setWebViewClient(new WebViewClient()); // set the WebViewClient
+        webView.setWebViewClient(new WebViewClient() {
+            @
+                    Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                return false;
+            }
+        });
+        //q2DataSource = "https://www.youtube.com/watch?v=cQ1_M1uY4FQ";
         webView.loadUrl(q2DataSource); // Load your desired url
-        webView.getSettings().setBuiltInZoomControls(true);
-        if (Build.VERSION.SDK_INT >= 11) {
-            webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        }
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.getSettings().setLoadWithOverviewMode(true);
-        webView.getSettings().setUseWideViewPort(true);
-        webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+        //webView.loadUrl(q1DataSource);
+        webView.getSettings().setPluginState(WebSettings.PluginState.ON);
         webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+        webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        webView.getSettings().setAppCacheEnabled(true);
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setDomStorageEnabled(true);
+        webView.getSettings().setLoadWithOverviewMode(true);
+        webView.setBackgroundColor(Color.BLACK);
+        webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+        webView.setVerticalScrollBarEnabled(false);
+//        q1YouTubeViewID = webViewYT.generateViewId();
+        //webView.setId(q1YouTubeViewID);
+        //webViewYT.setVisibility(View.VISIBLE);
+
+
         q2WebViewID = webView.generateViewId();
         webView.setId(q2WebViewID);
         q2WebViewb1.setOnClickListener(new View.OnClickListener() {
@@ -1525,6 +1722,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
     private void loadQuadrantThree() {
         //                            LinearLayout q3 = (LinearLayout) controls.findViewById(R.id.q3); // get your WebView form your xml file
         q3.removeAllViews();
+        q3.setBackgroundColor(0XFF000000);
         q3ImageViewb1 = new ImageView(getActivity());
         q3ImageViewb2 = new ImageView(getActivity());
         wbCompleted3 = new ImageView(getActivity());
@@ -1534,20 +1732,20 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
 
         ImageView imageView = new ImageView(getActivity());
         Picasso.with(getActivity()).load(q3DataSourceURI).into(imageView);
-        imageView.setScaleType(FIT_XY);
+        imageView.setScaleType(CENTER_INSIDE);
         imageView.setAdjustViewBounds(true);
         imageView.setBackgroundColor(Color.BLACK);
 
-        if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, 3)) {
-
+        if (quadrantIsCompleted(3) || !quadrantIsCompletable(3)) {
             imageView.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.FILL_PARENT,
-                    webviewHeight, Gravity.CENTER));
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    height,
+                    Gravity.CENTER));
         } else {
-
             imageView.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.FILL_PARENT,
-                    height, Gravity.CENTER));
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    webviewHeight,
+                    Gravity.CENTER));
         }
 
         //q3.setBackgroundColor(Color.BLACK);
@@ -1589,32 +1787,41 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         WebView webView = new WebView(getActivity());
         webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
 
-        if (checkIfCompletedIconIsNeeded(mSelectedDayObjectId, 4)) {
+        if (quadrantIsCompleted(4) || !quadrantIsCompletable(4)) {
             webView.setLayoutParams(new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
-                    webviewHeight));
+                    height));
 
         } else {
             webView.setLayoutParams(new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
-                    height));
+                    webviewHeight));
         }
 
         webView.setWebViewClient(new WebViewClient()); // set the WebViewClient
-        webView.loadUrl(q4DataSource); // Load your desired url
-        webView.getSettings().setBuiltInZoomControls(true);
-        if (Build.VERSION.SDK_INT >= 11) {
-            webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        }
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.getSettings().setLoadWithOverviewMode(true);
-        webView.getSettings().setUseWideViewPort(true);
-        webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
 
+        webView.setWebViewClient(new WebViewClient() {
+            @
+                    Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                return false;
+            }
+        });
+        //webView.loadUrl(q4DataSource); // Load your desired url
+        //q4DataSource = "https://www.youtube.com/watch?v=8y4rwXdz0I0";
+        webView.loadUrl(q4DataSource); // Load your desired url
+        //webView.loadUrl(q1DataSource);
         webView.getSettings().setPluginState(WebSettings.PluginState.ON);
+        webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
         webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         webView.getSettings().setAppCacheEnabled(true);
+        webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setDomStorageEnabled(true);
+        webView.getSettings().setLoadWithOverviewMode(true);
+        webView.setBackgroundColor(Color.BLACK);
+        webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+        webView.setVerticalScrollBarEnabled(false);
+
         q4WebViewID = webView.generateViewId();
         webView.setId(q4WebViewID);
         RecyclerView recyclerView2 = new RecyclerView(getActivity());
@@ -1648,22 +1855,48 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
     }
 
     private void showFab(){
-        fabUserContent.setVisibility(View.VISIBLE);
-        fabUserContent.setOnClickListener(new View.OnClickListener() {
+        fabCompleteHunt.setVisibility(View.VISIBLE);
+        fabCompleteHunt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try{
-                    if(mUserHuntJoinRecord == null){
-                        mKurtinListener.onReturnToHomeScreen(true);
-                    }else {
-                        mUserHuntJoinRecord.putCompletionStatus(true);
-                        mUserHuntJoinRecord.saveInBackground();
-                        mKurtinListener.onHuntCompleted(mUserHuntJoinRecord);
-                    }
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
+                 showPrompt(COMPLETE_HUNT_PROMPT);
             }
         });
+
+        fabClose.setVisibility(View.VISIBLE);
+        fabClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPrompt(CLOSE_HUNT_PROMPT);
+
+            }
+        });
+    }
+
+    private void completeHunt(){
+        try{
+            if(mUserHuntJoinRecord == null){
+                mKurtinListener.onReturnToHomeScreen(true);
+            }else {
+                mUserHuntJoinRecord.putCompletionStatus(true);
+                mUserHuntJoinRecord.saveInBackground();
+                mKurtinListener.onHuntCompleted(mUserHuntJoinRecord);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void closeHunt(){
+        try{
+            mKurtinListener.onBackRequested();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void showPrompt(String promptText){
+        tvPromptText.setText(promptText);
+        rlPrompt.setVisibility(View.VISIBLE);
     }
 }

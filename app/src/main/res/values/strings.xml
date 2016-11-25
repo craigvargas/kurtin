@@ -112,5 +112,9 @@
     <string name="points_earned">Points Earned:</string>
     <string name="next_hunt">NEXT HUNT</string>
 
+    <!--Button Text-->
+    <string name="yes">yes</string>
+    <string name="no">no</string>
+
 
 </resources>

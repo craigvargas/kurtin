@@ -53,4 +53,6 @@ public interface KurtinListener {
     HuntJoin getHuntJoinRecord();
 
     void setHuntJoinRecord(HuntJoin huntJoinRecord);
+
+    void onBackRequested();
 }

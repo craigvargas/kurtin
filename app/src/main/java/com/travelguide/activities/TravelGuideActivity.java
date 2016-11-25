@@ -537,7 +537,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
             removeFrag();
         }else {
             Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_frame_fullscreen);
-            if (fragment != null && fragment instanceof FullscreenFragment) {
+            if (fragment != null && (fragment instanceof FullscreenFragment || fragment instanceof CloudScannerFragment)) {
                 coordinatorLayout.setVisibility(View.VISIBLE);
                 fragmentFrameFullscreen.setVisibility(View.GONE);
                 getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -608,14 +608,9 @@ public class TravelGuideActivity extends AppCompatActivity implements
     public void onSignUpCompleted(Boolean isLoggedIn){
         mLoginStatus = isLoggedIn;
         prepareNavMenu();
-//        setHeaderProfileInfo(false);
         refreshBackdrop();
         refreshNavHeader();
         hideOrShowFAB();
-//        if(mLoginStatus) {
-////            getSupportFragmentManager().popBackStack("home", NO_FLAGS);
-//            getSupportFragmentManager().popBackStack(AppCodesKeys.HUNT_LIST_FRAGMENT_ID, NO_FLAGS);
-//        }
 
         Boolean isNewUser = true;
         KurtinProfileFragment kurtinProfileFragment = KurtinProfileFragment.newInstance(isNewUser);
@@ -627,6 +622,11 @@ public class TravelGuideActivity extends AppCompatActivity implements
 
     private void setToolbarTitle(String fragmentId){
         tvToolbarTitle.setText(AppCodesKeys.FRAGMENT_TITLE_MAP.get(fragmentId));
+//        if(fragmentId == AppCodesKeys.SCANNER_FRAGMENT_ID){
+//            appBar.setVisibility(View.INVISIBLE);
+//        }else{
+//            appBar.setVisibility(View.VISIBLE);
+//        }
     }
     @Override
     public void onTripPlanItemSelected(String objectId){
@@ -668,9 +668,13 @@ public class TravelGuideActivity extends AppCompatActivity implements
         CloudScannerFragment scannerFragment = new CloudScannerFragment();
         scannerFragment.setArguments(bundle);
         setContentFragment(
-                R.id.fragment_frame,
+                R.id.fragment_frame_fullscreen,
                 scannerFragment,
                 AppCodesKeys.SCANNER_FRAGMENT_ID);
+//        setContentFragment(
+//                R.id.fragment_frame,
+//                scannerFragment,
+//                AppCodesKeys.SCANNER_FRAGMENT_ID);
     }
 
     @Override
@@ -777,6 +781,12 @@ public class TravelGuideActivity extends AppCompatActivity implements
         if(needToClearHuntData) {
             clearAllHuntData();
         }
+    }
+
+    @Override
+    public void onBackRequested(){
+//        getSupportFragmentManager().popBackStack();
+        onBackPressed();
     }
 
     //*
@@ -892,17 +902,6 @@ public class TravelGuideActivity extends AppCompatActivity implements
         fragmentTransaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out);
         fragmentTransaction.replace(fragmentFrame, fragment);
 
-//        //Decide whether or not to put a tag on the backstack
-//        if(fragment instanceof HuntListFragment){
-//            referenceFragmentNameTag = HOME_FRAGMENT_TAG;
-//            fragmentTransaction.addToBackStack(referenceFragmentNameTag);
-//        }else if(fragment instanceof HuntDetailFragment) {
-//            referenceFragmentNameTag = HUNT_DETAIL_FRAGMENT_TAG;
-//            fragmentTransaction.addToBackStack(referenceFragmentNameTag);
-//        }else{
-//            fragmentTransaction.addToBackStack(null);
-//        }
-
         fragmentTransaction.addToBackStack(fragmentId);
 
         //Commit the transaction and load the fragment
@@ -912,7 +911,7 @@ public class TravelGuideActivity extends AppCompatActivity implements
         setToolbarTitle(fragmentId);
 
         //Decide which view needs to be visible
-        if (fragment instanceof FullscreenFragment) {
+        if (fragment instanceof FullscreenFragment || fragment instanceof CloudScannerFragment) {
             coordinatorLayout.setVisibility(View.GONE);
             fragmentFrameFullscreen.setVisibility(View.VISIBLE);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);

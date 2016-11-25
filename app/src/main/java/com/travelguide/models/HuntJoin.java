@@ -12,6 +12,8 @@ import com.parse.ParseException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
+
 
 /**
  * Created by cvar on 10/20/16.
@@ -35,6 +37,7 @@ public class HuntJoin extends ParseObject {
     public static final String JSON_OBJ_INTERACTION_POINTS_KEY = "points";
     public static final String JSON_OBJ_INTERACTION_USER_ANSWER_KEY = "userAnswer";
     public static final String JSON_OBJ_INTERACTION_NO_WRONG_ANSWER = "noWrongAnswer";
+    public static final String JSON_OBJ_INTERACTION_NONE = "None";
 
 
     //Constructor
@@ -241,7 +244,7 @@ public class HuntJoin extends ParseObject {
     }
 
     //Determine if a given interaction has already been completed by the user in the HuntJoin record
-    public static Boolean isInteractionCompleted(HuntJoin huntJoinRecord, String checkpointId, String interactionId){
+    public static Boolean isInteractionCompleted(HuntJoin huntJoinRecord, String checkpointId, String interactionId, String interactionType){
         JSONArray checkpointResultsArray = huntJoinRecord.getResults();
         JSONObject checkpointResult;
         JSONArray interactionResultsArray;
@@ -250,6 +253,11 @@ public class HuntJoin extends ParseObject {
 
         if(checkpointResultsArray == null){
             Log.v("HuntJoin","Interaction not completed");
+            return false;
+        }
+
+        if(interactionType.equals(HuntJoin.JSON_OBJ_INTERACTION_NONE)){
+            //No interaction available
             return false;
         }
 

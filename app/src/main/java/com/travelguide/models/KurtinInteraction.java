@@ -24,6 +24,9 @@ public class KurtinInteraction extends ParseObject{
 
     public static final String JSON_OBJ_ANSWER_KEY = "answer";
 
+    public static final String ANSWER_NO_WRONG_ANSWER = "noWrongAnswer";
+    public static final String INTERACTION_TYPE_NONE = "None";
+
     public static final String KURTIN_INTERACTION_ID_KEY = "kurtinInteractionRelation";
 
     public static final Integer FIRST_OPTION_INDEX = 0;
