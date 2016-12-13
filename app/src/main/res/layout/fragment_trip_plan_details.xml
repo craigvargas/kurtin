@@ -183,7 +183,9 @@
                 android:gravity="center_vertical"
                 android:text="Time"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/kurtin_text_primary" />
+                android:textColor="@color/kurtin_text_primary"
+                android:visibility="gone"
+                />
 
             <TextView
                 android:id="@+id/tvHuntPrize"
@@ -217,7 +219,9 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/vDividerCheckpoints"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="16dp" />
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                />
             <!--<View-->
             <!--android:layout_width="match_parent"-->
             <!--android:layout_height="1dp"-->

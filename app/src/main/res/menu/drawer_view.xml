@@ -42,6 +42,10 @@
             android:id="@+id/logout_fragment"
             android:icon="@drawable/ic_kurtin_key_white"
             android:title="@string/action_logout" />
+        <item
+            android:id="@+id/experimental_fragment"
+            android:icon="@drawable/ic_build"
+            android:title="@string/action_experimental" />
     </group>
 </menu>
 

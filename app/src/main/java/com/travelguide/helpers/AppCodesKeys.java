@@ -49,10 +49,12 @@ public class AppCodesKeys {
     public static final String SCANNER_FRAGMENT_ID = "scanner";
     public static final String SETTINGS_FRAGMENT_ID = "settings";
     public static final String HUNT_COMPLETE_FRAGMENT_ID = "huntComplete";
+    public static final String MEDIA_FRAGMENT_ID = "mediaFragment";
+    public static final String QUADRANT_FRAGMENT_ID = "quadrantFragment";
 
 
     //Fragment Titles
-    public static final String HUNT_LIST_TITLE = "PUBLIC HUNTS";
+    public static final String HUNT_LIST_TITLE = "THE HUNTS";
     public static final String HUNT_DETAIL_TITLE = "HUNT DETAILS";
     public static final String TRIP_PLAN_LIST_TITLE = "PUBLIC HUNTS";
     public static final String TRIP_PLAN_DETAILS_TITLE = "HUNT DETAILS";
@@ -65,6 +67,9 @@ public class AppCodesKeys {
     public static final String SCANNER_TITLE = "SCAN YOUR IMAGE";
     public static final String SETTINGS_TITLE = "SETTINGS";
     public static final String HUNT_COMPLETE_TITLE = "GREAT JOB!";
+    public static final String MEDIA_FRAGMENT_TITLE = "MEDIA";
+    public static final String QUADRANT_FRAGMENT_TITLE = "QUADRANTS";
+
 
     //Map to associate fragments with their titles
     public static final HashMap<String, String> FRAGMENT_TITLE_MAP = new HashMap<String, String>(){{
@@ -81,5 +86,7 @@ public class AppCodesKeys {
         put(SCANNER_FRAGMENT_ID, SCANNER_TITLE);
         put(SETTINGS_FRAGMENT_ID, SETTINGS_TITLE);
         put(HUNT_COMPLETE_FRAGMENT_ID, HUNT_COMPLETE_TITLE);
+        put(MEDIA_FRAGMENT_ID, MEDIA_FRAGMENT_TITLE);
+        put(QUADRANT_FRAGMENT_ID, QUADRANT_FRAGMENT_TITLE);
     }};
 }

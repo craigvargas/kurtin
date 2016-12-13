@@ -24,8 +24,14 @@ public class Hunt extends ParseObject {
     public static String HUNT_POSTER_URL = "huntPosterUrl";
     public static String HUNT_CHECKPOINT_RELATIONS = "checkpoints";
     public static String HUNT_CHECKPOINT_POINTER_PREFIX = "huntCheckpoint";
+    public static String HUNT_SUBTITLE = "huntSubtitle";
 
     public static String HUNT_LIST_ORDER = "listOrder";
+    public static String HUNT_CLASS = "huntClass";
+
+    public static String CLASS_VALUE_UNIVERSITY = "University";
+    public static String CLASS_VALUE_ALL = "All";
+
 
     //Constructor
     public Hunt(){ super(); }
@@ -40,6 +46,7 @@ public class Hunt extends ParseObject {
 
     //Hunt data from parse
     public String getHuntName(){ return getString(HUNT_NAME); }
+    public String getHuntSubtitle(){return getString(HUNT_SUBTITLE);}
     public String getHuntLocation(){ return getString(HUNT_LOCATION); }
     public String getHuntDescription(){ return getString(HUNT_DESCRIPTION); }
     public String getHuntTimeString(){ return getString(HUNT_TIME_STRING); }

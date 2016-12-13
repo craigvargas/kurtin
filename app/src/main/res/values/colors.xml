@@ -34,13 +34,18 @@
     <color name="transparent">#0000</color>
     <color name="translucent">#77000000</color>
     <color name="translucent_dark">#CC000000</color>
+    <color name="lemon_glacier">#F2FF00</color>
     <color name="usc_gold">#FFC700</color>
     <color name="sunset_orange">#FF5656</color>
     <color name="tangerine">#EF8300</color>
     <color name="dogwood_rose">#D80068</color>
+    <color name="doger_blue">#2196F3</color>
+    <color name="very_light_blue">#5F3FFF</color>
     <color name="onyx">#343D46</color>
     <color name="outer_space">#3D4854</color>
     <color name="japanese_indigo">#263c54</color>
+    <color name="divider_light">#D7D7D7</color>
+    <color name="question_text">@color/white</color>
 
 
 

@@ -84,6 +84,7 @@
     <string name="action_profile">PROFILE</string>
     <string name="action_logout">LOGOUT</string>
     <string name="action_settings">SETTINGS</string>
+    <string name="action_experimental">EXPERIMENTAL</string>
 
     <!--Login and Signup Strings-->
     <string name="login_instruction_one">Login Using</string>

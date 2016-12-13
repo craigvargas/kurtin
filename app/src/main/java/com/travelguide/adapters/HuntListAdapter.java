@@ -56,11 +56,13 @@ public class HuntListAdapter extends RecyclerView.Adapter<HuntListAdapter.ViewHo
         String huntId;
 
         String huntName = hunt.getHuntName();
+        String huntSubtitle = hunt.getHuntSubtitle();
         String huntAddress = hunt.getHuntAddress();
         String huntPrize = hunt.getHuntPrize();
 
         //Load hunt details
         holder.tvPlanName.setText(huntName);
+        holder.tvHuntSubtitle.setText(huntSubtitle);
         holder.tvHuntDistance.setText(huntAddress);
         holder.tvHuntPrize.setText(huntPrize);
         holder.ivPlace.setImageResource(R.drawable.city_placeholder);
@@ -118,6 +120,7 @@ public class HuntListAdapter extends RecyclerView.Adapter<HuntListAdapter.ViewHo
     class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivPlace;
         TextView tvPlanName;
+        TextView tvHuntSubtitle;
         TextView tvHuntDistance;
         TextView tvHuntPrize;
         ImageView ivStatusIcon;
@@ -127,6 +130,7 @@ public class HuntListAdapter extends RecyclerView.Adapter<HuntListAdapter.ViewHo
 
             ivPlace = (ImageView) itemView.findViewById(R.id.ivPlace);
             tvPlanName = (TextView) itemView.findViewById(R.id.tvPlanName);
+            tvHuntSubtitle = (TextView) itemView.findViewById(R.id.tvHuntSubtitle);
             tvHuntDistance = (TextView) itemView.findViewById(R.id.tvHuntDistance);
             tvHuntPrize = (TextView) itemView.findViewById(R.id.tvHuntPrize);
 

@@ -14,9 +14,9 @@
 
 
     <!--CVars Dimensions-->
-    <dimen name="home_tile_height">150dp</dimen>
-    <dimen name="home_tile_text_vert_margin">24dp</dimen>
-    <dimen name="home_tile_text_left_margin">150dp</dimen>
+    <dimen name="home_tile_height">200dp</dimen>
+    <dimen name="home_tile_text_vert_margin">40dp</dimen>
+    <dimen name="home_tile_text_left_margin">125dp</dimen>
     <dimen name="banner_logo_width">100dp</dimen>
     <dimen name="btn_login_margin_top">16dp</dimen>
     <dimen name="btn_login_margin_left_right">24dp</dimen>

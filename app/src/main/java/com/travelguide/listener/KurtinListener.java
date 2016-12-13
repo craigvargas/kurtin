@@ -18,6 +18,8 @@ public interface KurtinListener {
 
     void onHuntSelected(Hunt hunt, Boolean userAlreadyStartedThisHunt);
 
+    void onHuntSelected(Hunt hunt, Boolean userAlreadyStartedThisHunt, Boolean skipScanning);
+
     void onCheckpointScanSelected(Checkpoint checkpoint);
 
     void onTripPlanCreated(String tripPlanObjectId, String imageUrl);
@@ -55,4 +57,6 @@ public interface KurtinListener {
     void setHuntJoinRecord(HuntJoin huntJoinRecord);
 
     void onBackRequested();
+
+    int getToolbarHeight();
 }

@@ -279,7 +279,7 @@ public class HuntJoin extends ParseObject {
                                     Log.v("HuntJoin","Interaction not completed");
                                     return false;
                                 } else {
-                                    Log.v("HuntJoin","Interaction not completed");
+                                    Log.v("HuntJoin","Interaction completed");
                                     return true;
                                 }
                             }

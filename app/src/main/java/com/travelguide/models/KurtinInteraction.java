@@ -26,6 +26,8 @@ public class KurtinInteraction extends ParseObject{
 
     public static final String ANSWER_NO_WRONG_ANSWER = "noWrongAnswer";
     public static final String INTERACTION_TYPE_NONE = "None";
+    public static final String INTERACTION_TYPE_QUESTION = "Question";
+
 
     public static final String KURTIN_INTERACTION_ID_KEY = "kurtinInteractionRelation";
 

@@ -9,12 +9,14 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.LayoutDirection;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -43,6 +45,7 @@ import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
 import com.travelguide.R;
 import com.travelguide.adapters.QuestionsAdapter;
@@ -78,12 +81,18 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.V;
+import static android.widget.ImageView.ScaleType.CENTER_CROP;
 import static android.widget.ImageView.ScaleType.CENTER_INSIDE;
 import static android.widget.ImageView.ScaleType.FIT_XY;
 import static com.facebook.FacebookSdk.getApplicationContext;
+import static com.travelguide.R.id.btnAnimate;
 import static com.travelguide.R.id.default_activity_button;
 import static com.travelguide.R.id.on_click_cloud_tracking_info_field;
 import static com.travelguide.R.id.on_click_cloud_tracking_recognize_button;
@@ -93,8 +102,8 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
     private static final String TAG = "OnClickCloudTracking";
     private static final String WIKITUDE_METADATA_KEY = "metadata";
 
-    private static final String CLOSE_HUNT_PROMPT = "Are you sure you want to leave the hunt?";
-    private static final String COMPLETE_HUNT_PROMPT = "Are you sure you want to complete the hunt early? There are still quadrants to complete";
+    private static final String CLOSE_HUNT_PROMPT = "Are you sure you want close the Kurtin before exploring all quadrants?";
+    private static final String COMPLETE_HUNT_PROMPT = "Are you sure you want to complete the hunt early? There are still quadrants to explore";
 
     private WikitudeSDK _wikitudeSDK;
     private CustomSurfaceView _customSurfaceView;
@@ -114,7 +123,11 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
     int fullWidth;
     int smallHeight;
     int smallWidth;
+
     WebView webViewYT;
+    WebView webViewQ2;
+    WebView webViewQ4;
+    ImageView imageViewQ3;
 
     int webviewHeight;
     int quadheightsmall;
@@ -220,6 +233,8 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
     private Integer mSelectedOption;
     private HashMap<String,Integer> mSelectedOptionsMap;
 
+    private RelativeLayout mInteractionLayoutQ3;
+
 //    private FloatingActionButton fabCompleteHunt;
 //    private FloatingActionButton fabClose;
 
@@ -290,8 +305,6 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
 //        mQuestionsAdapter = new QuestionsAdapter(mQuestionsList, getContext());
         mQuestionsAdapter = new QuestionsAdapter(mQuestionsList, getContext(), this);
 
-//        fabCompleteHunt = (FloatingActionButton) controls.findViewById(R.id.fabCompleteHunt);
-//        fabClose = (FloatingActionButton) controls.findViewById(R.id.fabClose);
         fabCompleteHunt = (android.support.design.widget.FloatingActionButton) controls.findViewById(R.id.fabCompleteHunt);
         fabClose = (android.support.design.widget.FloatingActionButton) controls.findViewById(R.id.fabClose);
         fabClose.setVisibility(View.INVISIBLE);
@@ -496,6 +509,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
                             mCheckpointList = mKurtinListener.getCurrentCheckpoints();
                             mCurrentUser = ParseUser.getCurrentUser();
                             mUserHuntJoinRecord = mKurtinListener.getHuntJoinRecord();
+                            Log.v("Scanner Fragment","HuntJoinId: " + mUserHuntJoinRecord.getObjectId());
 
                             //Retrieve huntJoin record from database
 //                            //Query the Join table
@@ -586,7 +600,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         q3.setVisibility(View.INVISIBLE);
         q4.setVisibility(View.INVISIBLE);
         fabClose.setVisibility(View.INVISIBLE);
-        fabCompleteHunt.setVisibility(View.INVISIBLE);
+//        fabCompleteHunt.setVisibility(View.INVISIBLE);
         RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(fullWidth, fullHeight);
         linearlayout.setMargins(0, 0, 0, 0);
         q1.setLayoutParams(linearlayout);
@@ -608,7 +622,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         q3.setVisibility(View.VISIBLE);
         q4.setVisibility(View.VISIBLE);
         fabClose.setVisibility(View.VISIBLE);
-        fabCompleteHunt.setVisibility(View.VISIBLE);
+//        fabCompleteHunt.setVisibility(View.VISIBLE);
         RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(smallWidth, smallHeight);
         linearlayout.setMargins(mQuadrantMargin, mQuadrantMargin, 0, 0);
         q1.setLayoutParams(linearlayout);
@@ -630,7 +644,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         q3.setVisibility(View.INVISIBLE);
         q4.setVisibility(View.INVISIBLE);
         fabClose.setVisibility(View.INVISIBLE);
-        fabCompleteHunt.setVisibility(View.INVISIBLE);
+//        fabCompleteHunt.setVisibility(View.INVISIBLE);
         RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(fullWidth, fullHeight);
         linearlayout.setMargins(0, 0, 0, 0);
         q2.setLayoutParams(linearlayout);
@@ -649,7 +663,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         q3.setVisibility(View.VISIBLE);
         q4.setVisibility(View.VISIBLE);
         fabClose.setVisibility(View.VISIBLE);
-        fabCompleteHunt.setVisibility(View.VISIBLE);
+//        fabCompleteHunt.setVisibility(View.VISIBLE);
         RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(smallWidth, smallHeight);
         linearlayout.setMargins(mQuadrantMargin + smallWidth + mQuadrantMargin, mQuadrantMargin, mQuadrantMargin, 0);
         q2.setLayoutParams(linearlayout);
@@ -663,37 +677,58 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
     }
 
     public void setQ3Large(RelativeLayout q1, RelativeLayout q2, RelativeLayout q3, RelativeLayout q4, EditText windText, Button submitbtn) {
+        int mainQuadrant = 3;
         ivBrandLogo.setVisibility(View.INVISIBLE);
         q1.setVisibility(View.INVISIBLE);
         q2.setVisibility(View.INVISIBLE);
         q3.setVisibility(View.VISIBLE);
         q4.setVisibility(View.INVISIBLE);
         fabClose.setVisibility(View.INVISIBLE);
-        fabCompleteHunt.setVisibility(View.INVISIBLE);
+//        fabCompleteHunt.setVisibility(View.INVISIBLE);
         RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(fullWidth, fullHeight);
         linearlayout.setMargins(0, 0, 0, 0);
         q3.setLayoutParams(linearlayout);
+
+//        ImageView iv = (ImageView) q3.findViewById(q3ImageViewID);
+//        RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) iv.getLayoutParams();
+//        rlp.width = fullWidth;
+//        rlp.height = fullHeight;
+//        iv.setLayoutParams(rlp);
+//        iv.setScaleType(CENTER_INSIDE);
+
         windText.setText("Image");
 
+
 //        loadTripPlacesFromRemote(mSelectedDayObjectId, 3, submitbtn, completedTV);
-        setupInteractionView(mSelectedDayObjectId, 3, submitbtn, completedTV);
+//        setupInteractionView(mSelectedDayObjectId, 3, submitbtn, completedTV);
+        setupInteractionView(mainQuadrant);
         recognizeButton.setVisibility(View.GONE);
     }
 
 
     public void setQ3Small(RelativeLayout q1, RelativeLayout q2, RelativeLayout q3, RelativeLayout q4, Button submit, EditText namedisp, String sname) {
+        int minimizedQuadrant = 3;
         ivBrandLogo.setVisibility(View.VISIBLE);
         q1.setVisibility(View.VISIBLE);
         q2.setVisibility(View.VISIBLE);
         q3.setVisibility(View.VISIBLE);
         q4.setVisibility(View.VISIBLE);
         fabClose.setVisibility(View.VISIBLE);
-        fabCompleteHunt.setVisibility(View.VISIBLE);
+//        fabCompleteHunt.setVisibility(View.VISIBLE);
         RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(smallWidth, smallHeight);
         linearlayout.setMargins(mQuadrantMargin, mQuadrantMargin + smallHeight + mQuadrantMargin, 0, mQuadrantMargin);
         q3.setLayoutParams(linearlayout);
+
+//        ImageView iv = (ImageView) q3.findViewById(q3ImageViewID);
+//        RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) iv.getLayoutParams();
+//        rlp.width = smallWidth;
+//        rlp.height = smallHeight;
+//        iv.setLayoutParams(rlp);
+//        iv.setScaleType(CENTER_INSIDE);
+
         namedisp.setText(sname);
         clearRecyData(submit);
+        hideInteractionView(minimizedQuadrant);
         recognizeButton.setVisibility(View.GONE);
         if (isQ3Completed) {
             wbCompleted3.setVisibility(View.VISIBLE);
@@ -708,7 +743,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         q3.setVisibility(View.INVISIBLE);
         q4.setVisibility(View.VISIBLE);
         fabClose.setVisibility(View.INVISIBLE);
-        fabCompleteHunt.setVisibility(View.INVISIBLE);
+//        fabCompleteHunt.setVisibility(View.INVISIBLE);
         RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(fullWidth, fullHeight);
         linearlayout.setMargins(0, 0, 0, 0);
         q4.setLayoutParams(linearlayout);
@@ -726,7 +761,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         q3.setVisibility(View.VISIBLE);
         q4.setVisibility(View.VISIBLE);
         fabClose.setVisibility(View.VISIBLE);
-        fabCompleteHunt.setVisibility(View.VISIBLE);
+//        fabCompleteHunt.setVisibility(View.VISIBLE);
         RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(smallWidth, smallHeight);
         linearlayout.setMargins(mQuadrantMargin + smallWidth + mQuadrantMargin, mQuadrantMargin + smallHeight + mQuadrantMargin, mQuadrantMargin, mQuadrantMargin);
         q4.setLayoutParams(linearlayout);
@@ -862,6 +897,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         int collapseButtonCorner = 1;
         LinearLayout l = new LinearLayout(getActivity());
         l.setOrientation(LinearLayout.VERTICAL);
+        webView.pageUp(true);
         l.addView(webView);
         l.addView(setRecyView(recyclerView));
         q2.addView(setSubmitButton("0", submitbtn));
@@ -910,14 +946,51 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         LinearLayout.LayoutParams linpa = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         l.setLayoutParams(linpa);
         RelativeLayout r = new RelativeLayout(getActivity());
-        RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, webviewHeight);
-        r.setLayoutParams(linearlayout);
-        r.addView(quadImg(img));
-        l.setOrientation(LinearLayout.VERTICAL);
-        l.addView(r);
-        l.addView(setRecyView(recyclerView));
-        q2.addView(setSubmitButton("0", submit));
-        q2.addView(l);
+        RelativeLayout.LayoutParams relativeLayout = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, webviewHeight);
+        r.setLayoutParams(relativeLayout);
+
+//        r.addView(quadImg(img));
+//        r.addView(img);
+//        l.setOrientation(LinearLayout.VERTICAL);
+//        l.addView(r);
+//        l.addView(setRecyView(recyclerView));
+        int submitId = submit.generateViewId();
+        submit.setId(submitId);
+//        q2.addView(setSubmitButton("0", submit));
+//        q2.addView(l);
+//        q2.addView(positionCornerButton(b1, R.drawable.ic_up, expandButtonCorner, false, 150));
+//        q2.addView(positionCornerButton(b2, R.drawable.ic_left, collapseButtonCorner, true, 150));
+
+        //CVar: new layout scheme
+        RelativeLayout.LayoutParams imageViewLayoutParams =
+                new RelativeLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT);
+
+        RelativeLayout.LayoutParams recyclerViewLayoutParams =
+                new RelativeLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+        recyclerViewLayoutParams.addRule(RelativeLayout.ABOVE, submitId);
+        recyclerView = setRecyView(recyclerView);
+        recyclerView.setLayoutParams(recyclerViewLayoutParams);
+        recyclerView.setBackgroundColor(getResources().getColor(R.color.transparent));
+
+
+        mInteractionLayoutQ3 = new RelativeLayout(getContext());
+        RelativeLayout.LayoutParams interactionViewLayoutParams =
+                new RelativeLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        smallHeight);
+        interactionViewLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        mInteractionLayoutQ3.setLayoutParams(interactionViewLayoutParams);
+        mInteractionLayoutQ3.addView(setSubmitButton("0",submit));
+        mInteractionLayoutQ3.addView(recyclerView);
+        mInteractionLayoutQ3.setBackgroundColor(getResources().getColor(R.color.translucent_dark));
+
+        img.setLayoutParams(imageViewLayoutParams);
+        q2.addView(img);
+        q2.addView(mInteractionLayoutQ3);
         q2.addView(positionCornerButton(b1, R.drawable.ic_up, expandButtonCorner, false, 150));
         q2.addView(positionCornerButton(b2, R.drawable.ic_left, collapseButtonCorner, true, 150));
 
@@ -930,28 +1003,30 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         q2.setVisibility(View.VISIBLE);
     }
 
-    public ImageView quadImg(ImageView ivg) {
+    public ImageView quadImg(ImageView iv) {
         RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 //        linearlayout.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         linearlayout.addRule(RelativeLayout.CENTER_VERTICAL);
         linearlayout.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        ivg.setLayoutParams(linearlayout);
-        ivg.setScaleType(FIT_XY);
-        return ivg;
+        iv.setLayoutParams(linearlayout);
+        iv.setScaleType(CENTER_INSIDE);
+        return iv;
     }
 
     public Button setSubmitButton(String s, final Button button) {
         RelativeLayout.LayoutParams linearlayout = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         linearlayout.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         linearlayout.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        linearlayout.setMargins(10, 0, 10, 50);
+        linearlayout.setMargins(200, 0, 200, 50);
         button.setLayoutParams(linearlayout);
         if (s.equals("1")) {
             button.setVisibility(View.VISIBLE);
         } else if (s.equals("0")) {
-            button.setVisibility(View.GONE);
+            button.setVisibility(View.INVISIBLE);
         }
-        button.setBackgroundColor(getResources().getColor(R.color.blue));
+//        button.setBackgroundColor(getResources().getColor(R.color.blue));
+//        button.setBackgroundColor(Color.BLUE);
+        button.setBackground(getResources().getDrawable(R.drawable.btn_hollow_round_white));
         button.setTextColor(Color.WHITE);
         button.setText("Submit");
         button.setOnClickListener(new View.OnClickListener() {
@@ -965,6 +1040,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
                 mQuestionsAdapter.notifyDataSetChanged();
                 button.setVisibility(View.INVISIBLE);
                 RelativeLayout parentRL = (RelativeLayout) button.getParent();
+                Log.v("Scanner Fragment","Inside submit.onclick - parentRL: " + parentRL.toString());
                 if (parentRL == q1) {
                     q1YouTubeViewb2.setVisibility(View.GONE);
                     q1YouTubeViewb1.setVisibility(View.VISIBLE);
@@ -985,7 +1061,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
                     params.height = height;
                     tempWV2.setLayoutParams(params);
                     quadrant = 2;
-                } else if (parentRL == q3) {
+                } else if (parentRL == q3 || parentRL == mInteractionLayoutQ3) {
                     q3ImageViewb2.setVisibility(View.GONE);
                     q3ImageViewb1.setVisibility(View.VISIBLE);
                     isQ3Completed = true;
@@ -994,6 +1070,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
                     ViewGroup.LayoutParams params = tempWV3.getLayoutParams();
                     params.height = height;
                     tempWV3.setLayoutParams(params);
+                    mInteractionLayoutQ3.setVisibility(View.INVISIBLE);
                     quadrant = 3;
                 } else if (parentRL == q4) {
                     q4WebViewb2.setVisibility(View.GONE);
@@ -1055,7 +1132,8 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         recy.setItemAnimator(new DefaultItemAnimator());
         recy.addItemDecoration(itemDecoration);
         recy.setAdapter(mQuestionsAdapter);
-        recy.setLayoutParams(linearlayout);
+//        recy.setLayoutParams(linearlayout);
+//        recy.setLayoutParams(rlParams);
         return recy;
     }
 
@@ -1120,10 +1198,53 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         }
     }
 
+    private  void setupInteractionView(int quadrant){
+        if(quadrantIsCompletable(quadrant)) {
+            if (userHasCompletedThisInteraction(quadrant)) {
+                setCompletedText("1", completedTV);
+            } else {
+                switch (quadrant){
+                    case 1:
+                        setSubmitButton("1", submitbtn1);
+                        break;
+                    case 2:
+                        setSubmitButton("1", submitbtn2);
+                        break;
+                    case 3:
+                        setSubmitButton("1", submitbtn3);
+                        mInteractionLayoutQ3.setVisibility(View.VISIBLE);
+                        break;
+                    case 4:
+                        setSubmitButton("1", submitbtn4);
+                        break;
+                    default:
+                        break;
+                }
+                loadInteractionsIntoAdapter(quadrant);
+            }
+        }
+    }
+
+    private void hideInteractionView(int quadrant){
+        switch (quadrant){
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                mInteractionLayoutQ3.setVisibility(View.INVISIBLE);
+                break;
+            case 4:
+                break;
+            default:
+                break;
+        }
+    }
+
     //Adapt the interactions model to fit inside the questions model for the initial relealse
     private void loadInteractionsIntoAdapter(int quadrant) {
         if (mInteractionList.isEmpty()) {
-            Log.v("oadInteractions", "No Interactions to load into Adapter");
+            Log.v("loadInteractions", "No Interactions to load into Adapter");
         } else {
             try {
                 Questions question = new Questions();
@@ -1147,6 +1268,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
     @Override
     public void onOptionSelected(String interactionID, int selectedOption){
         mSelectedOptionsMap.put(interactionID, selectedOption);
+        Log.v("Scanner Fragment","onOptionSelected - interactionID: " + interactionID + ", selectedOption: " + selectedOption);
     }
 
     private HuntJoin getHuntJoinRecord(){
@@ -1314,10 +1436,10 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         }
 
         JSONObject interactionResult = createInteractionResultObject(quadrant);
-        JSONArray interactionResultsArray;
+        JSONArray interactionResultsArray = new JSONArray();
         JSONArray checkpointResultsArray = mUserHuntJoinRecord.getResults();
         JSONArray newCheckpointResultsArray = new JSONArray();
-        JSONObject checkpointResult;
+        JSONObject checkpointResult = new JSONObject();
 
         if(checkpointResultsArray == null){
             try {
@@ -1335,7 +1457,9 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
                 try {
                     checkpointResult = checkpointResultsArray.getJSONObject(checkpointIndex);
                     String checkpointId = checkpointResult.getString(HuntJoin.JSON_OBJ_CHECKPOINT_ID_KEY);
+                    Log.v("Scanner Fragment","checkpointID before if statement: " + checkpointId);
                     if (checkpointId.equals(mSelectedCheckpoint.getObjectId())) {
+                        Log.v("Scanner Fragment","Found checkpoint ID in results array: " + checkpointId);
                         interactionResultsArray = checkpointResult.getJSONArray(HuntJoin.JSON_OBJ_CHECKPOINT_INTERACTIONS_KEY);
                         interactionResultsArray.put(interactionResult);
                         checkpointResult.put(HuntJoin.JSON_OBJ_CHECKPOINT_INTERACTIONS_KEY, interactionResultsArray);
@@ -1353,7 +1477,16 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         mUserHuntJoinRecord.putResults(newCheckpointResultsArray);
         int pointsJustEarned = HuntJoin.calculatePointTotalsAndReturnPointIncrease(mUserHuntJoinRecord, mCheckpointList.size(), mInteractionList.size());
         updateUserTotalPoints(pointsJustEarned);
-        mUserHuntJoinRecord.saveInBackground();
+//        mUserHuntJoinRecord.saveInBackground();
+        mUserHuntJoinRecord.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                Log.v("Scanner Fragment","Done saving huntJoinRecord");
+                if (e != null){
+                    e.printStackTrace();
+                }
+            }
+        });
 
         if(mUserHuntJoinRecord.getCompletionStatus()){
             try{
@@ -1363,6 +1496,13 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
             }
             //Show hunt completion screen (trophy)
         }
+
+        Log.v("Scanner Fragment","HuntJoin id after save: " + mUserHuntJoinRecord.getObjectId());
+        Log.v("Scanner Fragment","HuntJoin results (straight from the record) after save: " + mUserHuntJoinRecord.getResults());
+        Log.v("Scanner Fragment","HuntJoin results after save: " + checkpointResultsArray);
+        Log.v("Scanner Fragment","HuntJoin result after save: " + checkpointResult);
+        Log.v("Scanner Fragment","HuntJoin interaction results after save: " + interactionResultsArray);
+        Log.v("Scanner Fragment","InteractionResult after save: " + interactionResult.toString());
     }
 
     private void updateUserTotalPoints(int pointsJustEarned){
@@ -1381,6 +1521,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
     }
 
     private JSONObject createInteractionResultObject(int quadrant){
+        Log.v("Scanner Fragment","Inside create result, quadrant: " + quadrant);
         KurtinInteraction interaction = mInteractionList.get(quadrant -1);
         String interactionID = interaction.getObjectId();
         int selectedOptionIndex;
@@ -1435,6 +1576,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         minimizeAllQuadrants();
 
         showFab();
+        new delayScrollToTopAsync().execute(7000L);
     }
 
     private void populateContentFieldsFromJson() {
@@ -1561,6 +1703,13 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         Glide.with(getContext())
                 .load(mSelectedCheckpoint.getScannerImageUrl())
                 .into(ivBrandLogo);
+        ivBrandLogo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                scrollToTopOfWebViews();
+            }
+        });
+
         ivBrandLogo.setVisibility(View.VISIBLE);
     }
 
@@ -1627,6 +1776,8 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
             public void onClick(View v) {
                 q1YouTubeViewb2.setVisibility(View.VISIBLE);
                 q1YouTubeViewb1.setVisibility(View.GONE);
+                Boolean pageUp = webViewYT.pageUp(true);
+                Log.v("Scanner Fragment","pageUp: " + pageUp.toString());
                 setQ1Large(q1, q2, q3, q4, on_click_cloud_tracking_info, submitbtn1, completedTV);
             }
         });
@@ -1655,21 +1806,21 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         wbCompleted2ID = q2WebViewb2.generateViewId();
         wbCompleted2.setId(wbCompleted2ID);
         //System.out.println("Choice2 selected");
-        WebView webView = new WebView(getActivity());
-        webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+        webViewQ2 = new WebView(getActivity());
+        webViewQ2.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
 
         if (quadrantIsCompleted(2) || !quadrantIsCompletable(2)) {
-            webView.setLayoutParams(new LinearLayout.LayoutParams(
+            webViewQ2.setLayoutParams(new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     height));
         } else {
-            webView.setLayoutParams(new LinearLayout.LayoutParams(
+            webViewQ2.setLayoutParams(new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
-                    webviewHeight));
+                    smallHeight));
         }
 
-        webView.setWebViewClient(new WebViewClient()); // set the WebViewClient
-        webView.setWebViewClient(new WebViewClient() {
+        webViewQ2.setWebViewClient(new WebViewClient()); // set the WebViewClient
+        webViewQ2.setWebViewClient(new WebViewClient() {
             @
                     Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -1677,25 +1828,25 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
             }
         });
         //q2DataSource = "https://www.youtube.com/watch?v=cQ1_M1uY4FQ";
-        webView.loadUrl(q2DataSource); // Load your desired url
+        webViewQ2.loadUrl(q2DataSource); // Load your desired url
         //webView.loadUrl(q1DataSource);
-        webView.getSettings().setPluginState(WebSettings.PluginState.ON);
-        webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
-        webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-        webView.getSettings().setAppCacheEnabled(true);
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.getSettings().setDomStorageEnabled(true);
-        webView.getSettings().setLoadWithOverviewMode(true);
-        webView.setBackgroundColor(Color.BLACK);
-        webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
-        webView.setVerticalScrollBarEnabled(false);
+        webViewQ2.getSettings().setPluginState(WebSettings.PluginState.ON);
+        webViewQ2.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+        webViewQ2.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        webViewQ2.getSettings().setAppCacheEnabled(true);
+        webViewQ2.getSettings().setJavaScriptEnabled(true);
+        webViewQ2.getSettings().setDomStorageEnabled(true);
+        webViewQ2.getSettings().setLoadWithOverviewMode(true);
+        webViewQ2.setBackgroundColor(Color.BLACK);
+        webViewQ2.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+        webViewQ2.setVerticalScrollBarEnabled(false);
 //        q1YouTubeViewID = webViewYT.generateViewId();
         //webView.setId(q1YouTubeViewID);
         //webViewYT.setVisibility(View.VISIBLE);
 
 
-        q2WebViewID = webView.generateViewId();
-        webView.setId(q2WebViewID);
+        q2WebViewID = webViewQ2.generateViewId();
+        webViewQ2.setId(q2WebViewID);
         q2WebViewb1.setOnClickListener(new View.OnClickListener() {
             @
                     Override
@@ -1716,13 +1867,13 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
             }
         });
         RecyclerView recyclerView2 = new RecyclerView(getActivity());
-        setWebviewAddview(q2, webView, recyclerView2, q2WebViewb1, q2WebViewb2, submitbtn2, wbCompleted2, mSelectedDayObjectId, 2);
+        setWebviewAddview(q2, webViewQ2, recyclerView2, q2WebViewb1, q2WebViewb2, submitbtn2, wbCompleted2, mSelectedDayObjectId, 2);
     }
 
     private void loadQuadrantThree() {
         //                            LinearLayout q3 = (LinearLayout) controls.findViewById(R.id.q3); // get your WebView form your xml file
         q3.removeAllViews();
-        q3.setBackgroundColor(0XFF000000);
+        q3.setBackgroundColor(Color.BLACK);
         q3ImageViewb1 = new ImageView(getActivity());
         q3ImageViewb2 = new ImageView(getActivity());
         wbCompleted3 = new ImageView(getActivity());
@@ -1730,30 +1881,35 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         wbCompleted3.setId(wbCompleted3ID);
         //System.out.println("Choice3 selected");
 
-        ImageView imageView = new ImageView(getActivity());
-        Picasso.with(getActivity()).load(q3DataSourceURI).into(imageView);
-        imageView.setScaleType(CENTER_INSIDE);
-        imageView.setAdjustViewBounds(true);
-        imageView.setBackgroundColor(Color.BLACK);
+        imageViewQ3 = new ImageView(getActivity());
+//        Picasso.with(getActivity()).load(q3DataSourceURI).into(imageView);
+        imageViewQ3.setScaleType(CENTER_INSIDE);
+//        imageView.setAdjustViewBounds(true);
+        imageViewQ3.setBackgroundColor(Color.BLACK);
 
-        if (quadrantIsCompleted(3) || !quadrantIsCompletable(3)) {
-            imageView.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    height,
-                    Gravity.CENTER));
-        } else {
-            imageView.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    webviewHeight,
-                    Gravity.CENTER));
-        }
+//        if (quadrantIsCompleted(3) || !quadrantIsCompletable(3)) {
+//            imageView.setLayoutParams(new LinearLayout.LayoutParams(
+//                    LinearLayout.LayoutParams.MATCH_PARENT,
+//                    height,
+//                    Gravity.CENTER));
+//        } else {
+//            imageView.setLayoutParams(new LinearLayout.LayoutParams(
+//                    LinearLayout.LayoutParams.MATCH_PARENT,
+//                    webviewHeight,
+//                    Gravity.CENTER));
+//        }
+        imageViewQ3.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                Gravity.CENTER));
+        Picasso.with(getActivity()).load(q3DataSourceURI).into(imageViewQ3);
 
         //q3.setBackgroundColor(Color.BLACK);
         RecyclerView recyclerView3 = new RecyclerView(getActivity());
-        recyclerView3.setBackgroundColor(Color.BLACK);
-        q3ImageViewID = imageView.generateViewId();
-        imageView.setId(q3ImageViewID);
-        setImageAddview(q3, imageView, recyclerView3, q3ImageViewb1, q3ImageViewb2, submitbtn3, wbCompleted3, mSelectedDayObjectId, 3);
+        recyclerView3.setBackgroundColor(getResources().getColor(R.color.translucent));
+        q3ImageViewID = imageViewQ3.generateViewId();
+        imageViewQ3.setId(q3ImageViewID);
+        setImageAddview(q3, imageViewQ3, recyclerView3, q3ImageViewb1, q3ImageViewb2, submitbtn3, wbCompleted3, mSelectedDayObjectId, 3);
         q3ImageViewb1.setOnClickListener(new View.OnClickListener() {
             @
                     Override
@@ -1784,23 +1940,23 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         wbCompleted4ID = wbCompleted4.generateViewId();
         wbCompleted4.setId(wbCompleted4ID);
         //System.out.println("Choice2 selected");
-        WebView webView = new WebView(getActivity());
-        webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+        webViewQ4 = new WebView(getActivity());
+        webViewQ4.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
 
         if (quadrantIsCompleted(4) || !quadrantIsCompletable(4)) {
-            webView.setLayoutParams(new LinearLayout.LayoutParams(
+            webViewQ4.setLayoutParams(new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     height));
 
         } else {
-            webView.setLayoutParams(new LinearLayout.LayoutParams(
+            webViewQ4.setLayoutParams(new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
-                    webviewHeight));
+                    smallHeight));
         }
 
-        webView.setWebViewClient(new WebViewClient()); // set the WebViewClient
+        webViewQ4.setWebViewClient(new WebViewClient()); // set the WebViewClient
 
-        webView.setWebViewClient(new WebViewClient() {
+        webViewQ4.setWebViewClient(new WebViewClient() {
             @
                     Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -1809,23 +1965,23 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
         });
         //webView.loadUrl(q4DataSource); // Load your desired url
         //q4DataSource = "https://www.youtube.com/watch?v=8y4rwXdz0I0";
-        webView.loadUrl(q4DataSource); // Load your desired url
+        webViewQ4.loadUrl(q4DataSource); // Load your desired url
         //webView.loadUrl(q1DataSource);
-        webView.getSettings().setPluginState(WebSettings.PluginState.ON);
-        webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
-        webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-        webView.getSettings().setAppCacheEnabled(true);
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.getSettings().setDomStorageEnabled(true);
-        webView.getSettings().setLoadWithOverviewMode(true);
-        webView.setBackgroundColor(Color.BLACK);
-        webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
-        webView.setVerticalScrollBarEnabled(false);
+        webViewQ4.getSettings().setPluginState(WebSettings.PluginState.ON);
+        webViewQ4.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+        webViewQ4.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        webViewQ4.getSettings().setAppCacheEnabled(true);
+        webViewQ4.getSettings().setJavaScriptEnabled(true);
+        webViewQ4.getSettings().setDomStorageEnabled(true);
+        webViewQ4.getSettings().setLoadWithOverviewMode(true);
+        webViewQ4.setBackgroundColor(Color.BLACK);
+        webViewQ4.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+        webViewQ4.setVerticalScrollBarEnabled(false);
 
-        q4WebViewID = webView.generateViewId();
-        webView.setId(q4WebViewID);
+        q4WebViewID = webViewQ4.generateViewId();
+        webViewQ4.setId(q4WebViewID);
         RecyclerView recyclerView2 = new RecyclerView(getActivity());
-        setWebviewAddview(q4, webView, recyclerView2, q4WebViewb1, q4WebViewb2, submitbtn4, wbCompleted4, mSelectedDayObjectId, 4);
+        setWebviewAddview(q4, webViewQ4, recyclerView2, q4WebViewb1, q4WebViewb2, submitbtn4, wbCompleted4, mSelectedDayObjectId, 4);
 
         q4WebViewb1.setOnClickListener(new View.OnClickListener() {
             @
@@ -1855,7 +2011,7 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
     }
 
     private void showFab(){
-        fabCompleteHunt.setVisibility(View.VISIBLE);
+//        fabCompleteHunt.setVisibility(View.VISIBLE);
         fabCompleteHunt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1898,5 +2054,32 @@ public class CloudScannerFragment extends Fragment implements CloudTrackerEventL
     private void showPrompt(String promptText){
         tvPromptText.setText(promptText);
         rlPrompt.setVisibility(View.VISIBLE);
+    }
+
+    private void scrollToTopOfWebViews(){
+        Boolean q1IsScrolledUp = webViewYT.pageUp(true);
+        Boolean q2IsScrolledUp = webViewQ2.pageUp(true);
+        Boolean q4IsScrolledUp = webViewQ4.pageUp(true);
+        Log.v("Scanner Fragment","Scroll result: " + q1IsScrolledUp.toString() + " " + q2IsScrolledUp.toString() + " " + q4IsScrolledUp.toString());
+    }
+
+    private class delayScrollToTopAsync extends AsyncTask<Long, Void, Void> {
+        protected Void doInBackground(Long... delay){
+
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    // this code will be executed after 2 seconds
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            scrollToTopOfWebViews();
+                        }
+                    });
+                }
+            }, delay[0]);
+
+            return null;
+        }
     }
 }

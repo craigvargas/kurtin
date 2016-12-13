@@ -1,48 +1,180 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.travelguide.fragments.MediaFragment">
+<!--<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--xmlns:tools="http://schemas.android.com/tools"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--tools:context="com.travelguide.fragments.MediaFragment">-->
 
     <RelativeLayout
-        android:id="@+id/rlQuadrantView"
+        android:id="@+id/rlParentView"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+    >
+
 
         <RelativeLayout
             android:id="@+id/rlQ1"
             android:layout_width="150dp"
             android:layout_height="250dp"
             android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"/>
+            android:layout_alignParentTop="true" />
 
         <RelativeLayout
             android:id="@+id/rlQ2"
             android:layout_width="150dp"
             android:layout_height="250dp"
             android:layout_alignParentEnd="true"
-            android:layout_alignParentTop="true"/>
+            android:layout_alignParentTop="true" />
 
         <RelativeLayout
             android:id="@+id/rlQ3"
             android:layout_width="150dp"
             android:layout_height="250dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"/>
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true" />
 
         <RelativeLayout
             android:id="@+id/rlQ4"
             android:layout_width="150dp"
             android:layout_height="250dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"/>
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true" />
+
+        <RelativeLayout
+            android:id="@+id/rlFullScreen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Full Screen Media" />
+
+        </RelativeLayout>
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/ivBrandLogo"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_centerInParent="true"/>
+            android:layout_centerInParent="true" />
+
+        <TextView
+            android:id="@+id/tvInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="100dp" />
+
+        <RelativeLayout
+            android:id="@+id/rlInteraction"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/kurtin_primary">
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/llSlidingMenu"
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:background="@color/outer_space"
+            android:orientation="vertical"
+            android:paddingLeft="16dp">
+
+            <Button
+                android:id="@+id/btnAnimate"
+                android:layout_width="150dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/btn_hollow_round"
+                android:backgroundTint="@color/white"
+                android:text="Animate"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
+            <!--android:layout_alignParentLeft="true"-->
+            <!--android:layout_marginLeft="16dp"-->
+
+            <Button
+                android:id="@+id/btnAux"
+                android:layout_width="150dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/btn_hollow_round"
+                android:backgroundTint="@color/white"
+                android:text="Custom Tab"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:layout_marginRight="16dp"-->
+
+            <Button
+                android:id="@+id/btnResize"
+                android:layout_width="150dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/btn_hollow_round"
+                android:backgroundTint="@color/white"
+                android:text="Resize"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
+            <!--android:layout_alignParentLeft="true"-->
+            <!--android:layout_below="@+id/btnAnimate"-->
+            <!--android:layout_marginLeft="16dp"-->
+
+            <Button
+                android:id="@+id/btnAddView"
+                android:layout_width="150dp"
+                android:layout_height="50dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/btn_hollow_round"
+                android:backgroundTint="@color/white"
+                android:text="Add View"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
+            <!--android:layout_below="@+id/btnAnimate"-->
+            <!--android:layout_marginRight="16dp"-->
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnShowMenu"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:text="K"
+            android:textColor="@color/white"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            android:tint="@color/dogwood_rose"
+            android:background="@drawable/circle"
+            android:backgroundTint="@color/doger_blue"
+            android:layout_alignParentRight="true"
+            android:layout_above="@+id/vwBottomAnchor"
+            android:layout_marginBottom="150dp"
+            android:layout_marginRight="36dp"
+            />
+
+        <View
+            android:id="@+id/vwBottomAnchor"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignParentBottom="true"/>
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_menu_hamburger"
+        android:background="@drawable/circle"
+        android:backgroundTint="@color/gray"
+        android:tint="@color/green"
+        android:layout_alignParentRight="true"
+        />
 
     </RelativeLayout>
 
-</FrameLayout>
+
+<!--</FrameLayout>-->

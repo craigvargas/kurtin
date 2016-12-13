@@ -88,13 +88,6 @@ public class HuntDetailFragment extends TripBaseFragment
     Hunt mCurrentHunt;
     List<Checkpoint> mCurrentCheckpoints;
     Checkpoint mSelectedCheckpoint;
-//    String mHuntName;
-//    String mHuntDescription;
-//    String mHuntAddress;
-//    String mHuntTimeString;
-//    String mHuntPrize;
-//    String mHuntPosterUrl;
-//    String mHuntId;
 
     private String mTripPLanObjectId;
     private String mTripPlanImageUrl;

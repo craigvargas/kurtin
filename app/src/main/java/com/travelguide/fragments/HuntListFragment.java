@@ -55,7 +55,7 @@ public class HuntListFragment extends TripBaseFragment {
 
     private static final int DONT_SKIP_ANY_RECORDS = 0;
 
-    private final int DIVIDER_HEIGHT = 24;
+    private static final int DIVIDER_HEIGHT = 24;
 
 
     private FloatingActionButton fabNewTripPlan;
@@ -77,6 +77,9 @@ public class HuntListFragment extends TripBaseFragment {
     private boolean status = false;
 
     private SwipeRefreshLayout swipeContainer;
+
+    private Boolean mSkipScanning = false;
+    private String mHuntClass;
 
     public HuntListFragment() {
 
@@ -137,14 +140,25 @@ public class HuntListFragment extends TripBaseFragment {
 
                 if (userAlreadyStartedThisHunt) {
                     try {
-                        mKurtinListener.setHuntJoinRecord(mUserHuntJoinList.get(position));
+                        String huntId;
+                        HuntJoin huntJoin;
+                        for (int index = 0; index<mUserHuntJoinList.size(); index++) {
+                            huntJoin = mUserHuntJoinList.get(index);
+                            huntId = huntJoin
+                                    .getParseObject(HuntJoin.HUNT_POINTER_KEY)
+                                    .getObjectId();
+                            if (huntId.equals(selectedHunt.getObjectId())){
+                                mKurtinListener.setHuntJoinRecord(huntJoin);
+                            }
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
 
                 try {
-                    mKurtinListener.onHuntSelected(selectedHunt, userAlreadyStartedThisHunt);
+                    mKurtinListener.onHuntSelected(selectedHunt, userAlreadyStartedThisHunt, mSkipScanning);
+//                    mKurtinListener.onHuntSelected(selectedHunt, userAlreadyStartedThisHunt);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -174,6 +188,12 @@ public class HuntListFragment extends TripBaseFragment {
                 .build();
 
         setHasOptionsMenu(true);
+
+        //mHuntType is a quick fix to only get the univeristy data
+        mHuntClass = Hunt.CLASS_VALUE_UNIVERSITY;
+        if(mHuntClass == Hunt.CLASS_VALUE_UNIVERSITY) {
+            mSkipScanning = true;
+        }
 
         return view;
     }
@@ -329,6 +349,9 @@ public class HuntListFragment extends TripBaseFragment {
         ParseQuery<Hunt> query = ParseQuery.getQuery(Hunt.class);
         query.setSkip(numberOfRecordsToSkip);
         query.orderByAscending(Hunt.HUNT_LIST_ORDER);
+        if (mHuntClass == Hunt.CLASS_VALUE_UNIVERSITY){
+            query.whereEqualTo(Hunt.HUNT_CLASS, Hunt.CLASS_VALUE_UNIVERSITY);
+        }
         query.findInBackground(new FindCallback<Hunt>() {
             @Override
             public void done(List<Hunt> hunts, ParseException e) {

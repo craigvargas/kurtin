@@ -64,8 +64,10 @@ import com.travelguide.fragments.KurtinProfileFragment;
 import com.travelguide.fragments.KurtinSignUpFragment;
 import com.travelguide.fragments.LeaderBoardFragment;
 import com.travelguide.fragments.LoginFragment;
+import com.travelguide.fragments.MediaFragment;
 import com.travelguide.fragments.OverallLeaderBoardFragment;
 import com.travelguide.fragments.ProfileFragment;
+import com.travelguide.fragments.QuadrantFragment;
 import com.travelguide.fragments.SearchListFragment;
 import com.travelguide.helpers.AppCodesKeys;
 import com.travelguide.helpers.DeviceDimensionsHelper;
@@ -309,6 +311,10 @@ public class TravelGuideActivity extends AppCompatActivity implements
                         AppCodesKeys.LEADER_BOARD_FRAGMENT_ID);
                 break;
             case R.id.private_fragment:
+                setContentFragment(
+                        R.id.fragment_frame_fullscreen,
+                        new QuadrantFragment(),
+                        AppCodesKeys.HUNT_LIST_FRAGMENT_ID);
                 break;
             case R.id.invite_friends_fragment:
                 break;
@@ -324,6 +330,14 @@ public class TravelGuideActivity extends AppCompatActivity implements
                 break;
             case R.id.logout_fragment:
                 new KurtinLoginFragment().logoutKurtin(ParseUser.getCurrentUser(), this);
+                break;
+            case R.id.experimental_fragment:
+                setContentFragment(
+                        R.id.fragment_frame,
+                        new MediaFragment(),
+                        AppCodesKeys.MEDIA_FRAGMENT_ID);
+                break;
+
         }
 
         // Highlight the selected item, update the title, and close the drawer
@@ -537,7 +551,8 @@ public class TravelGuideActivity extends AppCompatActivity implements
             removeFrag();
         }else {
             Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_frame_fullscreen);
-            if (fragment != null && (fragment instanceof FullscreenFragment || fragment instanceof CloudScannerFragment)) {
+//            if (fragment != null && (fragment instanceof FullscreenFragment || fragment instanceof CloudScannerFragment)) {
+            if (fragment != null) {
                 coordinatorLayout.setVisibility(View.VISIBLE);
                 fragmentFrameFullscreen.setVisibility(View.GONE);
                 getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -622,12 +637,8 @@ public class TravelGuideActivity extends AppCompatActivity implements
 
     private void setToolbarTitle(String fragmentId){
         tvToolbarTitle.setText(AppCodesKeys.FRAGMENT_TITLE_MAP.get(fragmentId));
-//        if(fragmentId == AppCodesKeys.SCANNER_FRAGMENT_ID){
-//            appBar.setVisibility(View.INVISIBLE);
-//        }else{
-//            appBar.setVisibility(View.VISIBLE);
-//        }
     }
+
     @Override
     public void onTripPlanItemSelected(String objectId){
         Log.v("From Activity", "onTripPlanItemSelected is an empty function");
@@ -651,6 +662,23 @@ public class TravelGuideActivity extends AppCompatActivity implements
                 R.id.fragment_frame,
                 new HuntDetailFragment(),
                 AppCodesKeys.HUNT_DETAIL_FRAGMENT_ID);
+    }
+
+    @Override
+    public void onHuntSelected(Hunt hunt, Boolean userAlreadyStartedThisHunt, Boolean skipScanning) {
+        mCurrentHunt = hunt;
+        Log.v("onHuntSelected", "mCurrentHunt: " + mCurrentHunt.getHuntName());
+        if(skipScanning) {
+            setContentFragment(
+                    R.id.fragment_frame_fullscreen,
+                    new QuadrantFragment(),
+                    AppCodesKeys.QUADRANT_FRAGMENT_ID);
+        }else{
+            setContentFragment(
+                    R.id.fragment_frame,
+                    new HuntDetailFragment(),
+                    AppCodesKeys.HUNT_DETAIL_FRAGMENT_ID);
+        }
     }
 
     @Override
@@ -733,8 +761,9 @@ public class TravelGuideActivity extends AppCompatActivity implements
 
     @Override
     public void setCurrentInteractions(List<KurtinInteraction> interactions){
-        mCurrentInteractions.clear();
-        mCurrentInteractions.addAll(interactions);
+//        mCurrentInteractions.clear();
+//        mCurrentInteractions.addAll(interactions);
+        mCurrentInteractions = interactions;
     }
 
     @Override
@@ -787,6 +816,11 @@ public class TravelGuideActivity extends AppCompatActivity implements
     public void onBackRequested(){
 //        getSupportFragmentManager().popBackStack();
         onBackPressed();
+    }
+
+    @Override
+    public int getToolbarHeight(){
+        return toolbar.getHeight();
     }
 
     //*
@@ -907,17 +941,17 @@ public class TravelGuideActivity extends AppCompatActivity implements
         //Commit the transaction and load the fragment
         fragmentTransaction.commit();
 
-        //setup the toolbar title
-        setToolbarTitle(fragmentId);
-
         //Decide which view needs to be visible
-        if (fragment instanceof FullscreenFragment || fragment instanceof CloudScannerFragment) {
+//        if (fragment instanceof FullscreenFragment || fragment instanceof CloudScannerFragment) {
+        if(fragmentFrame == R.id.fragment_frame_fullscreen){
             coordinatorLayout.setVisibility(View.GONE);
             fragmentFrameFullscreen.setVisibility(View.VISIBLE);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         } else {
             coordinatorLayout.setVisibility(View.VISIBLE);
             fragmentFrameFullscreen.setVisibility(View.GONE);
+            //setup the toolbar title
+            setToolbarTitle(fragmentId);
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
 
