@@ -8,12 +8,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
+import com.squareup.picasso.Picasso;
 import com.travelguide.R;
 import com.travelguide.layouts.WebLayout;
 import com.travelguide.listener.KurtinListener;
@@ -33,6 +35,10 @@ public class QuadrantFragment extends Fragment implements WebLayout.Listener {
 
     private static final String TAG = "QuadrantFragment";
 
+    private static final int DEFAULT_MARGIN = 2;
+    private static final int DEFAULT_LOGO_DIM = 200;
+    private static final int CIRCLE_BORDER_WIDTH_DP = 1;
+
     private static final String URL_STRING_1 = "https://www.youtube.com/watch?v=Qiudw2Rg2v4";
     private static final String URL_STRING_2 = "https://www.youtube.com/watch?v=34Na4j8AVgA";
     private static final String URL_STRING_3 = "https://www.youtube.com/watch?v=uQ_DHRI-Xp0";
@@ -47,10 +53,12 @@ public class QuadrantFragment extends Fragment implements WebLayout.Listener {
 
 
     List<WebLayout> mWebLayoutQuadrantList;
+    ImageView ivLogo;
     RelativeLayout rlRoot;
 
     int mFullWidth;
     int mFullHeight;
+    float mDensity;
 
     KurtinListener mKurtinListener;
     Hunt mSelectedHunt;
@@ -86,11 +94,22 @@ public class QuadrantFragment extends Fragment implements WebLayout.Listener {
         }
     }
 
+    @Override
+    public void onDestroyView(){
+        super.onDestroyView();
+        if (mWebLayoutQuadrantList != null){
+            for(WebLayout wl: mWebLayoutQuadrantList){
+                wl.destroy();
+            }
+        }
+    }
+
     private void initSubviews(View view){
         mFullWidth = getResources().getDisplayMetrics().widthPixels;
         mFullHeight = getResources().getDisplayMetrics().heightPixels;
+        mDensity = getResources().getDisplayMetrics().density;
         rlRoot = (RelativeLayout) view.findViewById(R.id.rlRoot);
-        mWebLayoutQuadrantList = WebLayout.makeQuadrants(getContext(), this, mFullWidth, mFullHeight, 0);
+        mWebLayoutQuadrantList = WebLayout.makeQuadrants(getContext(), this, mFullWidth, mFullHeight, DEFAULT_MARGIN);
         Log.v(TAG, "width: " + view.getWidth() + ", height: " + view.getHeight());
         int index = 0;
         for (WebLayout wl: mWebLayoutQuadrantList){
@@ -98,6 +117,15 @@ public class QuadrantFragment extends Fragment implements WebLayout.Listener {
             rlRoot.addView(wl);
             index += 1;
         }
+        ivLogo = new ImageView(getContext());
+        ivLogo.setBackgroundResource(R.drawable.circle_border_color);
+        ivLogo.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        int padding = (int)( ((Math.sqrt(2.0)/2.0 - 0.5) * DEFAULT_LOGO_DIM / Math.sqrt(2.0)) + (CIRCLE_BORDER_WIDTH_DP * mDensity) );
+        ivLogo.setPadding(padding, padding, padding, padding);
+        RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(DEFAULT_LOGO_DIM, DEFAULT_LOGO_DIM);
+        rlp.addRule(RelativeLayout.CENTER_IN_PARENT);
+        ivLogo.setLayoutParams(rlp);
+        rlRoot.addView(ivLogo);
     }
 
     private void getContent(){
@@ -112,6 +140,8 @@ public class QuadrantFragment extends Fragment implements WebLayout.Listener {
                     mSelectedCheckpoint = checkpoints.get(0);
                     mKurtinListener.setCurrentCheckpoints(checkpoints);
                     mKurtinListener.setSelectedCheckpoint(mSelectedCheckpoint);
+
+                    Picasso.with(getContext()).load(mSelectedCheckpoint.getScannerImageUrl()).into(ivLogo);
 
                     //Get Interaction(Question) data from parse
                     ParseRelation<KurtinInteraction> interactionParseRelation = mSelectedCheckpoint.getInteractions();
@@ -154,9 +184,11 @@ public class QuadrantFragment extends Fragment implements WebLayout.Listener {
             if (wl.equals(expandedWebLayout)){
                 wl.setVisibility(View.VISIBLE);
             }else{
-                wl.setVisibility(View.INVISIBLE);
+//                wl.setVisibility(View.INVISIBLE);
+                wl.setVisibility(View.GONE);
             }
         }
+        ivLogo.setVisibility(View.GONE);
     }
 
     @Override
@@ -169,6 +201,7 @@ public class QuadrantFragment extends Fragment implements WebLayout.Listener {
                 wl.shrinkView(false);
             }
         }
+        ivLogo.setVisibility(View.VISIBLE);
     }
 
     @Override

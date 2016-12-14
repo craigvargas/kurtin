@@ -42,6 +42,7 @@ public class MediaFragment extends Fragment {
 
     private static final String URL_STRING = "https://www.youtube.com/watch?v=34Na4j8AVgA";
     private static final String PACKAGE_NAME = "com.android.chrome";  // Change when in stable
+    private static final String FULL_SCREEN_PIC_URL = "https://yt3.ggpht.com/-gfdhjPBEJtQ/AAAAAAAAAAI/AAAAAAAAAAA/tVu1Lw1_7hk/s900-c-k-no-mo-rj-c0xffffff/photo.jpg";
 
     Button btnAnimate;
     Button btnAux;
@@ -53,6 +54,7 @@ public class MediaFragment extends Fragment {
     RelativeLayout rlFullScreen;
     LinearLayout llSlidingMenu;
     TextView tvInfo;
+    ImageView ivFullScreenImage;
 
     ImageView ivFlex;
     int largeSize = 650;
@@ -114,6 +116,7 @@ public class MediaFragment extends Fragment {
         rlFullScreen = (RelativeLayout) view.findViewById(R.id.rlFullScreen);
         llSlidingMenu = (LinearLayout) view.findViewById(R.id.llSlidingMenu);
         tvInfo = (TextView) view.findViewById(R.id.tvInfo);
+        ivFullScreenImage = (ImageView) view.findViewById(R.id.ivFullScreenImage);
 
         ivFlex = new ImageView(getContext());
         ivFlex.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
@@ -123,6 +126,13 @@ public class MediaFragment extends Fragment {
         rlp.addRule(RelativeLayout.CENTER_IN_PARENT);
         ivFlex.setLayoutParams(rlp);
         rlInteraction.addView(ivFlex);
+
+        density = getResources().getDisplayMetrics().density;
+        int padding = (int)(15 * density);
+        ivFullScreenImage.setPadding(padding, padding, padding, padding);
+        Picasso.with(getContext()).load(FULL_SCREEN_PIC_URL).into(ivFullScreenImage);
+//        ivFullScreenImage.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        Log.v(TAG, "Full Screen Image ScaleType: " + ivFullScreenImage.getScaleType());
     }
 
     private void setListeners(){
@@ -158,6 +168,21 @@ public class MediaFragment extends Fragment {
                     rlp.height = largeSize;
                     ivFlex.setLayoutParams(rlp);
                 }
+
+                RelativeLayout.LayoutParams rlp2 = (RelativeLayout.LayoutParams) rlFullScreen.getLayoutParams();
+                height = rlp2.height;
+                if(height == smallSize){
+//                    rlp2.width = RelativeLayout.LayoutParams.MATCH_PARENT;
+//                    rlp2.height = RelativeLayout.LayoutParams.MATCH_PARENT;
+
+                    rlp2.width = screenWidth;
+                    rlp2.height = screenHeight;
+                }else{
+                    rlp2.width = smallSize;
+                    rlp2.height = smallSize;
+                }
+                rlFullScreen.setLayoutParams(rlp2);
+
             }
         });
 

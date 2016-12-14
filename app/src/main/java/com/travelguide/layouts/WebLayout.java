@@ -10,6 +10,7 @@ import android.graphics.drawable.shapes.OvalShape;
 import android.graphics.drawable.shapes.Shape;
 import android.os.Build;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.TypedValue;
@@ -26,6 +27,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
 import com.travelguide.R;
 import com.travelguide.listener.KurtinListener;
 import com.travelguide.models.KurtinInteraction;
@@ -36,6 +38,7 @@ import org.json.JSONArray;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.R.attr.factor;
 import static android.R.attr.id;
 import static android.R.attr.textSize;
 import static android.R.attr.textStyle;
@@ -43,6 +46,7 @@ import static android.R.attr.width;
 import static android.R.attr.x;
 import static android.R.id.toggle;
 import static android.icu.lang.UCharacter.GraphemeClusterBreak.V;
+import static android.widget.ImageView.ScaleType.CENTER_INSIDE;
 import static com.google.android.gms.common.api.Status.we;
 import static com.loopj.android.http.AsyncHttpClient.log;
 import static com.travelguide.R.id.q1;
@@ -76,6 +80,7 @@ public class WebLayout extends RelativeLayout {
 
     private Context mContext;
     private WebView mWebView;
+    private ImageView mContentImageView;
     private RelativeLayout rlLargeViewGroup;
     private RelativeLayout rlSmallViewGroup;
     private LinearLayout rlInteractionPane;
@@ -83,13 +88,12 @@ public class WebLayout extends RelativeLayout {
     private RelativeLayout rlControlPanel;
     private View vwBottomAnchor;
     private ImageView btnOptions;
-    private Button btnNext;
-    private Button btnPrev;
-    private Button btnMinimize;
-    private Button btnToggleInteractionPane;
-    private Button btnMaximizeSvg;
-    private List<Button> mCtrlButtonList;
-    private List<ImageView> mCtrlImageButtonList;
+    private ImageView btnNext;
+    private ImageView btnPrev;
+    private ImageView btnMinimize;
+    private ImageView btnToggleInteractionPane;
+    private ImageView btnMaximizeSvg;
+    private List<ImageView> mCtrlButtonList;
     private int mIdBottomAnchor;
     private int mIdInteractionPane;
     private TextView tvQuestion;
@@ -169,7 +173,7 @@ public class WebLayout extends RelativeLayout {
         mFullHeight = fullHeight;
         mSmallWebWidth = smallWidth;
         mSmallWebHeight = smallHeight;
-        mLargeWebWidth = width;
+        mLargeWebWidth = fullWidth;
         mLargeWebHeight = mFullHeight - getStatusPanelHeight() - getControlPanelHeight();
         this.setLayoutParams(new RelativeLayout.LayoutParams(smallWidth, fullHeight));
         Log.v("WebLayout","mCtrlBtnDim: " + mCtrlBtnDim);
@@ -187,7 +191,7 @@ public class WebLayout extends RelativeLayout {
         mFullHeight = fullHeight;
         mSmallWebWidth = smallWidth;
         mSmallWebHeight = smallHeight;
-        mLargeWebWidth = width;
+        mLargeWebWidth = fullWidth;
         mLargeWebHeight = mFullHeight - getStatusPanelHeight() - getControlPanelHeight();
         this.setLayoutParams(new RelativeLayout.LayoutParams(smallWidth, fullHeight));
         Log.v("WebLayout","mCtrlBtnDim: " + mCtrlBtnDim);
@@ -205,6 +209,7 @@ public class WebLayout extends RelativeLayout {
         for (int quadrant = 1; quadrant <= 4; quadrant++){
             WebLayout wl = new WebLayout(context, listener, fullWidth, fullHeight, quadrantWidth, quadrantHeight);
             wl.setQuadrantLayoutParameters(quadrant);
+            wl.setQuadrantMargins(quadrant, margin);
             webLayoutList.add(wl);
         }
         return webLayoutList;
@@ -216,19 +221,10 @@ public class WebLayout extends RelativeLayout {
 
     private void initSizes(){
         setCtrlSizing();
-//        int numButtons = 5;
-//        int buttonSizeToSpacingRatio = 3;
-//        int numSpacesAtEnd = 1;
-//        int numSpaces = numButtons - 1 + 2 * numSpacesAtEnd;
-//        mCtrlBtnSpacingDim = (mFullWidth / (numButtons * buttonSizeToSpacingRatio + numSpaces));
-//        mCtrlBtnAutoDim = mCtrlBtnSpacingDim * buttonSizeToSpacingRatio;
-//        mDensity = getResources().getDisplayMetrics().density;
-//        mCtrlBtnDim = Math.min(mCtrlBtnAutoDim, dpiToPixels(CTRL_BTN_DIM_DPI));
-//        mCtrlBtnAnchorMarginRight = numSpacesAtEnd * mCtrlBtnSpacingDim;
     }
 
     private void initSubviews(){
-        this.setBackgroundColor(Color.RED);
+//        this.setBackgroundColor(Color.RED);
         initBottomAnchor();
         initLargeViewGroup();
         initSmallViewGroup();
@@ -236,6 +232,7 @@ public class WebLayout extends RelativeLayout {
         initStatusPane();
         initControlPanel();
         initWebView();
+        initContentImageView();
         initButtons();
     }
 
@@ -245,13 +242,20 @@ public class WebLayout extends RelativeLayout {
         rlLargeViewGroup.addView(rlStatusPane);
         rlLargeViewGroup.addView(rlControlPanel);
         rlLargeViewGroup.addView(btnOptions);
-        for(Button btn: mCtrlButtonList){
-            rlLargeViewGroup.addView(btn);
+
+        for(ImageView ivBtn: mCtrlButtonList){
+            rlLargeViewGroup.addView(ivBtn);
         }
+
         rlSmallViewGroup.addView(btnMaximizeSvg);
         this.addView(mWebView);
+        this.addView(mContentImageView);
         this.addView(rlLargeViewGroup);
         this.addView(rlSmallViewGroup);
+
+//        for(ImageView ivBtn: mCtrlButtonList){
+//            ivBtn.setVisibility(INVISIBLE);
+//        }
     }
 
     private void initState(LayoutState desiredLayoutState){
@@ -260,6 +264,12 @@ public class WebLayout extends RelativeLayout {
         }else{
             shrinkView(false);
         }
+
+        for(ImageView ivBtn: mCtrlButtonList){
+            ivBtn.setVisibility(INVISIBLE);
+        }
+        //If no interaction exists then this method call makes the buttons show up off of the bottom of the screen.
+//        hideInteractionPane();
     }
 
     private void initBottomAnchor(){
@@ -299,6 +309,18 @@ public class WebLayout extends RelativeLayout {
             // older android version, disable hardware acceleration
             mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         }
+    }
+
+    private void initContentImageView(){
+        mContentImageView = new ImageView(mContext);
+        RelativeLayout.LayoutParams rlp =
+                new RelativeLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT);
+        rlp.topMargin = getStatusPanelHeight();
+        mContentImageView.setLayoutParams(rlp);
+//        mContentImageView.setScaleType(CENTER_INSIDE);
+        mContentImageView.setBackgroundColor(Color.BLACK);
     }
 
     private void initLargeViewGroup(){
@@ -447,8 +469,8 @@ public class WebLayout extends RelativeLayout {
 
     private void resizeButtons(){
         setUpExpandableImageButton(btnOptions, false);
-        for(Button btn: mCtrlButtonList){
-            setUpExpandableButton(btn, false);
+        for(ImageView ivBtn: mCtrlButtonList){
+            setUpExpandableImageButton(ivBtn, false);
         }
     }
 
@@ -491,16 +513,16 @@ public class WebLayout extends RelativeLayout {
         return button;
     }
 
-    private Button makeExpandableButton(String title, Boolean collapsed){
-        Button button = makeControlButton(title);
-        setUpExpandableButton(button, collapsed);
+//    private Button makeExpandableButton(String title, Boolean collapsed){
+//        Button button = makeControlButton(title);
+//        setUpExpandableButton(button, collapsed);
+//
+//        return button;
+//    }
 
-        return button;
-    }
-
-    private ImageView makeExpandableImageButton(int drawableId, Boolean collapsed){
+    private ImageView makeExpandableImageButton(int drawableId, Boolean addToList){
         ImageView ivBtn = makeControlImageButton(drawableId);
-        setUpExpandableImageButton(ivBtn, collapsed);
+        setUpExpandableImageButton(ivBtn, addToList);
 
         return ivBtn;
     }
@@ -516,12 +538,12 @@ public class WebLayout extends RelativeLayout {
 
     private void initButtons(){
         mCtrlButtonList = new ArrayList<>();
-        btnMaximizeSvg = makeMaximizeButton("L");
-        btnOptions = makeExpandableImageButton(R.drawable.ic_menu_hamburger, false);
-        btnNext = makeExpandableButton("N", true);
-        btnPrev = makeExpandableButton("P", true);
-        btnMinimize = makeExpandableButton("S", true);
-        btnToggleInteractionPane = makeExpandableButton("I", true);
+        btnMaximizeSvg = makeMaximizeImageButton(R.drawable.ic_zoom_out_expand_white);
+        btnOptions = makeExpandableImageButton(R.drawable.ic_more_horizontal_white, false);
+        btnNext = makeExpandableImageButton(R.drawable.ic_right_white, true);
+        btnPrev = makeExpandableImageButton(R.drawable.ic_left_white, true);
+        btnMinimize = makeExpandableImageButton(R.drawable.ic_fullscreen_exit_white, true);
+        btnToggleInteractionPane = makeExpandableImageButton(R.drawable.ic_light_bulb_white, true);
 
         setUpOnClickListeners();
         setUpAnimationListeners();
@@ -535,31 +557,48 @@ public class WebLayout extends RelativeLayout {
 
     }
 
-    private Button makeMaximizeButton(String title){
-        Button button = makeControlButton(title);
-        RelativeLayout.LayoutParams rlp = getCtrlButtonLayoutParams(button, VIEW_ID_PARENT_BOTTOM);
-        button.setLayoutParams(rlp);
+//    private Button makeMaximizeButton(String title){
+//        Button button = makeControlButton(title);
+//        RelativeLayout.LayoutParams rlp = getCtrlButtonLayoutParams(button, VIEW_ID_PARENT_BOTTOM);
+//        button.setLayoutParams(rlp);
+//
+//        return button;
+//    }
 
-        return button;
+    private ImageView makeMaximizeImageButton(int drawableId){
+        ImageView ivBtn = makeControlImageButton(drawableId);
+        RelativeLayout.LayoutParams rlp = getCtrlImageButtonLayoutParams(ivBtn, VIEW_ID_PARENT_BOTTOM);
+        rlp = shrinkLayoutSize(rlp, 0.6);
+        ivBtn.setLayoutParams(rlp);
+
+        return ivBtn;
     }
 
-    private void setUpExpandableButton(Button btn, Boolean addToList){
-        RelativeLayout.LayoutParams rlp = getCtrlButtonLayoutParams(btn, rlInteractionPane.getId());
-        btn.setLayoutParams(rlp);
-        if (addToList) {
-            btn.setAlpha(0);
-            btn.setVisibility(INVISIBLE);
-            mCtrlButtonList.add(btn);
-        }
+    private RelativeLayout.LayoutParams shrinkLayoutSize(RelativeLayout.LayoutParams rlp, double factor){
+        rlp.width = (int) (factor * rlp.width);
+        rlp.height = (int) (factor * rlp.height);
+        rlp.bottomMargin = (int) (factor * rlp.bottomMargin);
+        return rlp;
     }
+
+//    private void setUpExpandableButton(Button btn, Boolean addToList){
+//        RelativeLayout.LayoutParams rlp = getCtrlButtonLayoutParams(btn, rlInteractionPane.getId());
+//        btn.setLayoutParams(rlp);
+//        if (addToList) {
+//            btn.setAlpha(0);
+//            btn.setVisibility(INVISIBLE);
+//            mCtrlButtonList.add(btn);
+//        }
+//    }
 
     private void setUpExpandableImageButton(ImageView ivBtn, Boolean addToList){
         RelativeLayout.LayoutParams rlp = getCtrlImageButtonLayoutParams(ivBtn, rlInteractionPane.getId());
         ivBtn.setLayoutParams(rlp);
         if (addToList) {
-//            btn.setAlpha(0);
-//            btn.setVisibility(INVISIBLE);
-//            mCtrlButtonList.add(btn);
+//            ivBtn.setAlpha(0);
+//            ivBtn.setImageAlpha(0);
+//            ivBtn.setVisibility(INVISIBLE);
+            mCtrlButtonList.add(ivBtn);
         }
     }
 
@@ -632,9 +671,9 @@ public class WebLayout extends RelativeLayout {
             @Override
             public void onClick(View v) {
                 if (mInteractionPaneViewState == ViewState.VIEW_VISIBLE){
-                    hideInteractionPane();
+                    closeInteractionPane();
                 }else{
-                    showInteractionPane();
+                    openInteractionPane();
                 }
             }
         });
@@ -665,16 +704,16 @@ public class WebLayout extends RelativeLayout {
             @Override
             public void onAnimationEnd(Animator animation) {
                 if(mCtrlButtonsViewState == ViewState.VIEW_HIDDEN){
-                    for(Button btn: mCtrlButtonList){
-                        btn.setVisibility(INVISIBLE);
+                    for(ImageView ivBtn: mCtrlButtonList){
+                        ivBtn.setVisibility(INVISIBLE);
                     }
                 }else{
 //                    for(Button btn: mCtrlButtonList){
 //                        btn.setVisibility(VISIBLE);
 //                    }
                 }
-                for(Button btn: mCtrlButtonList){
-                    Log.v(TAG, "Animation Finished. Button: " + btn.getText() + ", X: " + btn.getX() + ", Y: " + btn.getY());
+                for(ImageView ivBtn: mCtrlButtonList){
+                    Log.v(TAG, "Animation Finished. Button: " + ivBtn + ", X: " + ivBtn.getX() + ", Y: " + ivBtn.getY());
                 }
             }
 
@@ -693,7 +732,7 @@ public class WebLayout extends RelativeLayout {
     private void showCtrlButtons(){
         if(mCtrlButtonsViewState == ViewState.VIEW_HIDDEN) {
             int translationUnit = 4 * mCtrlBtnSpacingDim;
-            int translation;
+            float translation;
 //            Log.v(TAG, "Inside showCtrlButtons, spacing: " + mCtrlBtnSpacingDim + ", translationUnit: " + translationUnit);
             mCtrlButtonsViewState = ViewState.VIEW_VISIBLE;
             for (int index = 0; index < mCtrlButtonList.size(); index++) {
@@ -707,7 +746,9 @@ public class WebLayout extends RelativeLayout {
                 }else {
                     mCtrlButtonList.get(index).setVisibility(VISIBLE);
                 }
-                mCtrlButtonList.get(index).animate().alpha(1).translationX(-translation);
+//                mCtrlButtonList.get(index).animate().alpha(1).translationX(-translation);
+                mCtrlButtonList.get(index).animate().alpha(255.0f).translationX(-translation);
+//                ViewCompat.animate(mCtrlButtonList.get(index)).alpha(255.0f).translationX(-translation);
             }
         }
     }
@@ -722,28 +763,29 @@ public class WebLayout extends RelativeLayout {
                 translation = (index + 1) * translationUnit;
                 Log.v(TAG, "Hide Button -> index: " + index + ", x_pos: " + mCtrlButtonList.get(index).getX() + ", translation: " + (translation));
                 Log.v(TAG, "Translation X: " + mCtrlButtonList.get(index).getTranslationX() + ", Y: " + mCtrlButtonList.get(index).getTranslationY());
-                mCtrlButtonList.get(index).animate().alpha(0).translationX(0);
+                mCtrlButtonList.get(index).animate().alpha(0.0f).translationX(0);
+//                ViewCompat.animate(mCtrlButtonList.get(index)).alpha(0.0f).translationX(0.0f);
             }
         }
     }
 
-    private void showInteractionPane(){
+    private void openInteractionPane(){
 //        rlInteractionPane.animate().yBy(-rlInteractionPane.getHeight());
         rlInteractionPane.animate().translationY(0);
         mInteractionPaneViewState = ViewState.VIEW_VISIBLE;
         btnOptions.animate().translationY(0);
-        for(Button btn: mCtrlButtonList){
-            btn.animate().translationY(0);
+        for(ImageView ivBtn: mCtrlButtonList){
+            ivBtn.animate().translationY(0);
         }
     }
 
-    private void hideInteractionPane(){
+    private void closeInteractionPane(){
 //        rlInteractionPane.animate().yBy(rlInteractionPane.getHeight());
         rlInteractionPane.animate().translationY(getInteractionPaneHeight());
         mInteractionPaneViewState = ViewState.VIEW_HIDDEN;
         btnOptions.animate().translationY(getInteractionPaneHeight());
-        for(Button btn: mCtrlButtonList){
-            btn.animate().translationY(getInteractionPaneHeight());
+        for(ImageView ivBtn: mCtrlButtonList){
+            ivBtn.animate().translationY(getInteractionPaneHeight());
         }
     }
 
@@ -780,20 +822,25 @@ public class WebLayout extends RelativeLayout {
         RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) this.getLayoutParams();
         switch (quadrant){
             case 1:
-                rlp.setMargins(margin, margin, 0, 0);
+//                rlp.setMargins(margin, margin, 0, 0);
+                rlp.setMargins(margin, margin, margin, margin);
                 break;
             case 2:
-                rlp.setMargins(margin, margin, 0, 0);
+//                rlp.setMargins(margin, margin, margin, 0);
+                rlp.setMargins(margin, margin, margin, margin);
                 break;
             case 3:
-                rlp.setMargins(margin, margin, 0, 0);
+//                rlp.setMargins(margin, margin, 0, margin);
+                rlp.setMargins(margin, margin, margin, margin);
                 break;
             case 4:
-                rlp.setMargins(margin, margin, 0, 0);
+//                rlp.setMargins(margin, margin, margin, margin);
+                rlp.setMargins(margin, margin, margin, margin);
                 break;
             default:
                 Log.e(TAG, "Unhandled case in setQuadrantMargins quadrant= " + quadrant);
         }
+        this.setLayoutParams(rlp);
     }
 
     public void growView(Boolean showControls){
@@ -805,6 +852,7 @@ public class WebLayout extends RelativeLayout {
         rlp.width = mLargeWebWidth;
         rlp.height = mLargeWebHeight;
         this.setLayoutParams(rlp);
+//        mContentImageView.setLayoutParams(getLargeContentLayoutParams(mContentImageView));
 
         mLayoutState = LayoutState.LARGE_LAYOUT;
 
@@ -829,6 +877,7 @@ public class WebLayout extends RelativeLayout {
         rlp.width = mSmallWebWidth;
         rlp.height = mSmallWebHeight;
         this.setLayoutParams(rlp);
+//        mContentImageView.setLayoutParams(getSmallContentLayoutParams(mContentImageView));
 
         mLayoutState = LayoutState.SMALL_LAYOUT;
         if(tellListener) {
@@ -839,6 +888,32 @@ public class WebLayout extends RelativeLayout {
                 e.printStackTrace();
             }
         }
+    }
+
+    private RelativeLayout.LayoutParams getLargeContentLayoutParams(View view){
+        RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) view.getLayoutParams();
+        if(rlp == null) {
+            rlp = new RelativeLayout.LayoutParams(
+                    mFullWidth,
+                    mFullHeight - getStatusPanelHeight() - getControlPanelHeight());
+            rlp.topMargin = getStatusPanelHeight();
+        }else {
+            rlp.width = mFullWidth;
+            rlp.height = mFullHeight - getStatusPanelHeight() - getControlPanelHeight();
+            rlp.topMargin = getStatusPanelHeight();
+        }
+        return rlp;
+    }
+
+    private RelativeLayout.LayoutParams getSmallContentLayoutParams(View view){
+        RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) view.getLayoutParams();
+        if(rlp == null) {
+            rlp = new RelativeLayout.LayoutParams(mSmallWebWidth, mSmallWebHeight);
+        }else {
+            rlp.width = mSmallWebWidth;
+            rlp.height = mSmallWebHeight;
+        }
+        return rlp;
     }
 
     public void growPreviousView(){
@@ -872,7 +947,20 @@ public class WebLayout extends RelativeLayout {
     }
 
     public void setQuadrantInteraction(KurtinInteraction interaction){
-        loadUrl(interaction.getSource());
+        if(interaction.getContentType().equals(KurtinInteraction.CONTENT_TYPE_IMAGE)){
+            mWebView.setVisibility(INVISIBLE);
+            mContentImageView.setVisibility(VISIBLE);
+//            this.removeView(mContentImageView);
+//            this.setVisibility(INVISIBLE);
+//            growView(false);
+            Picasso.with(mContext).load(interaction.getSource()).into(mContentImageView);
+//            shrinkView(false);
+//            this.setVisibility(VISIBLE);
+        }else {
+            mWebView.setVisibility(VISIBLE);
+            mContentImageView.setVisibility(INVISIBLE);
+            loadUrl(interaction.getSource());
+        }
         if(interaction.getInteractionType().equals(KurtinInteraction.INTERACTION_TYPE_QUESTION)){
 
             JSONArray choices = interaction.getAnswerChoices();
@@ -893,9 +981,81 @@ public class WebLayout extends RelativeLayout {
         }
         Log.v(TAG, "Interaction Type: " + interaction.getInteractionType());
         setInteractionPaneDimensions();
+        closeInteractionPane();
+    }
+
+    public void destroy(){
+        if (mWebView != null){
+            mWebView.destroy();
+        }
     }
 
 }
+
+
+//    private void loadQuadrantThree() {
+//        //                            LinearLayout q3 = (LinearLayout) controls.findViewById(R.id.q3); // get your WebView form your xml file
+//        q3.removeAllViews();
+//        q3.setBackgroundColor(Color.BLACK);
+//        q3ImageViewb1 = new ImageView(getActivity());
+//        q3ImageViewb2 = new ImageView(getActivity());
+//        wbCompleted3 = new ImageView(getActivity());
+//        wbCompleted3ID = wbCompleted3.generateViewId();
+//        wbCompleted3.setId(wbCompleted3ID);
+//        //System.out.println("Choice3 selected");
+//
+//        imageViewQ3 = new ImageView(getActivity());
+////        Picasso.with(getActivity()).load(q3DataSourceURI).into(imageView);
+//        imageViewQ3.setScaleType(CENTER_INSIDE);
+////        imageView.setAdjustViewBounds(true);
+//        imageViewQ3.setBackgroundColor(Color.BLACK);
+//
+////        if (quadrantIsCompleted(3) || !quadrantIsCompletable(3)) {
+////            imageView.setLayoutParams(new LinearLayout.LayoutParams(
+////                    LinearLayout.LayoutParams.MATCH_PARENT,
+////                    height,
+////                    Gravity.CENTER));
+////        } else {
+////            imageView.setLayoutParams(new LinearLayout.LayoutParams(
+////                    LinearLayout.LayoutParams.MATCH_PARENT,
+////                    webviewHeight,
+////                    Gravity.CENTER));
+////        }
+//        imageViewQ3.setLayoutParams(new LinearLayout.LayoutParams(
+//                LinearLayout.LayoutParams.MATCH_PARENT,
+//                LinearLayout.LayoutParams.MATCH_PARENT,
+//                Gravity.CENTER));
+//        Picasso.with(getActivity()).load(q3DataSourceURI).into(imageViewQ3);
+//
+//        //q3.setBackgroundColor(Color.BLACK);
+//        RecyclerView recyclerView3 = new RecyclerView(getActivity());
+//        recyclerView3.setBackgroundColor(getResources().getColor(R.color.translucent));
+//        q3ImageViewID = imageViewQ3.generateViewId();
+//        imageViewQ3.setId(q3ImageViewID);
+//        setImageAddview(q3, imageViewQ3, recyclerView3, q3ImageViewb1, q3ImageViewb2, submitbtn3, wbCompleted3, mSelectedDayObjectId, 3);
+//        q3ImageViewb1.setOnClickListener(new View.OnClickListener() {
+//            @
+//                    Override
+//            public void onClick(View v) {
+//                q3ImageViewb2.setVisibility(View.VISIBLE);
+//                q3ImageViewb1.setVisibility(View.GONE);
+//                setQ3Large(q1, q2, q3, q4, on_click_cloud_tracking_info, submitbtn3);
+//            }
+//        });
+//
+//        q3ImageViewb2.setOnClickListener(new View.OnClickListener() {
+//            @
+//                    Override
+//            public void onClick(View v) {
+//                setQ3Small(q1, q2, q3, q4, submitbtn3, on_click_cloud_tracking_info, QuadHeadname);
+//                q3ImageViewb2.setVisibility(View.GONE);
+//                q3ImageViewb1.setVisibility(View.VISIBLE);
+//            }
+//        });
+//    }
+
+
+
 
 //    private void loadQuadrantFour() {
 //        //                            LinearLayout q4 = (LinearLayout) controls.findViewById(R.id.q4); // get your WebView form your xml file
